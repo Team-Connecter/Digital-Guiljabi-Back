@@ -3,8 +3,7 @@ package com.connecter.digitalguiljabiback.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Builder
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -23,4 +22,11 @@ public class BoardTag {
     @JoinColumn(name = "tag_pk", referencedColumnName = "pk")
     private Tag tag;
 
+    public static BoardTag makeBoardTag(BoardContent boardContent, Tag tag) {
+        BoardTag boardTag = new BoardTag();
+        boardTag.boardContent = boardContent;
+        boardTag.tag = tag;
+
+        return boardTag;
+    }
 }

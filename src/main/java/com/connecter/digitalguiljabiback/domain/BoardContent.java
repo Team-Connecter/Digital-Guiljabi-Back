@@ -7,8 +7,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@Builder
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -27,12 +26,21 @@ public class BoardContent {
     private String title;
 
 
+    @Column(name = "img_url")
     private String imgUrl;
 
     private String content;
 
-    @OneToMany(mappedBy = "board_content", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "boardContent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardTag> boardTags = new ArrayList<>();
 
+    public static BoardContent makeBoardContent(Board board, String title, String imgUrl, String contnet) {
+        BoardContent boardContent = new BoardContent();
+        boardContent.board = board;
+        boardContent.title = title;
+        boardContent.imgUrl = imgUrl;
+        boardContent.content = contnet;
 
+        return boardContent;
+    }
 }
