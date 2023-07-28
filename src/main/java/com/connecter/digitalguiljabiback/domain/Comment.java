@@ -32,7 +32,7 @@ public class Comment {
     private LocalDateTime createAt = LocalDateTime.now();
 
     @NotNull
-    @Column(length = 999999)
+    @Column(length = 999999999)
     private String content;
 
     public static Comment makeComment(Board board, Users user, String contnet) {

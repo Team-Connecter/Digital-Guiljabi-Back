@@ -31,6 +31,7 @@ public class EditRequest {
     @Column(name = "create_at")
     private LocalDateTime createAt = LocalDateTime.now();
 
+    @NotNull
     @Column(length = 999999999)
     private String content; // 사유
 

@@ -9,5 +9,4 @@ import lombok.Getter;
 @AllArgsConstructor
 public class RegisterResponse {
   private String id;
-  private String username;
 }

@@ -1,6 +1,7 @@
 package com.connecter.digitalguiljabiback.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
@@ -9,8 +10,10 @@ public class RefreshToken {
   @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long pk;
 
+  @NotNull
   private String refreshToken;
 
+  @NotNull
   @ManyToOne
   @JoinColumn(name = "user_pk")
   private Users user;
