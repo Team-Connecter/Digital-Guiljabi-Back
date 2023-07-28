@@ -15,16 +15,16 @@ public class BoardTag {
     private Long pk;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_content_pk", referencedColumnName = "pk")
-    private BoardContent boardContent;
+    @JoinColumn(name = "board_pk", referencedColumnName = "pk")
+    private Board board;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_pk", referencedColumnName = "pk")
     private Tag tag;
 
-    public static BoardTag makeBoardTag(BoardContent boardContent, Tag tag) {
+    public static BoardTag makeBoardTag(Board board, Tag tag) {
         BoardTag boardTag = new BoardTag();
-        boardTag.boardContent = boardContent;
+        boardTag.board = board;
         boardTag.tag = tag;
 
         return boardTag;

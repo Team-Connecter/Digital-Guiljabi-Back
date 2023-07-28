@@ -31,15 +31,13 @@ public class BoardContent {
 
     private String content;
 
-    @OneToMany(mappedBy = "boardContent", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BoardTag> boardTags = new ArrayList<>();
 
-    public static BoardContent makeBoardContent(Board board, String title, String imgUrl, String contnet) {
+    public static BoardContent makeBoardContent(Board board, String title, String imgUrl, String content) {
         BoardContent boardContent = new BoardContent();
         boardContent.board = board;
         boardContent.title = title;
         boardContent.imgUrl = imgUrl;
-        boardContent.content = contnet;
+        boardContent.content = content;
 
         return boardContent;
     }

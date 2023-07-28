@@ -73,15 +73,25 @@ public class Board {
     private List<BoardContent> contents = new ArrayList<>();
 
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BoardTag> boardTags = new ArrayList<>();
+
+
     //얘는 너무 길어서 builder 사용
     @Builder
-    public Board(Users user, String title, String thumbnailUrl, String introduction, String sources, String reason, List<BoardContent> contents) {
+    public Board(Users user, String title, String thumbnailUrl, String introduction, String sources) {
         this.user = user;
         this.title = title;
         this.thumbnailUrl = thumbnailUrl;
         this.introduction = introduction;
         this.sources = sources;
-        this.reason = reason;
+    }
+
+    public void setBoardTags(List<BoardTag> boardTags) {
+        this.boardTags = boardTags;
+    }
+
+    public void setContents(List<BoardContent> contents) {
         this.contents = contents;
     }
 }
