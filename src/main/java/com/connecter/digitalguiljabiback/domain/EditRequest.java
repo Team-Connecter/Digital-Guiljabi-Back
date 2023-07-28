@@ -5,10 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Builder
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -29,10 +28,20 @@ public class EditRequest {
 
     @NotNull
     @CreationTimestamp
-    @Column(name = "create_datetime")
-    @Builder.Default
-    private LocalDate createDatetime = LocalDate.now();
+    @Column(name = "create_at")
+    private LocalDateTime createAt = LocalDateTime.now();
 
-    private String reason; // 사유
+    @NotNull
+    @Column(length = 999999999)
+    private String content; // 사유
+
+    public static EditRequest makeEditRequest(Users user, Board board, String content) {
+        EditRequest editRequest = new EditRequest();
+        editRequest.user = user;
+        editRequest.board = board;
+        editRequest.content = content;
+
+        return editRequest;
+    }
 
 }

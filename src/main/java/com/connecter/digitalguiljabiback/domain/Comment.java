@@ -5,14 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Builder
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "comment")
+@Table(name = "comments")
 public class Comment {
 
     @Id
@@ -29,10 +28,19 @@ public class Comment {
 
     @NotNull
     @CreationTimestamp
-    @Column(name = "create_datetime")
-    @Builder.Default
-    private LocalDate createDatetime = LocalDate.now();
+    @Column(name = "create_at")
+    private LocalDateTime createAt = LocalDateTime.now();
 
     @NotNull
+    @Column(length = 999999999)
     private String content;
+
+    public static Comment makeComment(Board board, Users user, String contnet) {
+        Comment comment = new Comment();
+        comment.board = board;
+        comment.user = user;
+        comment.content = contnet;
+
+        return comment;
+    }
 }

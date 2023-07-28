@@ -5,10 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Builder
-@Data
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
@@ -29,7 +28,14 @@ public class Bookmark {
 
     @NotNull
     @CreationTimestamp
-    @Column(name = "create_datetime")
-    @Builder.Default
-    private LocalDate createDatetime = LocalDate.now();
+    @Column(name = "create_at")
+    private LocalDateTime createAt = LocalDateTime.now();
+
+    public static Bookmark makeBookmark(Users user, Board board) {
+        Bookmark bookmark = new Bookmark();
+        bookmark.user = user;
+        bookmark.board = board;
+
+        return bookmark;
+    }
 }

@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -23,22 +23,23 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
+    @Column(name = "login_id", unique = true)
+    private String loginId;
+
+    private String passwords;
+
     @NotNull
     @CreationTimestamp
-    @Column(name = "create_datetime")
-    @Builder.Default
-    private LocalDate createDatetime = LocalDate.now();
+    @Column(name = "create_at")
+    private LocalDateTime createAt = LocalDateTime.now();
 
     @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "roles")
-    @Builder.Default
     private UserRole role = UserRole.USER;
 
-    @NotNull
     private String nickname;
 
-    @Builder.Default
     @Lob
     @Column(name = "profile_url", length = 99999)
     private String profileUrl = null;
@@ -47,43 +48,52 @@ public class Users implements UserDetails {
     @Column(length = 999999999)
     private String introduction;
 
-    @NotNull
     private String id1365;
 
-    @NotNull
     private String idvms;
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarks = new ArrayList<>();
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public static Users makeUsers(String loginId, String passwords) {
+        Users user = new Users();
+        user.loginId = loginId;
+        user.passwords = passwords;
+        return user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return passwords;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return loginId;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
