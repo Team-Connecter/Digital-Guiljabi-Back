@@ -23,9 +23,11 @@ public class Users implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
+    @NotNull
     @Column(name = "login_id", unique = true)
     private String loginId;
 
+    @NotNull
     private String passwords;
 
     @NotNull
@@ -38,6 +40,8 @@ public class Users implements UserDetails {
     @Column(name = "roles")
     private UserRole role = UserRole.USER;
 
+    @NotNull
+    @Column(unique = true)
     private String nickname;
 
     @Lob

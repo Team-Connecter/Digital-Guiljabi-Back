@@ -18,10 +18,12 @@ public class BoardContent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="board_pk", referencedColumnName = "pk")
     private Board board;
 
+    @NotNull
     private String title;
 
 

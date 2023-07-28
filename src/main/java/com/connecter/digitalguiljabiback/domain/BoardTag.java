@@ -1,6 +1,7 @@
 package com.connecter.digitalguiljabiback.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -14,10 +15,12 @@ public class BoardTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_pk", referencedColumnName = "pk")
     private Board board;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tag_pk", referencedColumnName = "pk")
     private Tag tag;

@@ -1,6 +1,5 @@
 package com.connecter.digitalguiljabiback.service;
 
-import com.connecter.digitalguiljabiback.domain.Board;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
