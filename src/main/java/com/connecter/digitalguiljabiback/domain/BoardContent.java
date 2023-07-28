@@ -22,7 +22,6 @@ public class BoardContent {
     @JoinColumn(name="board_pk", referencedColumnName = "pk")
     private Board board;
 
-    @NotNull
     private String title;
 
 
