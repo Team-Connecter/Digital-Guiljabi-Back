@@ -20,6 +20,7 @@ public class Board {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_pk", referencedColumnName = "pk")
     private Users user;
@@ -59,7 +60,7 @@ public class Board {
 
     @NotNull
     @Column(name = "report_cnt")
-    private int reportCnt = 0;
+    private Long reportCnt = 0L;
 
     @NotNull
     @Column(name = "like_cnt")
