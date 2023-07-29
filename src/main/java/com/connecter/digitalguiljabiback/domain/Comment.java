@@ -23,7 +23,7 @@ public class Comment {
     @JoinColumn(name="board_pk", referencedColumnName = "pk")
     private Board board;
 
-    @NotNull
+    //댓글을 단 사용자가 탈퇴하면 알수없음 처리 nullable
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_pk", referencedColumnName = "pk")
     private Users user;
