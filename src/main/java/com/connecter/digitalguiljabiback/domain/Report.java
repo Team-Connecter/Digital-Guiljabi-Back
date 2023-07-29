@@ -18,7 +18,7 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
-    @NotNull
+    //사용자 탈퇴 시 알수없음 처리 nullable
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_pk", referencedColumnName = "pk")
     private Users user;

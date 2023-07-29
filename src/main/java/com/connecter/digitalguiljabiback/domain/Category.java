@@ -19,24 +19,12 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
-    @ManyToOne(fetch = FetchType.LAZY) // 자기 참조 설정
-    @JoinColumn(name = "parent_pk", referencedColumnName = "pk")
-    private Category parentCategory;
-
     @NotNull
     @Column(name = "category_name")
     private String name;
 
-    public static Category makeCategory(Category category, String name) {
+    public static Category makeCategory(String name) {
         Category newCategory = new Category();
-
-        // 전달받은 category 객체가 영속 상태인지 확인
-        if (category != null && Hibernate.isInitialized(category)) {
-            newCategory.parentCategory = category;
-        } else {
-            newCategory.parentCategory = null;
-        }
-
         newCategory.name  = name;
         return newCategory;
     }

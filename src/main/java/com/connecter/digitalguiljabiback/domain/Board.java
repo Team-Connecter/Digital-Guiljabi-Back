@@ -2,6 +2,7 @@ package com.connecter.digitalguiljabiback.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -20,7 +21,7 @@ public class Board {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
-    @NotNull
+    //사용자가 탈퇴했을 때 알수없음 처리를 위해 nullable
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_pk", referencedColumnName = "pk")
     private Users user;
@@ -60,7 +61,7 @@ public class Board {
 
     @NotNull
     @Column(name = "report_cnt")
-    private Long reportCnt = 0L;
+    private int reportCnt = 0; //신고횟수는 5회 이상이 넘어가지 않기 때문에 Long보단 int가 좋을 것 같음
 
     @NotNull
     @Column(name = "like_cnt")

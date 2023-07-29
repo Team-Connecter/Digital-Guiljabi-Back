@@ -40,7 +40,7 @@ public class Users implements UserDetails {
     @Column(name = "roles")
     private UserRole role = UserRole.USER;
 
-    @NotNull
+    //카카오 로그인이 완전히 완료된 후에 nickname을 지정할 것 같아서 일단 nullable
     @Column(unique = true)
     private String nickname;
 

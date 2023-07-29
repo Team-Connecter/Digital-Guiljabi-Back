@@ -15,7 +15,7 @@ public class Likes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long pk;
 
-    @NotNull
+    //user가 탈퇴하면 알수없음으로 처리, like 개수는 유지
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_pk", referencedColumnName = "pk")
     private Users user;
