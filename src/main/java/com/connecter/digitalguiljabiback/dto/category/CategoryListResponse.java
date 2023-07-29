@@ -12,5 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class CategoryListResponse {
-  List<CategoryResponse> list;
+  private int cnt;
+  private List<CategoryResponse> list;
 }

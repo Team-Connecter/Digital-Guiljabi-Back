@@ -60,7 +60,9 @@ public class CategoryService {
 
     List<CategoryResponse> responseList = convertDto(ancestor);
 
-    CategoryListResponse listDto = CategoryListResponse.builder().list(responseList)
+    CategoryListResponse listDto = CategoryListResponse.builder()
+      .cnt(responseList.size())
+      .list(responseList)
       .build();
 
     return listDto;
@@ -78,5 +80,35 @@ public class CategoryService {
     }
 
     return dto;
+  }
+
+  //직속 자식 찾기
+  public CategoryListResponse getChildren(Long categoryPk) {
+    List<Category> children = categoryRepository.findChildren(categoryPk)
+      .orElseGet(() -> new ArrayList<>());
+
+    List<CategoryResponse> responseList = convertDto(children);
+
+    CategoryListResponse listDto = CategoryListResponse.builder()
+      .cnt(responseList.size())
+      .list(responseList)
+      .build();
+
+    return listDto;
+  }
+
+  //내 모든 조상 찾기
+  public CategoryListResponse getMyAncestor(Long categoryPk) {
+    List<Category> children = categoryRepository.findMyAncestor(categoryPk)
+      .orElseGet(() -> new ArrayList<>());
+
+    List<CategoryResponse> responseList = convertDto(children);
+
+    CategoryListResponse listDto = CategoryListResponse.builder()
+      .cnt(responseList.size())
+      .list(responseList)
+      .build();
+
+    return listDto;
   }
 }
