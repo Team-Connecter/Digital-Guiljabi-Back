@@ -52,7 +52,7 @@ tasks.named('test') {
 
 task copyPrivate(type: Copy) {
     copy {
-        from './submodule-data'
+        from './Digital-Guiljabi-Back-Submodule'
         include "*.yml"
         into 'src/main/resources'
     }
