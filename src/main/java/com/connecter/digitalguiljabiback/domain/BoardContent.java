@@ -23,15 +23,13 @@ public class BoardContent {
     @JoinColumn(name="board_pk", referencedColumnName = "pk")
     private Board board;
 
-    @NotNull
+    //subtitle은 null이 될 수 있음 -> nullable
     private String title;
-
 
     @Column(name = "img_url")
     private String imgUrl;
 
     private String content;
-
 
     public static BoardContent makeBoardContent(Board board, String title, String imgUrl, String content) {
         BoardContent boardContent = new BoardContent();
