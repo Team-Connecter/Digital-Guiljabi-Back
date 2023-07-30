@@ -19,4 +19,11 @@ public class BoardCategory {
   @ManyToOne
   @JoinColumn(name = "board_pk", referencedColumnName = "pk")
   private Board board;
+
+  public static BoardCategory makeBoardCategory(Category category, Board board) {
+    BoardCategory bc =new BoardCategory();
+    bc.category = category;
+    bc.board = board;
+    return bc;
+  }
 }

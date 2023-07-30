@@ -2,7 +2,7 @@ package com.connecter.digitalguiljabiback.dto.board;
 
 import lombok.*;
 
-@Builder
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

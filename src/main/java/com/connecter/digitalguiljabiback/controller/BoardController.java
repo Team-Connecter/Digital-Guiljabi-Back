@@ -1,10 +1,7 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.board.AddBoardRequest;
-import com.connecter.digitalguiljabiback.dto.board.BoardListResponse;
-import com.connecter.digitalguiljabiback.dto.board.BoardResponse;
-import com.connecter.digitalguiljabiback.dto.board.BoardListRequest;
+import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -49,7 +46,13 @@ public class BoardController {
 
   //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
-  //board 인증, 카테고리 추기
+  //board 승인하기 + 카테고리 추기
+  @PostMapping("/admin/boards/approve")
+  public ResponseEntity approveBoard(@RequestBody ApproveBoardRequest approveBoardRequest) {
+    boardService.approve(approveBoardRequest);
+
+    return ResponseEntity.ok().build();
+  }
   
   
   //승인되지 않은 글 모두 조회

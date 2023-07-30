@@ -63,7 +63,7 @@ public class Board {
     @Column(name = "report_cnt")
     private int reportCnt = 0; //신고횟수는 5회 이상이 넘어가지 않기 때문에 Long보단 int가 좋을 것 같음
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST)
     private List<BoardCategory> boardCategories;
 
     @NotNull
@@ -81,6 +81,13 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BoardTag> boardTags = new ArrayList<>();
 
+    public void setBoardCategories(List<BoardCategory> boardCategories) {
+        this.boardCategories = boardCategories;
+    }
+
+    public void approve() {
+        this.status = BoardStatus.APPROVED;
+    }
 
     //얘는 너무 길어서 builder 사용
     @Builder

@@ -5,6 +5,7 @@ import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.repository.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 @Service
@@ -21,10 +24,11 @@ public class BoardService {
   private final BoardRepository boardRepository;
   private final TagRepository tagRepository;
   private final CategoryRepository categoryRepository;
+  private final BoardCategoryRepository boardCategoryRepository;
   private final UserRepository userRepository;
   private final BoardTagRepository boardTagRepository;
 
-  public void makeBoard(Users user, AddBoardRequest addBoardRequest) {
+  public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws RuntimeException {
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
@@ -63,7 +67,7 @@ public class BoardService {
     boardRepository.save(board);
   }
 
-  private Tag getTag(String tagName) {
+  private Tag getTag(String tagName) throws RuntimeException {
     Tag findTag = tagRepository.findByName(tagName)
       .orElseGet(() -> null);
 
@@ -75,7 +79,7 @@ public class BoardService {
     return findTag;
   }
 
-  public BoardResponse getBoardInfo(Long boardPk) {
+  public BoardResponse getBoardInfo(Long boardPk) throws RuntimeException {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글을 찾을 수 없습니다"));
 
@@ -126,16 +130,16 @@ public class BoardService {
     return boardResponse;
   }
 
-  public BoardListResponse getApprovedBoardList(BoardListRequest request) {
+  public BoardListResponse getApprovedBoardList(BoardListRequest request) throws RuntimeException {
     return getBoardList(request, BoardStatus.APPROVED);
   }
 
-  public BoardListResponse getWaitingBoardList(BoardListRequest request) {
+  public BoardListResponse getWaitingBoardList(BoardListRequest request) throws RuntimeException {
     return getBoardList(request, BoardStatus.WAITING);
   }
 
   //APPROVED된 것만 조회가능
-  public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) {
+  public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) throws RuntimeException {
     //  private Long categoryPk;
     //  private String search;
 
@@ -168,7 +172,7 @@ public class BoardService {
     return boardListResponse;
   }
 
-  private List<BriefBoardInfo> convertToBriefDto(List<Board> list) {
+  private List<BriefBoardInfo> convertToBriefDto(List<Board> list) throws RuntimeException {
     List<BriefBoardInfo> breifList = new ArrayList<>();
 
     for (Board b: list) {
@@ -195,7 +199,7 @@ public class BoardService {
     return breifList;
   }
 
-  private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) {
+  private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) throws RuntimeException {
 
     Sort sort;
     if (sortType == null || sortType == SortType.NEW)
@@ -210,5 +214,29 @@ public class BoardService {
       pageSize = 10;
 
     return PageRequest.of(page-1, pageSize, sort);
+  }
+
+  public void approve(ApproveBoardRequest request) throws RuntimeException {
+    Board board = boardRepository.findById(request.getBoardPk())
+      .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
+
+    List<Category> categoryList = categoryRepository.findByPkIn(request.getCategoryPkList());
+
+    //카테고리가 이전과 같지 않거나, 세팅된 적이 없으면
+    if (board.getBoardCategories() == null || board.getBoardCategories() != boardCategoryRepository.findByCategoryPkIn(request.getCategoryPkList())) {
+      for (BoardCategory bc : board.getBoardCategories()) {
+        boardCategoryRepository.deleteById(bc.getPk());
+      }
+
+      List<BoardCategory> boardCategoryList = categoryList.stream()
+        .map((Category c) -> BoardCategory.makeBoardCategory(c, board))
+        .collect(Collectors.toList());
+
+      log.info("@@@0"+ boardCategoryList);
+
+      board.setBoardCategories(boardCategoryList);
+    }
+
+    board.approve();
   }
 }
