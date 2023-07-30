@@ -1,8 +1,9 @@
-package com.connecter.digitalguiljabiback.dto.board;
+package com.connecter.digitalguiljabiback.dto.board.request;
 
+import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import lombok.*;
 
-@Builder
+
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

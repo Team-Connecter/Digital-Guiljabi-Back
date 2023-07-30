@@ -1,46 +1,96 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.board.AddBoardRequest;
-import com.connecter.digitalguiljabiback.dto.board.BoardResponse;
+import com.connecter.digitalguiljabiback.dto.board.*;
+import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.RejectRequest;
+import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
+import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @Tag(name = "BoardController", description = "정보글 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
-@RequestMapping("/api/v1/boards")
+@RequestMapping("/api/v1")
 public class BoardController {
 
   private final BoardService boardService;
 
-  @PostMapping
+  //board 만들기
+  @PostMapping("/boards")
   public ResponseEntity makeBoard(@AuthenticationPrincipal Users user, @RequestBody AddBoardRequest addBoardRequest) {
     boardService.makeBoard(user, addBoardRequest);
 
     return ResponseEntity.ok().build();
   }
 
-  @GetMapping("/{boardPk}")
+  //board 상세보기
+  @GetMapping("/boards/{boardPk}")
   public ResponseEntity<BoardResponse> getBoard(@PathVariable Long boardPk) {
     BoardResponse boardInfo = boardService.getBoardInfo(boardPk);
 
     return ResponseEntity.ok(boardInfo);
   }
 
-//  //모두 접근 가능
-//  @GetMapping
-//  public ResponseEntity getBoardList() {
-//    boardService.getList();
-//
-//    return ResponseEntity.ok().build();
-//  }
+  //승인된 board 목록 조회 (검색, 카테고리별 확인~)  - @TODO 지금은 모두 조회하는 것, 나중에 sort랑 다 처리 ㄱㄱ
+  @GetMapping("/boards")
+  public ResponseEntity<BoardListResponse> getApprevedBoardList(@Valid @ModelAttribute BoardListRequest listBoardRequest) {
+    BoardListResponse boardList = boardService.getApprovedBoardList(listBoardRequest);
+
+    return ResponseEntity.ok(boardList);
+  }
+
+  //내가 쓴 글 모두 조회
+  @GetMapping("/boards/my")
+  public ResponseEntity<BoardListResponse> getMyBoardList(@AuthenticationPrincipal Users user) {
+    BoardListResponse myList = boardService.getMyList(user);
+
+    return ResponseEntity.ok(myList);
+  }
+
+  //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+  //board 승인하기 + 카테고리 추기
+  @PostMapping("/admin/boards/{boardId}/approve")
+  public ResponseEntity approveBoard(@PathVariable Long boardId, @RequestBody List<Long> categoryPkList) {
+    boardService.approve(boardId, categoryPkList);
+
+    return ResponseEntity.ok().build();
+  }
+
+  //board 승인 거절하기
+  @PostMapping("/admin/boards/{boardId}/reject")
+  public ResponseEntity approveBoard(@PathVariable Long boardId, @RequestBody @Valid RejectRequest request) {
+    boardService.reject(boardId, request.getRejReason());
+
+    return ResponseEntity.ok().build();
+  }
+
+
+  //승인되지 않은 글 모두 조회
+  @GetMapping("/admin/boards/waiting")
+  public ResponseEntity<BoardListResponse> getWaitingBoardList(@Valid @ModelAttribute BoardListRequest listBoardRequest) {
+    BoardListResponse boardList = boardService.getWaitingBoardList(listBoardRequest);
+
+    return ResponseEntity.ok(boardList);
+  }
+
+  //내가
+
+
+
 
 
 

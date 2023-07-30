@@ -30,10 +30,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
   @Procedure(procedureName = "insertCategory")
   void addConnect(@Param("cur_idx") Long categoryPk, @Param("parent_idx")Long parentCategoryPk);
 
-  @Procedure(procedureName = "CdeleteCategory")
+  @Procedure(procedureName = "deleteCategory")
   void deleteConnect(@Param("cur_idx") Long categoryPk);
 
-  @Procedure(name = "updateCategory")
+  @Procedure(procedureName = "updateCategory")
   void updateConnect(@Param("cur_idx") Long categoryPk, @Param("parent_idx") Long parentCategoryPk);
 
   @Query(value = findAncestors, nativeQuery = true)
@@ -45,4 +45,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
   //나를 제외한 모든 나의 조상 찾기(가장 조상부터 내림차순으로 정렬)
   @Query(value = findMyAncestors, nativeQuery = true)
   Optional<List<Category>> findMyAncestor(Long pk);
+
+  @Query(value = "SELECT * FROM category WHERE pk IN (:categoryPkList)", nativeQuery = true)
+  List<Category> findByPkIn(@Param("categoryPkList") List<Long> categoryPkList);
 }

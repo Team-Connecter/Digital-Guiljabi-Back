@@ -1,5 +1,7 @@
-package com.connecter.digitalguiljabiback.dto.board;
+package com.connecter.digitalguiljabiback.dto.board.response;
 
+import com.connecter.digitalguiljabiback.dto.board.CardDto;
+import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,6 +23,7 @@ public class BoardResponse {
   private List<CardDto> cards;
   private List<String> sources;
   private List<String> tags;
+  private List<CategoryResponse> categories;
   private Long likeCnt;
   private Long bookmarkCnt;
 }
