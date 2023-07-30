@@ -17,6 +17,16 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
       );
     """;
 
+  String findMyAncestors = """
+    SELECT c.* FROM category c
+    INNER JOIN (
+      SELECT ancestor, depth FROM clo_category
+      WHERE descendant = ?1
+    ) as ct
+    ON c.pk = ct.ancestor
+    ORDER BY ct.depth DESC;
+    """;
+
   @Procedure(procedureName = "insertCategory")
   void addConnect(@Param("cur_idx") Long categoryPk, @Param("parent_idx")Long parentCategoryPk);
 
@@ -28,4 +38,11 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
 
   @Query(value = findAncestors, nativeQuery = true)
   Optional<List<Category>> findFirstAncestor();
+
+  @Query(value = "SELECT * FROM category WHERE pk IN (SELECT descendant FROM clo_category WHERE ancestor = ?1 AND depth=1)", nativeQuery = true)
+  Optional<List<Category>> findChildren(Long pk); //직속 자식 찾기
+
+  //나를 제외한 모든 나의 조상 찾기(가장 조상부터 내림차순으로 정렬)
+  @Query(value = findMyAncestors, nativeQuery = true)
+  Optional<List<Category>> findMyAncestor(Long pk);
 }
