@@ -126,8 +126,16 @@ public class BoardService {
     return boardResponse;
   }
 
+  public BoardListResponse getApprovedBoardList(BoardListRequest request) {
+    return getBoardList(request, BoardStatus.APPROVED);
+  }
+
+  public BoardListResponse getWaitingBoardList(BoardListRequest request) {
+    return getBoardList(request, BoardStatus.WAITING);
+  }
+
   //APPROVED된 것만 조회가능
-  public BoardListResponse getBoardList(BoardListRequest request) {
+  public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) {
     //  private Long categoryPk;
     //  private String search;
 
@@ -147,7 +155,7 @@ public class BoardService {
     } else if (request.getSearch() != null) { //검색어만 지정된 경우
       throw new NoSuchElementException("에러");
     } else { //아무것도 지정 x -> 그냥 줌
-      list = boardRepository.findByStatus(pageable, BoardStatus.APPROVED).getContent();
+      list = boardRepository.findByStatus(pageable, boardStatus).getContent();
     }
 
     List<BriefBoardInfo> briefBoardInfoList = convertToBriefDto(list);
