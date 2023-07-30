@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "BoardController", description = "정보글 관련 API")
 @RequiredArgsConstructor
 @RestController
@@ -47,9 +49,17 @@ public class BoardController {
   //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
   //board 승인하기 + 카테고리 추기
-  @PostMapping("/admin/boards/approve")
-  public ResponseEntity approveBoard(@RequestBody ApproveBoardRequest approveBoardRequest) {
-    boardService.approve(approveBoardRequest);
+  @PostMapping("/admin/boards/{boardId}/approve")
+  public ResponseEntity approveBoard(@PathVariable Long boardId, @RequestBody List<Long> categoryPkList) {
+    boardService.approve(boardId, categoryPkList);
+
+    return ResponseEntity.ok().build();
+  }
+
+  //board 승인 거절하기
+  @PostMapping("/admin/boards/{boardId}/reject")
+  public ResponseEntity approveBoard(@PathVariable Long boardId, @RequestBody String rejReason) {
+    boardService.reject(boardId, rejReason);
 
     return ResponseEntity.ok().build();
   }

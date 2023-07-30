@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,15 +29,16 @@ public class BoardService {
   private final UserRepository userRepository;
   private final BoardTagRepository boardTagRepository;
 
+  //source를 구분하는 구분자
+  private final String sourceDelim = "\tl\tL\t@ls";
+
   public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws RuntimeException {
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
 
-    List<BoardContent> boardContents = new ArrayList<>();
-
-    String[] source = addBoardRequest.getSources();
-    String sourceText = String.join("\tl\tL\t@ls", source);
+    //source string배열을 올 텍스트로 바꿈
+    String sourceText = sourceToText(addBoardRequest.getSources());
 
     Board board = Board.builder()
       .user(findUser)
@@ -46,31 +48,48 @@ public class BoardService {
       .sources(sourceText)
       .build();
 
-    List<BoardTag> boardTags = new ArrayList<>();
+    List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
+    List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
 
-    for (String tag: addBoardRequest.getTags()) {
-      Tag findTag = getTag(tag);
-      BoardTag boardTag = BoardTag.makeBoardTag(board, findTag);
-      boardTags.add(boardTag);
-    }
+    board.setInfo(boardTags, boardContents);
 
-    board.setBoardTags(boardTags);
+    boardRepository.save(board);
+  }
 
-    for (CardDto card : addBoardRequest.getCards()) {
+  //출처는 이런 걸로 구분함 ㅎ..
+  private String sourceToText(String[] source) {
+    return String.join(sourceDelim, source);
+  }
+
+  private List<BoardContent> getBoardContent(Board board, CardDto[] cards) {
+    List<BoardContent> boardContents = new ArrayList<>();
+
+    for (CardDto card : cards) {
       boardContents.add(
         BoardContent.makeBoardContent(board, card.getSubTitle(), card.getImgUrl(), card.getContent())
       );
     }
 
-    board.setContents(boardContents);
-
-    boardRepository.save(board);
+    return boardContents;
   }
 
+  private List<BoardTag> makeBoardTag(Board board, String[] tags) {
+    List<BoardTag> boardTags = new ArrayList<>();
+
+    for (String tag: tags) {
+      Tag findTag = getTag(tag);
+      BoardTag boardTag = BoardTag.makeBoardTag(board, findTag);
+      boardTags.add(boardTag);
+    }
+
+    return boardTags;
+  }
+  
   private Tag getTag(String tagName) throws RuntimeException {
     Tag findTag = tagRepository.findByName(tagName)
       .orElseGet(() -> null);
-
+    
+    //없으면 생성, 있으면 재활용
     if (findTag == null) {
       findTag = Tag.makeTag(tagName);
       findTag = tagRepository.save(findTag);
@@ -90,7 +109,7 @@ public class BoardService {
     }
 
     List<String> sourceList = new ArrayList<>();
-    StringTokenizer st = new StringTokenizer(board.getSources(), "\tl\tL\t@ls");
+    StringTokenizer st = new StringTokenizer(board.getSources(), sourceDelim);
     while (st.hasMoreTokens()) {
       sourceList.add(st.nextToken());
     }
@@ -216,27 +235,35 @@ public class BoardService {
     return PageRequest.of(page-1, pageSize, sort);
   }
 
-  public void approve(ApproveBoardRequest request) throws RuntimeException {
-    Board board = boardRepository.findById(request.getBoardPk())
+  public void approve(Long boardId, List<Long> categoryPkList) throws RuntimeException {
+    Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
-    List<Category> categoryList = categoryRepository.findByPkIn(request.getCategoryPkList());
+    List<Category> categoryList = categoryRepository.findByPkIn(categoryPkList);
 
     //카테고리가 이전과 같지 않거나, 세팅된 적이 없으면
-    if (board.getBoardCategories() == null || board.getBoardCategories() != boardCategoryRepository.findByCategoryPkIn(request.getCategoryPkList())) {
-      for (BoardCategory bc : board.getBoardCategories()) {
-        boardCategoryRepository.deleteById(bc.getPk());
+    if (board.getBoardCategories() == null || board.getBoardCategories() != boardCategoryRepository.findByCategoryPkIn(categoryPkList)) {
+
+      //원본 삭제
+      if (board.getBoardCategories() != null) {
+        for (BoardCategory bc : board.getBoardCategories())
+          boardCategoryRepository.deleteById(bc.getPk());
       }
 
       List<BoardCategory> boardCategoryList = categoryList.stream()
         .map((Category c) -> BoardCategory.makeBoardCategory(c, board))
         .collect(Collectors.toList());
 
-      log.info("@@@0"+ boardCategoryList);
-
       board.setBoardCategories(boardCategoryList);
     }
 
     board.approve();
+  }
+
+  public void reject(Long boardId, String rejReason) {
+    Board board = boardRepository.findById(boardId)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
+
+    board.reject(rejReason);
   }
 }
