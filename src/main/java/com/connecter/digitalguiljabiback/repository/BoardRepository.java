@@ -1,9 +1,6 @@
 package com.connecter.digitalguiljabiback.repository;
 
-import com.connecter.digitalguiljabiback.domain.Board;
-import com.connecter.digitalguiljabiback.domain.BoardStatus;
-import com.connecter.digitalguiljabiback.domain.Category;
-import com.connecter.digitalguiljabiback.domain.Tag;
+import com.connecter.digitalguiljabiback.domain.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,6 +12,8 @@ import java.util.Optional;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
   Page<Board> findByStatus(Pageable pageable, BoardStatus status);
+
+  List<Board> findByUser(Users user);
 
 //  @Query("SELECT b FROM BoardCategory bc JOIN bc.board b JOIN bc.category c WHERE c=?1 AND ")
 //  Optional<List<Board>> findByCategoryAndSearch(Category category, String search);

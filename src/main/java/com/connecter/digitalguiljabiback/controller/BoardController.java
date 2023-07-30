@@ -12,6 +12,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "BoardController", description = "정보글 관련 API")
 @RequiredArgsConstructor
@@ -46,6 +47,14 @@ public class BoardController {
     return ResponseEntity.ok(boardList);
   }
 
+  //내가 쓴 글 모두 조회
+  @GetMapping("/boards/my")
+  public ResponseEntity<BoardListResponse> getMyBoardList(@AuthenticationPrincipal Users user) {
+    BoardListResponse myList = boardService.getMyList(user);
+
+    return ResponseEntity.ok(myList);
+  }
+
   //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
   //board 승인하기 + 카테고리 추기
@@ -58,8 +67,8 @@ public class BoardController {
 
   //board 승인 거절하기
   @PostMapping("/admin/boards/{boardId}/reject")
-  public ResponseEntity approveBoard(@PathVariable Long boardId, @RequestBody String rejReason) {
-    boardService.reject(boardId, rejReason);
+  public ResponseEntity approveBoard(@PathVariable Long boardId, @RequestBody @Valid RejectRequest request) {
+    boardService.reject(boardId, request.getRejReason());
 
     return ResponseEntity.ok().build();
   }
@@ -73,7 +82,7 @@ public class BoardController {
     return ResponseEntity.ok(boardList);
   }
   
-  //
+  //내가
 
 
 

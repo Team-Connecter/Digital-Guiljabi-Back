@@ -192,25 +192,44 @@ public class BoardService {
   }
 
   private List<BriefBoardInfo> convertToBriefDto(List<Board> list) throws RuntimeException {
+    return convertToBriefDto(list, false);
+  }
+
+  private List<BriefBoardInfo> convertToBriefDto(List<Board> list, boolean ismyData) throws RuntimeException {
     List<BriefBoardInfo> breifList = new ArrayList<>();
 
     for (Board b: list) {
-      List<Tag> byBoard = tagRepository.findTagByBoard(b)
-        .orElseGet(() -> new ArrayList<>());
+      BriefBoardInfo brbi;
 
-      BriefBoardInfo brbi = BriefBoardInfo.builder()
-        .boardPk(b.getPk())
-        .title(b.getTitle())
-        .thumbnail(b.getThumbnailUrl())
-        .updateAt(b.getUpdateAt())
-        .introduction(b.getIntroduction())
-        .tag(byBoard.stream()
-          .map(Tag::getName)
-          .toArray(String[]::new)
-        )
-        .likeCnt(b.getLikeCnt())
-        .bookmarkCnt(b.getBookmarkCnt())
-        .build();
+      if (ismyData) { //내 데이터면 -> 태그 필요 x
+        brbi= BriefBoardInfo.builder()
+          .boardPk(b.getPk())
+          .title(b.getTitle())
+          .thumbnail(b.getThumbnailUrl())
+          .updateAt(b.getUpdateAt())
+          .likeCnt(b.getLikeCnt())
+          .bookmarkCnt(b.getBookmarkCnt())
+          .status(b.getStatus())
+          .reason(b.getReason())
+          .build();
+      } else { //전체 조회면 -> 태그 필요
+        List<Tag> byBoard = tagRepository.findTagByBoard(b)
+          .orElseGet(() -> new ArrayList<>());
+
+        brbi= BriefBoardInfo.builder()
+          .boardPk(b.getPk())
+          .title(b.getTitle())
+          .thumbnail(b.getThumbnailUrl())
+          .updateAt(b.getUpdateAt())
+          .introduction(b.getIntroduction())
+          .tag(byBoard.stream()
+            .map(Tag::getName)
+            .toArray(String[]::new)
+          )
+          .likeCnt(b.getLikeCnt())
+          .bookmarkCnt(b.getBookmarkCnt())
+          .build();
+      }
 
       breifList.add(brbi);
     }
@@ -266,4 +285,18 @@ public class BoardService {
 
     board.reject(rejReason);
   }
+
+  public BoardListResponse getMyList(Users user) {
+    List<Board> boardList = boardRepository.findByUser(user);
+
+    List<BriefBoardInfo> briefBoardInfoList = convertToBriefDto(boardList, true);
+
+    BoardListResponse boardListResponse = BoardListResponse.builder()
+      .list(briefBoardInfoList)
+      .cnt(briefBoardInfoList.size())
+      .build();
+
+    return boardListResponse;
+  }
+
 }
