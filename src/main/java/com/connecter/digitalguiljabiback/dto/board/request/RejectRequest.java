@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.board;
+package com.connecter.digitalguiljabiback.dto.board.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

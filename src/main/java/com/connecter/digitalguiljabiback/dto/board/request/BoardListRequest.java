@@ -1,5 +1,6 @@
-package com.connecter.digitalguiljabiback.dto.board;
+package com.connecter.digitalguiljabiback.dto.board.request;
 
+import com.connecter.digitalguiljabiback.dto.board.SortType;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -2,6 +2,10 @@ package com.connecter.digitalguiljabiback.service;
 
 import com.connecter.digitalguiljabiback.domain.*;
 import com.connecter.digitalguiljabiback.dto.board.*;
+import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
+import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
+import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +41,7 @@ public class BoardService {
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
 
     //source string배열을 올 텍스트로 바꿈
-    String sourceText = sourceToText(addBoardRequest.getSources());
+    String sourceText = sourceStringListToText(addBoardRequest.getSources());
 
     Board board = Board.builder()
       .user(findUser)
@@ -57,7 +60,7 @@ public class BoardService {
   }
 
   //출처는 이런 걸로 구분함 ㅎ..
-  private String sourceToText(String[] source) {
+  private String sourceStringListToText(String[] source) {
     return String.join(sourceDelim, source);
   }
 
@@ -102,17 +105,13 @@ public class BoardService {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글을 찾을 수 없습니다"));
 
-    List<String> tagList = new ArrayList<>();
-    for (BoardTag boardTag: board.getBoardTags()) {
-      Tag tag = boardTag.getTag();
-      tagList.add(tag.getName());
-    }
+    //boardTag -> String tag list
+    List<String> tagList = board.getBoardTags().stream()
+      .map(BoardTag::getTag)
+      .map(Tag::getName)
+      .collect(Collectors.toList());
 
-    List<String> sourceList = new ArrayList<>();
-    StringTokenizer st = new StringTokenizer(board.getSources(), sourceDelim);
-    while (st.hasMoreTokens()) {
-      sourceList.add(st.nextToken());
-    }
+    List<String> sourceList = sourceTextToStringList(board.getSources());
 
     List<CardDto> cardDtoList = new ArrayList<>();
     for (BoardContent boardContent : board.getContents()) {
@@ -147,6 +146,15 @@ public class BoardService {
       .build();
 
     return boardResponse;
+  }
+
+  private List<String> sourceTextToStringList(String sources) {
+    List<String> sourceList = new ArrayList<>();
+    StringTokenizer st = new StringTokenizer(sources, sourceDelim);
+    while (st.hasMoreTokens())
+      sourceList.add(st.nextToken());
+
+    return sourceList;
   }
 
   public BoardListResponse getApprovedBoardList(BoardListRequest request) throws RuntimeException {

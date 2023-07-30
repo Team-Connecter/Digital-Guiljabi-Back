@@ -2,6 +2,11 @@ package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.board.*;
+import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.RejectRequest;
+import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
+import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -72,8 +77,8 @@ public class BoardController {
 
     return ResponseEntity.ok().build();
   }
-  
-  
+
+
   //승인되지 않은 글 모두 조회
   @GetMapping("/admin/boards/waiting")
   public ResponseEntity<BoardListResponse> getWaitingBoardList(@Valid @ModelAttribute BoardListRequest listBoardRequest) {
@@ -81,7 +86,7 @@ public class BoardController {
 
     return ResponseEntity.ok(boardList);
   }
-  
+
   //내가
 
 

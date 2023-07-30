@@ -1,5 +1,6 @@
-package com.connecter.digitalguiljabiback.dto.board;
+package com.connecter.digitalguiljabiback.dto.board.response;
 
+import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

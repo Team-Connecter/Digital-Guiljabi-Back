@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.board;
+package com.connecter.digitalguiljabiback.dto.comment;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardListResponse {
-  private int cnt;
-  private List<BriefBoardInfo> list;
+public class CommentListResponse {
+    private Integer cnt;
+    private List<CommentResponse> comments;
 }
