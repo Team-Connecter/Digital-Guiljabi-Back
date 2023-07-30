@@ -63,6 +63,9 @@ public class Board {
     @Column(name = "report_cnt")
     private int reportCnt = 0; //신고횟수는 5회 이상이 넘어가지 않기 때문에 Long보단 int가 좋을 것 같음
 
+    @OneToMany(mappedBy = "board")
+    private List<BoardCategory> boardCategories;
+
     @NotNull
     @Column(name = "like_cnt")
     private Long likeCnt = 0L;

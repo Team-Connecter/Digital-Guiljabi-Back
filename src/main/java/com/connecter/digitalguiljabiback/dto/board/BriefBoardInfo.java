@@ -1,28 +1,23 @@
 package com.connecter.digitalguiljabiback.dto.board;
 
-import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardResponse {
+public class BriefBoardInfo {
+  private Long boardPk;
   private String title;
-  private Long writerPk;
-  private String writerName;
+  private String thumbnail;
   private LocalDateTime updateAt;
-  private int cardCnt;
-  private List<CardDto> cards;
-  private List<String> sources;
-  private List<String> tags;
-  private List<CategoryResponse> categories;
+  private String introduction;
+  private String[] tag;
   private Long likeCnt;
   private Long bookmarkCnt;
 }

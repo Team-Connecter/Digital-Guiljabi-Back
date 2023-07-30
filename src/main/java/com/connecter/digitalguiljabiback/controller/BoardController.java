@@ -1,11 +1,13 @@
 package com.connecter.digitalguiljabiback.controller;
 
-import com.connecter.digitalguiljabiback.domain.Board;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.board.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.BoardResponse;
+import com.connecter.digitalguiljabiback.dto.board.BoardListRequest;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ public class BoardController {
 
   private final BoardService boardService;
 
+  //board 만들기
   @PostMapping
   public ResponseEntity makeBoard(@AuthenticationPrincipal Users user, @RequestBody AddBoardRequest addBoardRequest) {
     boardService.makeBoard(user, addBoardRequest);
@@ -28,20 +31,34 @@ public class BoardController {
     return ResponseEntity.ok().build();
   }
 
+  //board 상세보기
   @GetMapping("/{boardPk}")
-  public ResponseEntity<BoardResponse> getBoard(@RequestParam Long boardPk) {
+  public ResponseEntity<BoardResponse> getBoard(@PathVariable Long boardPk) {
     BoardResponse boardInfo = boardService.getBoardInfo(boardPk);
 
     return ResponseEntity.ok(boardInfo);
   }
 
-//  //모두 접근 가능
-//  @GetMapping
-//  public ResponseEntity getBoardList() {
-//    boardService.getList();
-//
-//    return ResponseEntity.ok().build();
-//  }
+  //승인된 board 목록 조회 (검색, 카테고리별 확인~)  - @TODO 지금은 모두 조회하는 것, 나중에 sort랑 다 처리 ㄱㄱ
+  @GetMapping
+  public ResponseEntity<BoardListResponse> getBoardList(@Valid @ModelAttribute BoardListRequest listBoardRequest) {
+    BoardListResponse boardList = boardService.getBoardList(listBoardRequest);
+
+    return ResponseEntity.ok(boardList);
+  }
+
+  //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+  //board 인증, 카테고리 추기
+  
+  
+  //승인되지 않은 글 모두 조회
+  
+  
+  //
+
+
+
 
 
 

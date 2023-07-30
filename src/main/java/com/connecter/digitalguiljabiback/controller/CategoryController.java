@@ -19,13 +19,15 @@ public class CategoryController {
 
   private final CategoryService categoryService;
 
-  @PostMapping("/admin")
+  //[관리자]카테고리 추가
+  @PostMapping("/admin/categories")
   public ResponseEntity addCategory(@RequestBody AddCategoryRequest addCategoryRequest) {
     categoryService.add(addCategoryRequest);
 
     return ResponseEntity.ok().build();
   }
 
+  //최상위 카테고리 조회
   @GetMapping("/categories/root")
   public ResponseEntity<CategoryListResponse> getFirstCategory() {
     CategoryListResponse ancestors = categoryService.getAncestorList();
@@ -33,14 +35,16 @@ public class CategoryController {
     return ResponseEntity.ok(ancestors);
   }
 
-  @GetMapping("/{categoryPk}/children") //직속 자식 찾기
+  //직속 자식 찾기
+  @GetMapping("/categories/{categoryPk}/children")
   public ResponseEntity<CategoryListResponse> getChildren(@PathVariable Long categoryPk) {
     CategoryListResponse ancestors = categoryService.getChildren(categoryPk);
 
     return ResponseEntity.ok(ancestors);
   }
 
-  @GetMapping("/{categoryPk}/ancestor") //내 조상 모두 찾아 먼 순서대로 내림차순 정렬(나 포함 ㄴㄴ)
+  //내 조상 모두 찾아 먼 순서대로 내림차순 정렬(나 포함)
+  @GetMapping("/categories/{categoryPk}/ancestor")
   public ResponseEntity<CategoryListResponse> getMyAncestor(@PathVariable Long categoryPk) {
     CategoryListResponse ancestors = categoryService.getMyAncestor(categoryPk);
 

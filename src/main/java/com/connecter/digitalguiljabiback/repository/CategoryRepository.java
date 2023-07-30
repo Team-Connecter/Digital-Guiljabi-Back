@@ -30,10 +30,10 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
   @Procedure(procedureName = "insertCategory")
   void addConnect(@Param("cur_idx") Long categoryPk, @Param("parent_idx")Long parentCategoryPk);
 
-  @Procedure(procedureName = "CdeleteCategory")
+  @Procedure(procedureName = "deleteCategory")
   void deleteConnect(@Param("cur_idx") Long categoryPk);
 
-  @Procedure(name = "updateCategory")
+  @Procedure(procedureName = "updateCategory")
   void updateConnect(@Param("cur_idx") Long categoryPk, @Param("parent_idx") Long parentCategoryPk);
 
   @Query(value = findAncestors, nativeQuery = true)
