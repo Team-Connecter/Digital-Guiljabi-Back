@@ -1,3 +1,6 @@
 [submodule "Digital-Guiljabi-Back-Submodule"]
 	path = Digital-Guiljabi-Back-Submodule
 	url = https://github.com/Team-Connecter/Digital-Guiljabi-Back-Submodule.git
+[submodule "Digital-Guiljabi-Back"]
+	path = Digital-Guiljabi-Back
+	url = https://github.com/Team-Connecter/Digital-Guiljabi-Back.git

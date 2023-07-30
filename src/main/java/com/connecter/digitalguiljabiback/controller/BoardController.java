@@ -1,6 +1,5 @@
 package com.connecter.digitalguiljabiback.controller;
 
-import com.connecter.digitalguiljabiback.domain.Board;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.board.AddBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.BoardResponse;
@@ -29,7 +28,7 @@ public class BoardController {
   }
 
   @GetMapping("/{boardPk}")
-  public ResponseEntity<BoardResponse> getBoard(@RequestParam Long boardPk) {
+  public ResponseEntity<BoardResponse> getBoard(@PathVariable Long boardPk) {
     BoardResponse boardInfo = boardService.getBoardInfo(boardPk);
 
     return ResponseEntity.ok(boardInfo);
