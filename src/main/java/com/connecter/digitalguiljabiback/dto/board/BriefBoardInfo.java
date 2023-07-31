@@ -62,7 +62,7 @@ public class BriefBoardInfo {
   public static List<BriefBoardInfo> convertList(List<Board> list, List<List<Tag>> tagList) {
     List<BriefBoardInfo> breifList = new ArrayList<>();
 
-    for (int i =0; i<breifList.size(); i++) {
+    for (int i =0; i<list.size(); i++) {
       Board b = list.get(i);
 
       BriefBoardInfo brbi;

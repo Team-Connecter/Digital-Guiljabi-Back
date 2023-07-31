@@ -9,16 +9,20 @@ import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.repository.*;
+import com.connecter.digitalguiljabiback.repository.specification.BoardSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,7 +35,6 @@ public class BoardService {
   private final CategoryRepository categoryRepository;
   private final BoardCategoryRepository boardCategoryRepository;
   private final UserRepository userRepository;
-  private final BoardTagRepository boardTagRepository;
 
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
@@ -180,16 +183,32 @@ public class BoardService {
 
     //선택한 카테고리, 검색어가 존재한다면 해당 카테고리에 해당하는 검색어와 일치하는 글을 조회
     if (request.getCategoryPk() != null && request.getSearch() != null) {
-//      Category category = categoryRepository.findById(request.getCategoryPk())
-//        .orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 없습니다"));
-//      list = boardRepository.findByCategoryAndSearch(category, request.getSearch());
-      throw new NoSuchElementException("에러");
+      Category category = categoryRepository.findById(request.getCategoryPk())
+        .orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 없습니다"));
+
+
+      list = boardRepository.findAll(
+        where(BoardSpecification.matchesSearchTerm(request.getSearch())) //검색어와 매칭
+          .and(BoardSpecification.hasCategory(category)) //카테고리 일치
+      );
+
     } else if (request.getCategoryPk() != null) { //카테고리만 지정된 경우
-      throw new NoSuchElementException("에러");
+      Category category = categoryRepository.findById(request.getCategoryPk())
+        .orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 없습니다"));
+
+      list = boardRepository.findByCategory(category);
+
     } else if (request.getSearch() != null) { //검색어만 지정된 경우
-      throw new NoSuchElementException("에러");
+      list = boardRepository.findAll(
+        where(BoardSpecification.matchesSearchTerm(request.getSearch())) //검색어와 매칭
+      );
+
+      log.info("@@@" + list.size() );
+
+
     } else { //아무것도 지정 x -> 그냥 줌
       list = boardRepository.findByStatus(pageable, boardStatus).getContent();
+
     }
 
     List<List<Tag>> tagList = new ArrayList<>();

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -25,4 +26,5 @@ public class GlobalExceptionHandler {
     log.info("NoSuchElementException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
   }
+
 }
