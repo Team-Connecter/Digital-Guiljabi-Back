@@ -45,7 +45,7 @@ public class BoardController {
     return ResponseEntity.ok(boardInfo);
   }
 
-  //승인된 board 목록 조회 (검색, 카테고리별 확인~)  - @TODO 지금은 모두 조회하는 것, 나중에 sort랑 다 처리 ㄱㄱ
+  //승인된 board 목록 조회 (검색, 카테고리별 확인~)
   @GetMapping("/boards")
   public ResponseEntity<BoardListResponse> getApprevedBoardList(@Valid @ModelAttribute BoardListRequest listBoardRequest) {
     BoardListResponse boardList = boardService.getApprovedBoardList(listBoardRequest);
@@ -61,9 +61,16 @@ public class BoardController {
     return ResponseEntity.ok(myList);
   }
 
-  @PatchMapping("/boards/{boardId}")
-  public ResponseEntity editBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId, @RequestBody AddBoardRequest addBoardRequest) {
+  @PatchMapping("/boards/{boardPk}")
+  public ResponseEntity editBoard(@AuthenticationPrincipal Users user, @PathVariable("boardPk") Long boardId, @RequestBody AddBoardRequest addBoardRequest) {
     boardService.editBoard(user, boardId, addBoardRequest);
+
+    return ResponseEntity.ok().build();
+  }
+
+  @DeleteMapping("/boards/{boardPk}")
+  public ResponseEntity deleteBoard(@AuthenticationPrincipal Users user, @PathVariable Long boardPk) {
+    boardService.deleteBoard(user, boardPk);
 
     return ResponseEntity.ok().build();
   }
@@ -94,8 +101,6 @@ public class BoardController {
 
     return ResponseEntity.ok(boardList);
   }
-
-  //내가
 
 
 

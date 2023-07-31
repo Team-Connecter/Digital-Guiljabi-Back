@@ -321,4 +321,18 @@ public class BoardService {
 
     boardRepository.save(board);
   }
+
+  public void deleteBoard(Users user, Long boardPk) {
+    Users findUser = userRepository.findById(user.getPk())
+      .orElseThrow(() -> new NoSuchElementException("user를 찾을 수 없음"));
+
+    Board board = boardRepository.findById(boardPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 게시판을 찾을 수 없음"));
+
+    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser) {
+      throw new ForbiddenException("권한이 없는 사용자입니다");
+    }
+
+    boardRepository.delete(board);
+  }
 }
