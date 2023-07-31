@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Tag(name = "BoardController", description = "정보글 관련 API")
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class BoardController {
 
   //board 만들기
   @PostMapping("/boards")
-  public ResponseEntity makeBoard(@AuthenticationPrincipal Users user, @RequestBody AddBoardRequest addBoardRequest) {
+  public ResponseEntity makeBoard(@AuthenticationPrincipal Users user, @RequestBody @Valid AddBoardRequest addBoardRequest) throws NoSuchElementException {
     boardService.makeBoard(user, addBoardRequest);
 
     return ResponseEntity.ok().build();
@@ -38,8 +39,8 @@ public class BoardController {
 
   //board 상세보기
   @GetMapping("/boards/{boardPk}")
-  public ResponseEntity<BoardResponse> getBoard(@PathVariable Long boardPk) {
-    BoardResponse boardInfo = boardService.getBoardInfo(boardPk);
+  public ResponseEntity<BoardResponse> getBoard(@AuthenticationPrincipal Users user, @PathVariable Long boardPk) throws NoSuchElementException {
+    BoardResponse boardInfo = boardService.getBoardInfo(boardPk, user);
 
     return ResponseEntity.ok(boardInfo);
   }

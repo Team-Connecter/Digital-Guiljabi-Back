@@ -36,7 +36,7 @@ public class BoardService {
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
 
-  public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws RuntimeException {
+  public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws NoSuchElementException {
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
@@ -54,7 +54,6 @@ public class BoardService {
 
     List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
     List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
-
     board.setInfo(boardTags, boardContents);
 
     boardRepository.save(board);
@@ -112,9 +111,18 @@ public class BoardService {
     return findTag;
   }
 
-  public BoardResponse getBoardInfo(Long boardPk) throws RuntimeException {
+  public BoardResponse getBoardInfo(Long boardPk, Users user) throws NoSuchElementException {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글을 찾을 수 없습니다"));
+
+    Users writer = board.getUser();
+
+    //게시글이 승인되지 않았다면 관리자, 작성자만 볼 수 있음
+    if (board.getStatus() != BoardStatus.APPROVED) {
+      if (user == null || (user.getRole() != UserRole.ADMIN && writer.getPk() != user.getPk())) {
+        throw new NoSuchElementException("해당 글을 볼 수 없는 사용자입니다");
+      }
+    }
 
     //boardTag -> String tag list
     List<String> tagList = board.getBoardTags().stream()
@@ -123,24 +131,8 @@ public class BoardService {
       .collect(Collectors.toList());
 
     List<String> sourceList = sourceTextToStringList(board.getSources());
-
-    List<CardDto> cardDtoList = new ArrayList<>();
-    for (BoardContent boardContent : board.getContents()) {
-      CardDto cardDto = new CardDto(boardContent.getTitle(), boardContent.getImgUrl(), boardContent.getContent());
-      cardDtoList.add(cardDto);
-    }
-
-    List<CategoryResponse> categories = new ArrayList<>();
-    for(BoardCategory boardCategory: board.getBoardCategories()) {
-      Category category = boardCategory.getCategory();
-      CategoryResponse cr = CategoryResponse.builder()
-        .name(category.getName())
-        .pk(category.getPk())
-        .build();
-      categories.add(cr);
-    }
-
-    Users writer = board.getUser();
+    List<CardDto> cardDtoList = CardDto.convert(board.getContents());
+    List<CategoryResponse> categories = CategoryResponse.convert(board.getBoardCategories());
 
     BoardResponse boardResponse = BoardResponse.builder()
       .title(board.getTitle())
@@ -200,7 +192,16 @@ public class BoardService {
       list = boardRepository.findByStatus(pageable, boardStatus).getContent();
     }
 
-    List<BriefBoardInfo> briefBoardInfoList = convertToBriefDto(list);
+    List<List<Tag>> tagList = new ArrayList<>();
+    for (Board b: list) {
+      List<Tag> byBoard = tagRepository.findTagByBoard(b)
+        .orElseGet(() -> new ArrayList<>());
+
+      tagList.add(byBoard);
+    }
+
+    //전체 조회의 경우 태그가 필요함
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)
@@ -210,51 +211,6 @@ public class BoardService {
     return boardListResponse;
   }
 
-  private List<BriefBoardInfo> convertToBriefDto(List<Board> list) throws RuntimeException {
-    return convertToBriefDto(list, false);
-  }
-
-  private List<BriefBoardInfo> convertToBriefDto(List<Board> list, boolean ismyData) throws RuntimeException {
-    List<BriefBoardInfo> breifList = new ArrayList<>();
-
-    for (Board b: list) {
-      BriefBoardInfo brbi;
-
-      if (ismyData) { //내 데이터면 -> 태그 필요 x
-        brbi= BriefBoardInfo.builder()
-          .boardPk(b.getPk())
-          .title(b.getTitle())
-          .thumbnail(b.getThumbnailUrl())
-          .updateAt(b.getUpdateAt())
-          .likeCnt(b.getLikeCnt())
-          .bookmarkCnt(b.getBookmarkCnt())
-          .status(b.getStatus())
-          .reason(b.getReason())
-          .build();
-      } else { //전체 조회면 -> 태그 필요
-        List<Tag> byBoard = tagRepository.findTagByBoard(b)
-          .orElseGet(() -> new ArrayList<>());
-
-        brbi= BriefBoardInfo.builder()
-          .boardPk(b.getPk())
-          .title(b.getTitle())
-          .thumbnail(b.getThumbnailUrl())
-          .updateAt(b.getUpdateAt())
-          .introduction(b.getIntroduction())
-          .tag(byBoard.stream()
-            .map(Tag::getName)
-            .toArray(String[]::new)
-          )
-          .likeCnt(b.getLikeCnt())
-          .bookmarkCnt(b.getBookmarkCnt())
-          .build();
-      }
-
-      breifList.add(brbi);
-    }
-
-    return breifList;
-  }
 
   private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) throws RuntimeException {
 
@@ -308,7 +264,7 @@ public class BoardService {
   public BoardListResponse getMyList(Users user) {
     List<Board> boardList = boardRepository.findByUser(user);
 
-    List<BriefBoardInfo> briefBoardInfoList = convertToBriefDto(boardList, true);
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(boardList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)
@@ -326,9 +282,9 @@ public class BoardService {
       .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
 
     //글 작성자거나, admin이 아니라면 수정 불가능
-    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser) {
+    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser)
       throw new ForbiddenException("권한이 없는 사용자");
-    }
+
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
 
@@ -345,26 +301,5 @@ public class BoardService {
     );
 
     boardRepository.save(board);
-
-
-//
-//    Board board = Board.builder()
-//      .user(findUser)
-//      .title(addBoardRequest.getTitle())
-//      .thumbnailUrl(addBoardRequest.getThumbnail())
-//      .introduction(addBoardRequest.getIntroduction())
-//      .sources(sourceText)
-//      .build();
-//
-//    List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
-//    List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
-//
-//    board.setInfo(boardTags, boardContents);
-//
-//    boardRepository.save(board);
-
-
-
-
   }
 }

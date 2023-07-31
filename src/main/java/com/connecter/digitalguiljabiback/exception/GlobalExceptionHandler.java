@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.util.NoSuchElementException;
+
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
@@ -16,5 +18,11 @@ public class GlobalExceptionHandler {
   protected ResponseEntity handlerUsernameDuplicatedException(UsernameDuplicatedException e) {
     log.info("UsernameDuplicatedException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
+  }
+
+  @ExceptionHandler(NoSuchElementException.class)
+  protected ResponseEntity handlerNoSuchElementException(NoSuchElementException e) {
+    log.info("NoSuchElementException = {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
   }
 }
