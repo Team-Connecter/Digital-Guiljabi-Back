@@ -60,6 +60,13 @@ public class BoardController {
     return ResponseEntity.ok(myList);
   }
 
+  @PatchMapping("/boards/{boardId}")
+  public ResponseEntity editBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId, @RequestBody AddBoardRequest addBoardRequest) {
+    boardService.editBoard(user, boardId, addBoardRequest);
+
+    return ResponseEntity.ok().build();
+  }
+
   //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
   //board 승인하기 + 카테고리 추기

@@ -7,6 +7,7 @@ import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
+import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,11 +67,21 @@ public class BoardService {
 
   private List<BoardContent> getBoardContent(Board board, CardDto[] cards) {
     List<BoardContent> boardContents = new ArrayList<>();
+    List<BoardContent> originBCList = board.getContents();
 
-    for (CardDto card : cards) {
-      boardContents.add(
-        BoardContent.makeBoardContent(board, card.getSubTitle(), card.getImgUrl(), card.getContent())
-      );
+    for (int i =0; i<cards.length; i++) {
+      CardDto card = cards[i];
+
+      if (originBCList.size() < i+1) {
+        boardContents.add(
+          BoardContent.makeBoardContent(board, card.getSubTitle(), card.getImgUrl(), card.getContent())
+        );
+      } else {
+        //기존꺼 재활용
+        BoardContent bc = originBCList.get(i);
+        bc.edit(card.getSubTitle(), card.getImgUrl(), card.getContent());
+        boardContents.add(bc);
+      }
     }
 
     return boardContents;
@@ -307,4 +318,53 @@ public class BoardService {
     return boardListResponse;
   }
 
+  public void editBoard(Users user, Long boardId, AddBoardRequest addBoardRequest) {
+    Board board = boardRepository.findById(boardId)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
+
+    Users findUser = userRepository.findById(user.getPk())
+      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
+
+    //글 작성자거나, admin이 아니라면 수정 불가능
+    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser) {
+      throw new ForbiddenException("권한이 없는 사용자");
+    }
+    //source string배열을 올 텍스트로 바꿈
+    String sourceText = sourceStringListToText(addBoardRequest.getSources());
+
+    List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
+    List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
+
+    board.edit(
+      addBoardRequest.getTitle(),
+      addBoardRequest.getThumbnail(),
+      addBoardRequest.getIntroduction(),
+      sourceText,
+      boardTags,
+      boardContents
+    );
+
+    boardRepository.save(board);
+
+
+//
+//    Board board = Board.builder()
+//      .user(findUser)
+//      .title(addBoardRequest.getTitle())
+//      .thumbnailUrl(addBoardRequest.getThumbnail())
+//      .introduction(addBoardRequest.getIntroduction())
+//      .sources(sourceText)
+//      .build();
+//
+//    List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
+//    List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
+//
+//    board.setInfo(boardTags, boardContents);
+//
+//    boardRepository.save(board);
+
+
+
+
+  }
 }
