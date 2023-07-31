@@ -75,11 +75,11 @@ public class Board {
     private Long bookmarkCnt = 0L;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true) //boardcontent를 삭제하지 않아도 삭제됨 @TODO 테스트
-    private List<BoardContent> contents = new ArrayList<>();
+    private List<BoardContent> contents = new ArrayList<BoardContent>();
 
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BoardTag> boardTags = new ArrayList<>();
+    private List<BoardTag> boardTags = new ArrayList<BoardTag>();
 
     //얘는 너무 길어서 builder 사용
     @Builder
@@ -107,5 +107,17 @@ public class Board {
     public void reject(String rejReason) {
         this.reason = rejReason;
         this.status = BoardStatus.REFUSAL;
+    }
+
+    public void edit(String title, String thumbnailUrl, String introduction, String sources, List<BoardTag> boardTags, List<BoardContent> contents) {
+        this.boardTags.clear();
+        this.contents.clear();
+
+        this.title = title;
+        this.thumbnailUrl = thumbnailUrl;
+        this.introduction = introduction;
+        this.sources = sources;
+        this.boardTags.addAll(boardTags);
+        this.contents.addAll(contents);
     }
 }

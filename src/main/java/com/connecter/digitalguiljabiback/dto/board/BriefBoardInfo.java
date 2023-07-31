@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Builder
 @Getter
 @AllArgsConstructor
@@ -23,10 +23,7 @@ public class BriefBoardInfo {
   private String[] tag;
   private Long likeCnt;
   private Long bookmarkCnt;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private BoardStatus status;
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String reason;
 
   public void setStatus(BoardStatus status, String reason) {
