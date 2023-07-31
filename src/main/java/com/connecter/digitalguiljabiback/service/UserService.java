@@ -53,7 +53,7 @@ public class UserService {
         Users user = userRepository.findFirstByLoginId(dto.getId())
           .orElseThrow(() -> new NoSuchElementException());
 
-        String jwtToken = jwtService.generateToken(user);
+        String jwtToken = jwtService.generateAccessToken(user);
         return new LoginResponse(jwtToken);
     }
 

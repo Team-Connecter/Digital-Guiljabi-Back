@@ -1,6 +1,7 @@
 package com.connecter.digitalguiljabiback.config;
 
 import com.connecter.digitalguiljabiback.service.JwtService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -44,7 +45,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7); //Bearer 제외
         userId = jwtService.extractUsername(jwt);
 
-        if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+        if (userId == null)
+            throw new JwtException("유효하지 않은 토큰");
+
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userId);
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
@@ -62,7 +66,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
 
         filterChain.doFilter(request, response);
     }

@@ -8,6 +8,7 @@ import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
+import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.*;
 import com.connecter.digitalguiljabiback.repository.specification.BoardSpecification;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -163,52 +163,45 @@ public class BoardService {
     return sourceList;
   }
 
-  public BoardListResponse getApprovedBoardList(BoardListRequest request) throws RuntimeException {
+  public BoardListResponse getApprovedBoardList(BoardListRequest request) throws CategoryNotFoundException {
     return getBoardList(request, BoardStatus.APPROVED);
   }
 
-  public BoardListResponse getWaitingBoardList(BoardListRequest request) throws RuntimeException {
+  public BoardListResponse getWaitingBoardList(BoardListRequest request) throws CategoryNotFoundException {
     return getBoardList(request, BoardStatus.WAITING);
   }
 
   //APPROVED된 것만 조회가능
-  public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) throws RuntimeException {
-    //  private Long categoryPk;
-    //  private String search;
-
+  public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) throws CategoryNotFoundException {
     //pageable객체 만들기
-    Pageable pageable = makePageable(request.getSortType(), request.getPage(), request.getPageSize());
+    Pageable pageable = makePageable(request.getSort(), request.getPage(), request.getPageSize());
 
     List<Board> list;
 
     //선택한 카테고리, 검색어가 존재한다면 해당 카테고리에 해당하는 검색어와 일치하는 글을 조회
-    if (request.getCategoryPk() != null && request.getSearch() != null) {
+    if (request.getCategoryPk() != null && request.getQ() != null) {
       Category category = categoryRepository.findById(request.getCategoryPk())
-        .orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 없습니다"));
+        .orElseThrow(() -> new CategoryNotFoundException("해당하는 카테고리가 없습니다"));
 
 
       list = boardRepository.findAll(
-        where(BoardSpecification.matchesSearchTerm(request.getSearch())) //검색어와 매칭
+        where(BoardSpecification.matchesSearchTerm(request.getQ())) //검색어와 매칭
           .and(BoardSpecification.hasCategory(category)) //카테고리 일치
       );
 
     } else if (request.getCategoryPk() != null) { //카테고리만 지정된 경우
       Category category = categoryRepository.findById(request.getCategoryPk())
-        .orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 없습니다"));
+        .orElseThrow(() -> new CategoryNotFoundException("해당하는 카테고리가 없습니다"));
 
       list = boardRepository.findByCategory(category);
 
-    } else if (request.getSearch() != null) { //검색어만 지정된 경우
+    } else if (request.getQ() != null) { //검색어만 지정된 경우
       list = boardRepository.findAll(
-        where(BoardSpecification.matchesSearchTerm(request.getSearch())) //검색어와 매칭
+        where(BoardSpecification.matchesSearchTerm(request.getQ())) //검색어와 매칭
       );
-
-      log.info("@@@" + list.size() );
-
 
     } else { //아무것도 지정 x -> 그냥 줌
       list = boardRepository.findByStatus(pageable, boardStatus).getContent();
-
     }
 
     List<List<Tag>> tagList = new ArrayList<>();
@@ -248,11 +241,14 @@ public class BoardService {
     return PageRequest.of(page-1, pageSize, sort);
   }
 
-  public void approve(Long boardId, List<Long> categoryPkList) throws RuntimeException {
+  public void approve(Long boardId, List<Long> categoryPkList) throws NoSuchElementException {
     Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
-    List<Category> categoryList = categoryRepository.findByPkIn(categoryPkList);
+    List<Category> categoryList = new ArrayList<>();
+
+    if (categoryPkList != null)
+      categoryRepository.findByPkIn(categoryPkList);
 
     //카테고리가 이전과 같지 않거나, 세팅된 적이 없으면
     if (board.getBoardCategories() == null || board.getBoardCategories() != boardCategoryRepository.findByCategoryPkIn(categoryPkList)) {
@@ -273,7 +269,7 @@ public class BoardService {
     board.approve();
   }
 
-  public void reject(Long boardId, String rejReason) {
+  public void reject(Long boardId, String rejReason) throws NoSuchElementException {
     Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
@@ -293,12 +289,12 @@ public class BoardService {
     return boardListResponse;
   }
 
-  public void editBoard(Users user, Long boardId, AddBoardRequest addBoardRequest) {
+  public void editBoard(Users user, Long boardId, AddBoardRequest addBoardRequest) throws NoSuchElementException, ForbiddenException {
     Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
 
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
+      .orElseThrow(() -> new ForbiddenException("유저정보가 이상합니다. 500"));
 
     //글 작성자거나, admin이 아니라면 수정 불가능
     if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser)
@@ -322,9 +318,9 @@ public class BoardService {
     boardRepository.save(board);
   }
 
-  public void deleteBoard(Users user, Long boardPk) {
+  public void deleteBoard(Users user, Long boardPk) throws NoSuchElementException, ForbiddenException{
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("user를 찾을 수 없음"));
+      .orElseThrow(() -> new ForbiddenException("user를 찾을 수 없음"));
 
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 게시판을 찾을 수 없음"));

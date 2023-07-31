@@ -32,9 +32,4 @@ public class UserController {
     return ResponseEntity.ok(userService.authenticate(request));
   }
 
-  @GetMapping("/asdf")
-  public ResponseEntity test() {
-      return ResponseEntity.ok().build();
-  }
-
 }
