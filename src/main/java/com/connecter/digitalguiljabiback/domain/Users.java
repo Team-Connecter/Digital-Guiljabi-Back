@@ -25,10 +25,10 @@ public class Users implements UserDetails {
 
     @NotNull
     @Column(name = "login_id", unique = true)
-    private String loginId;
+    private String loginId; //@TODO authId
 
     @NotNull
-    private String passwords;
+    private String passwords; //@TODO delete
 
     @NotNull
     @CreationTimestamp

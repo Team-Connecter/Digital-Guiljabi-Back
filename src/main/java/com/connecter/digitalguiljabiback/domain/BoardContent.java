@@ -6,6 +6,8 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,5 +41,11 @@ public class BoardContent {
         boardContent.content = content;
 
         return boardContent;
+    }
+
+    public void edit(String subTitle, String imgUrl, String content) {
+        this.title = Objects.nonNull(subTitle) ? subTitle : this.title;
+        this.imgUrl = Objects.nonNull(imgUrl) ? imgUrl : this.imgUrl;
+        this.content = Objects.nonNull(content) ? content : this.content;
     }
 }

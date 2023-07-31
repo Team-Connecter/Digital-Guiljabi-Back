@@ -63,6 +63,9 @@ public class Board {
     @Column(name = "report_cnt")
     private int reportCnt = 0; //신고횟수는 5회 이상이 넘어가지 않기 때문에 Long보단 int가 좋을 것 같음
 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST)
+    private List<BoardCategory> boardCategories;
+
     @NotNull
     @Column(name = "like_cnt")
     private Long likeCnt = 0L;
@@ -72,12 +75,11 @@ public class Board {
     private Long bookmarkCnt = 0L;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true) //boardcontent를 삭제하지 않아도 삭제됨 @TODO 테스트
-    private List<BoardContent> contents = new ArrayList<>();
+    private List<BoardContent> contents = new ArrayList<BoardContent>();
 
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BoardTag> boardTags = new ArrayList<>();
-
+    private List<BoardTag> boardTags = new ArrayList<BoardTag>();
 
     //얘는 너무 길어서 builder 사용
     @Builder
@@ -89,11 +91,33 @@ public class Board {
         this.sources = sources;
     }
 
-    public void setBoardTags(List<BoardTag> boardTags) {
+    public void setInfo(List<BoardTag> boardTags, List<BoardContent> contents) {
         this.boardTags = boardTags;
+        this.contents = contents;
     }
 
-    public void setContents(List<BoardContent> contents) {
-        this.contents = contents;
+    public void setBoardCategories(List<BoardCategory> boardCategories) {
+        this.boardCategories = boardCategories;
+    }
+
+    public void approve() {
+        this.status = BoardStatus.APPROVED;
+    }
+
+    public void reject(String rejReason) {
+        this.reason = rejReason;
+        this.status = BoardStatus.REFUSAL;
+    }
+
+    public void edit(String title, String thumbnailUrl, String introduction, String sources, List<BoardTag> boardTags, List<BoardContent> contents) {
+        this.boardTags.clear();
+        this.contents.clear();
+
+        this.title = title;
+        this.thumbnailUrl = thumbnailUrl;
+        this.introduction = introduction;
+        this.sources = sources;
+        this.boardTags.addAll(boardTags);
+        this.contents.addAll(contents);
     }
 }
