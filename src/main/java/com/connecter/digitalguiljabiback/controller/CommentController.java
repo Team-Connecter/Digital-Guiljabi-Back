@@ -34,7 +34,7 @@ public class CommentController {
         return ResponseEntity.ok().build();
     }
 
-    // 댓글 삭제 (작성자)
+    // 댓글 삭제 (작성자, 관리자)
     @DeleteMapping("/comments/{commentPk}")
     public ResponseEntity deleteComment(@AuthenticationPrincipal Users user, @PathVariable Long commentPk)
     {
