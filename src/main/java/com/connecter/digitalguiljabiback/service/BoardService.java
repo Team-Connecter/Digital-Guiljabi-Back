@@ -8,6 +8,7 @@ import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
+import com.connecter.digitalguiljabiback.exception.NotFoundException;
 import com.connecter.digitalguiljabiback.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class BoardService {
   private final BoardCategoryRepository boardCategoryRepository;
   private final UserRepository userRepository;
   private final BoardTagRepository boardTagRepository;
+  private final BoardLikeRepository boardLikeRepository;
 
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
@@ -366,5 +368,35 @@ public class BoardService {
 
 
 
+  }
+
+  // 게시글 좋아요
+  public void addLikeToBoard(Users user, Long boardId) {
+
+    Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
+
+    Users findUser = userRepository.findById(user.getPk())
+            .orElseThrow(() -> new NotFoundException("해당하는 사용자가 없습니다."));
+
+    Likes likes = Likes.makeLikes(findUser, board);
+
+    // 이전에 좋아요를 눌렀는지 확인
+    boolean isClicked = boardLikeRepository.existsByUserAndBoard(user, board);
+    if(!isClicked) {
+      boardLikeRepository.save(likes);
+    }
+
+  }
+
+  // 게시글 좋아요 취소
+  public void cancelLikeToBoard(Users user, Long boardId) {
+    Board board = boardRepository.findById(boardId)
+            .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
+
+    Likes likes = boardLikeRepository.findByUserAndBoard(user, board)
+            .orElseThrow(() -> new NotFoundException("좋아요가 존재하지 않습니다."));
+
+    boardLikeRepository.delete(likes);
   }
 }
