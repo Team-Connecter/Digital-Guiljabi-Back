@@ -1,6 +1,8 @@
 
 jwt:
   secretKey: "26462948404D635166546A576E5A7234753778214125442A472D4B614E645267"
+  expirationHours: 24
+  issuer: lime
 
 spring:
   datasource:
@@ -16,6 +18,21 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+  security:
+    oauth2:
+      kakao:
+        grantType: authorization_code
+        clientId: 78f9db867e8831b570efd5e479f72a08
+        clientSecret: OVrR5jRNXuVhuiH6eSpPB6SGHhsmCRlu
+        #TODO 배포시 리다이렉트 주소 변경해야함
+        redirectUri: http://localhost:8080/api/login/callback
+        clientName: Kakao
+        clientAuthenticationMethod: POST
+        authorizationUri: https://kauth.kakao.com/oauth/authorize
+        tokenUri: https://kauth.kakao.com/oauth/token
+        userInfoUri: https://kapi.kakao.com/v2/user/me
+        userNameAttribute: id
 
 logging:
   level:

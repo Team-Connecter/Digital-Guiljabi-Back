@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         authHeader = request.getHeader("Authorization");
 
         final String jwt;
-        final String userId; //로그인아이디
+        final String userId; //oauth uid
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
