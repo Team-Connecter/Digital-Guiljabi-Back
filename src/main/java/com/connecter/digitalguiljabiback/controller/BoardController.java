@@ -1,6 +1,7 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.Users;
+import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.RejectRequest;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -78,6 +80,22 @@ public class BoardController {
   public ResponseEntity deleteBoard(@AuthenticationPrincipal Users user, @PathVariable Long boardPk) throws NoSuchElementException, ForbiddenException {
     boardService.deleteBoard(user, boardPk);
 
+    return ResponseEntity.ok().build();
+  }
+
+  // 게시글 좋아요 추가 (회원만)
+  @Secured("USER")
+  @PostMapping("/boards/{boardId}/likes")
+  public ResponseEntity addLikeToBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId) {
+    boardService.addLikeToBoard(user, boardId);
+    return ResponseEntity.ok().build();
+  }
+
+  // 게시글 좋아요 취소 (좋아요한 회원만)
+  @Secured("USER")
+  @DeleteMapping("/boards/{boardId}/likes")
+  public ResponseEntity cancelLikeToBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId) {
+    boardService.cancelLikeToBoard(user, boardId);
     return ResponseEntity.ok().build();
   }
 
