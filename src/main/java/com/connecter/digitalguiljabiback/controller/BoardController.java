@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,6 +65,22 @@ public class BoardController {
   public ResponseEntity editBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId, @RequestBody AddBoardRequest addBoardRequest) {
     boardService.editBoard(user, boardId, addBoardRequest);
 
+    return ResponseEntity.ok().build();
+  }
+
+  // 게시글 좋아요 추가 (회원만)
+  @Secured("USER")
+  @PostMapping("/boards/{boardId}/likes")
+  public ResponseEntity addLikeToBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId) {
+    boardService.addLikeToBoard(user, boardId);
+    return ResponseEntity.ok().build();
+  }
+
+  // 게시글 좋아요 취소 (좋아요한 회원만)
+  @Secured("USER")
+  @DeleteMapping("/boards/{boardId}/likes")
+  public ResponseEntity cancelLikeToBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId) {
+    boardService.cancelLikeToBoard(user, boardId);
     return ResponseEntity.ok().build();
   }
 
