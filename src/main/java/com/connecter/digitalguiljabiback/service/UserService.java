@@ -26,6 +26,8 @@ public class UserService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
+
+
     public void register(RegisterRequest dto) throws UsernameDuplicatedException {
 
         Users findByLoginIdUser = userRepository.findFirstByLoginId(dto.getId())
