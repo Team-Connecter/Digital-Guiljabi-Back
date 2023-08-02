@@ -105,7 +105,7 @@ public class ReportService {
       .orElseThrow(() -> new NoSuchElementException("해당하는 게시글이 없습니다"));
 
     Users reportUser = report.getUser();
-    if (user != reportUser) {
+    if (user.getPk() != reportUser.getPk()) {
       throw new ForbiddenException("해당 신고를 취소할 권한이 없습니다");
     }
 
@@ -117,5 +117,15 @@ public class ReportService {
     List<MyReportResponse> list = MyReportResponse.convertList(reportList);
 
     return new MyReportListResponse(list.size(), list);
+  }
+
+  public void deleteAllReport(Long boardPk) {
+    Board board = boardRepository.findById(boardPk)
+      .orElseThrow(() -> new NoSuchElementException("해당 pk의 정보글이 존재하지 않습니다"));
+
+    List<Report> reportList = reportRepository.findByBoard(board);
+    for(Report r: reportList) {
+      reportRepository.delete(r);
+    }
   }
 }

@@ -77,4 +77,12 @@ public class ReportController {
 
     return ResponseEntity.ok(byBoard);
   }
+
+  //신고내역 초기화
+  @DeleteMapping("/admin/boards/{boardPk}/reports")
+  public ResponseEntity deleteAllReport(@PathVariable Long boardPk) {
+    reportService.deleteAllReport(boardPk);
+
+    return ResponseEntity.ok().build();
+  }
 }
