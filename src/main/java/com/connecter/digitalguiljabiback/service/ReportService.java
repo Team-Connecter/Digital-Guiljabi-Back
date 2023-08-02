@@ -8,6 +8,7 @@ import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListRespon
 import com.connecter.digitalguiljabiback.dto.report.BriefReportResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
+import com.connecter.digitalguiljabiback.dto.report.ReportSortType;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.ReportDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.BoardRepository;
@@ -34,7 +35,7 @@ public class ReportService {
   private final BoardRepository boardRepository;
 
 
-  public void addReport(Users user, Long boardPk, ReportRequest request) {
+  public void addReport(Users user, Long boardPk, ReportRequest request) throws NoSuchElementException, ReportDuplicatedException {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
 
@@ -53,28 +54,39 @@ public class ReportService {
     board.addReportCnt();
   }
 
-  public ReportBoardListResponse findByBoard(Long boardPk) {
+  public ReportBoardListResponse findByBoard(Long boardPk) throws NoSuchElementException {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 Board가 존재하지 않습니다"));
+
+    Users user = board.getUser();
 
     List<Report> reportList = reportRepository.findByBoard(board);
 
     List<BriefReportResponse> briefReportResponses = BriefReportResponse.convertList(reportList);
 
-    return new ReportBoardListResponse(reportList.size(), briefReportResponses);
+    return ReportBoardListResponse
+      .builder()
+      .boardPk(boardPk)
+      .title(board.getTitle())
+      .writerPk(user.getPk())
+      .writerName(user.getNickname())
+      .cnt(reportList.size())
+      .repList(briefReportResponses)
+      .build();
   }
 
-  public AdminBoardListResponse getBoardByReport(Integer pageSize, Integer page, Boolean viewHigh5) {
+  public AdminBoardListResponse getBoardByReport(Integer pageSize, Integer page, Boolean viewHigh5, ReportSortType type) {
     Pageable pageable = PageRequest.of(page-1, pageSize);
 
     List<Board> boardList;
     List<LocalDateTime> recentReportedAtList = new ArrayList<>();
 
-    if (viewHigh5) {
-      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByReportCnt(5, pageable); //5회 이상인 것만 조회
-    } else {
-      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByReportCnt(1, pageable); //1회 이상인 것만 조회
-    }
+    int moreThan = viewHigh5? 5 : 1;
+
+    if (type == ReportSortType.RECENT) //최신순 정렬
+      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByCreateAtDesc(moreThan, pageable); //5회 이상인 것만 조회
+    else //신고많은 순 정렬
+      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByReportCnt(moreThan, pageable); //5회 이상인 것만 조회
 
     for (Board b: boardList) {
       LocalDateTime ldt = reportRepository.findByRecentReportByBoard(b.getPk())

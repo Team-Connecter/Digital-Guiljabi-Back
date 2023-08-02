@@ -22,4 +22,5 @@ public interface BoardRepository extends JpaRepository<Board, Long>, JpaSpecific
   List<Board> findByOrderByReportCntDesc(Pageable pageable);
 
   List<Board> findByReportCntGreaterThanEqualOrderByReportCnt(int reportCnt, Pageable pageable);
+  List<Board> findByReportCntGreaterThanEqualOrderByCreateAtDesc(int reportCnt, Pageable pageable);
 }

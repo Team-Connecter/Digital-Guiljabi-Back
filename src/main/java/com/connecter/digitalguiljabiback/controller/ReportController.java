@@ -1,11 +1,14 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.Users;
+import com.connecter.digitalguiljabiback.dto.board.SortType;
 import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
+import com.connecter.digitalguiljabiback.dto.report.ReportSortType;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
+import com.connecter.digitalguiljabiback.exception.ReportDuplicatedException;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import com.connecter.digitalguiljabiback.service.ReportService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +33,12 @@ public class ReportController {
 
   //게시글 신고하기
   @PostMapping("/boards/{boardPk}/reports")
-  public ResponseEntity report(@AuthenticationPrincipal Users user, @PathVariable Long boardPk, @RequestBody ReportRequest request) {
+  public ResponseEntity report(
+    @AuthenticationPrincipal Users user,
+    @PathVariable Long boardPk,
+    @RequestBody ReportRequest request
+  ) throws NoSuchElementException, ReportDuplicatedException {
+
     reportService.addReport(user, boardPk, request);
 
     return ResponseEntity.ok().build();
@@ -50,20 +58,20 @@ public class ReportController {
   public ResponseEntity getBoardByReport(
     @RequestParam(required = false, defaultValue = "10") Integer pageSize ,
     @RequestParam(required = false, defaultValue = "1") Integer page,
-    @RequestParam(required = false, defaultValue = "false") Boolean viewHigh5
+    @RequestParam(required = false, defaultValue = "false") Boolean viewHigh5,
+    @RequestParam(required = false, defaultValue = "RECENT") ReportSortType sort
   ) {
-    AdminBoardListResponse response = reportService.getBoardByReport(pageSize, page, viewHigh5);
+    AdminBoardListResponse response = reportService.getBoardByReport(pageSize, page, viewHigh5, sort);
 
     return ResponseEntity.ok(response);
   }
 
-  //게시글에 대한 신고 목록 조회
+  //정보글에 대한 신고 목록 조회
   @GetMapping("/admin/boards/{boardPk}/reports")
-  public ResponseEntity getReportByBoard(@PathVariable Long boardPk) {
+  public ResponseEntity<ReportBoardListResponse> getReportByBoard(@PathVariable Long boardPk) {
     ReportBoardListResponse byBoard = reportService.findByBoard(boardPk);
 
     return ResponseEntity.ok(byBoard);
   }
-
 
 }

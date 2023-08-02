@@ -16,16 +16,17 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 public class BriefReportResponse {
+  private Long reportPk;
   private LocalDateTime reportedAt;
   private Long userPk;
-  private String nickName;
+  private String username;
   private String reason;
 
   public static List<BriefReportResponse> convertList(List<Report> boardList) {
     List<BriefReportResponse> list = new ArrayList<>();
     for (Report r: boardList) {
       Users user = r.getUser();
-      BriefReportResponse br = new BriefReportResponse(r.getCreateAt(), user.getPk(), user.getNickname(), r.getContent());
+      BriefReportResponse br = new BriefReportResponse(r.getPk(), r.getCreateAt(), user.getPk(), user.getNickname(), r.getContent());
       list.add(br);
     }
 
