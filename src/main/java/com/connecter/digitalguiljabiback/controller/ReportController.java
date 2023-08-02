@@ -5,6 +5,7 @@ import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListRespon
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
+import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import com.connecter.digitalguiljabiback.service.ReportService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Tag(name = "ReportController", description = "신고 관련 API")
 @RequiredArgsConstructor
@@ -30,6 +32,14 @@ public class ReportController {
   @PostMapping("/boards/{boardPk}/reports")
   public ResponseEntity report(@AuthenticationPrincipal Users user, @PathVariable Long boardPk, @RequestBody ReportRequest request) {
     reportService.addReport(user, boardPk, request);
+
+    return ResponseEntity.ok().build();
+  }
+
+  //게시글 신고 취소하기
+  @DeleteMapping("/reports/{reportPk}")
+  public ResponseEntity cancelReport(@AuthenticationPrincipal Users user, @PathVariable Long reportPk) throws NoSuchElementException, ForbiddenException {
+    reportService.deleteReport(user, reportPk);
 
     return ResponseEntity.ok().build();
   }

@@ -8,6 +8,7 @@ import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListRespon
 import com.connecter.digitalguiljabiback.dto.report.BriefReportResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
+import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.ReportDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.BoardRepository;
 import com.connecter.digitalguiljabiback.repository.ReportRepository;
@@ -84,5 +85,17 @@ public class ReportService {
     List<AdminBriefBoardInfo> info = AdminBriefBoardInfo.convertList(boardList, recentReportedAtList);
 
     return new AdminBoardListResponse(boardList.size(), info);
+  }
+
+  public void deleteReport(Users user, Long reportPk) throws NoSuchElementException, ForbiddenException {
+    Report report = reportRepository.findById(reportPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 게시글이 없습니다"));
+
+    Users reportUser = report.getUser();
+    if (user != reportUser) {
+      throw new ForbiddenException("해당 신고를 취소할 권한이 없습니다");
+    }
+
+    reportRepository.delete(report);
   }
 }
