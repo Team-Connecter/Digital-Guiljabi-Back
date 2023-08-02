@@ -24,11 +24,13 @@ public class Users implements UserDetails {
     private Long pk;
 
     @NotNull
-    @Column(name = "login_id", unique = true)
-    private String loginId; //@TODO authId
+    @Column(unique = true)
+    private String uid; //@TODO authId
 
     @NotNull
     private String passwords; //@TODO delete
+
+    private OauthType oauthType;
 
     @NotNull
     @CreationTimestamp
@@ -63,9 +65,10 @@ public class Users implements UserDetails {
         this.nickname = nickname;
     }
 
-    public static Users makeUsers(String loginId, String passwords) {
+    public static Users makeUsers(String uidString, String passwords, OauthType oauthType) {
         Users user = new Users();
-        user.loginId = loginId;
+        user.uid = uidString;
+        user.oauthType = oauthType;
         user.passwords = passwords;
         return user;
     }
@@ -82,7 +85,7 @@ public class Users implements UserDetails {
 
     @Override
     public String getUsername() {
-        return loginId;
+        return uid;
     }
 
     @Override

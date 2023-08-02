@@ -3,6 +3,7 @@ package com.connecter.digitalguiljabiback.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -16,8 +17,8 @@ public class SecurityConfig {
 
     private final String[] whiteList = {
       "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**",
-      "/api/v1/users/", "/api/v1/users/login",
-      "/error", "/api/v1/boards/*/comments"
+      "/api/v1/users/", "/api/v1/users/login", "/api/login/**",
+      "/error"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -30,7 +31,9 @@ public class SecurityConfig {
           .disable()
           .authorizeHttpRequests()
             .requestMatchers(whiteList).permitAll()
-          .anyRequest().authenticated()
+            .requestMatchers(HttpMethod.GET, "/api/v1/boards/*").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/boards").permitAll()
+            .anyRequest().authenticated()
           .and()
           .authenticationProvider(authenticationProvider)
           .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

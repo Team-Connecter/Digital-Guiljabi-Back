@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,8 +21,13 @@ public class applicationConfig {
     private final UserRepository userRepository;
 
     @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+
+    @Bean
     public UserDetailsService userDetailsService() {
-        return loginId -> userRepository.findFirstByLoginId(loginId)
+        return uid -> userRepository.findByUid(uid)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 

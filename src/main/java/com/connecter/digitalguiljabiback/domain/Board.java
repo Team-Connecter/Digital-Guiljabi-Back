@@ -9,6 +9,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,7 +44,6 @@ public class Board {
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 
-    @NotNull
     @Column(name = "thumbnail_url", length = 99999)
     private String thumbnailUrl = null;
 
@@ -86,7 +86,7 @@ public class Board {
     public Board(Users user, String title, String thumbnailUrl, String introduction, String sources) {
         this.user = user;
         this.title = title;
-        this.thumbnailUrl = thumbnailUrl;
+        this.thumbnailUrl = Objects.nonNull(thumbnailUrl)?thumbnailUrl : this.thumbnailUrl;
         this.introduction = introduction;
         this.sources = sources;
     }
@@ -114,7 +114,7 @@ public class Board {
         this.contents.clear();
 
         this.title = title;
-        this.thumbnailUrl = thumbnailUrl;
+        this.thumbnailUrl = Objects.nonNull(thumbnailUrl)?thumbnailUrl:this.thumbnailUrl;
         this.introduction = introduction;
         this.sources = sources;
         this.boardTags.addAll(boardTags);
