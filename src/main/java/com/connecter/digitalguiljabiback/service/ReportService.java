@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -41,5 +42,12 @@ public class ReportService {
 
     //board의 reportCnt +1
     board.addReportCnt();
+  }
+
+  public void getMyReport(Users user) {
+    List<Report> byUser = reportRepository.findByUser(user);
+
+
+
   }
 }

@@ -19,4 +19,7 @@ public interface BoardRepository extends JpaRepository<Board, Long>, JpaSpecific
   @Query("SELECT b FROM BoardCategory bc JOIN bc.category c JOIN bc.board b WHERE c = ?1")
   List<Board> findByCategory(Category category);
 
+  List<Board> findByOrderByReportCntDesc(Pageable pageable);
+
+  List<Board> findByReportCntGreaterThanEqualOrderByReportCnt(int reportCnt, Pageable pageable);
 }

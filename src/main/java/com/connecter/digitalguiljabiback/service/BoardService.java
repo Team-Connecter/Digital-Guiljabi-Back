@@ -4,6 +4,7 @@ import com.connecter.digitalguiljabiback.domain.*;
 import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
+import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +39,7 @@ public class BoardService {
   private final BoardCategoryRepository boardCategoryRepository;
   private final UserRepository userRepository;
   private final BoardTagRepository boardTagRepository;
+  private final ReportRepository reportRepository;
   private final BoardLikeRepository boardLikeRepository;
 
   //source를 구분하는 구분자
@@ -365,4 +368,28 @@ public class BoardService {
 
     boardLikeRepository.delete(likes);
   }
+
+  public AdminBoardListResponse getBoardByReport(Integer pageSize, Integer page, Boolean viewHigh5) {
+    Pageable pageable = PageRequest.of(page-1, pageSize);
+
+    List<Board> boardList;
+    List<LocalDateTime> recentReportedAtList = new ArrayList<>();
+
+    if (viewHigh5) {
+      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByReportCnt(5, pageable); //5회 이상인 것만 조회
+    } else {
+      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByReportCnt(1, pageable); //1회 이상인 것만 조회
+    }
+
+    for (Board b: boardList) {
+      LocalDateTime ldt = reportRepository.findByRecentReportByBoard(b.getPk())
+        .orElseGet(() -> null);
+      recentReportedAtList.add(ldt);
+    }
+
+    List<AdminBriefBoardInfo> info = AdminBriefBoardInfo.convertList(boardList, recentReportedAtList);
+
+    return new AdminBoardListResponse(boardList.size(), info);
+  }
+
 }

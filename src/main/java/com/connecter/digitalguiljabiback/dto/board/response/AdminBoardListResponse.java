@@ -1,6 +1,5 @@
 package com.connecter.digitalguiljabiback.dto.board.response;
 
-import com.connecter.digitalguiljabiback.domain.Board;
 import com.connecter.digitalguiljabiback.dto.board.AdminBriefBoardInfo;
 import com.connecter.digitalguiljabiback.dto.board.BriefBoardInfo;
 import lombok.AllArgsConstructor;
@@ -14,8 +13,8 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BoardListResponse {
+public class AdminBoardListResponse {
   private int cnt;
-  private List<BriefBoardInfo> list;
+  private List<AdminBriefBoardInfo> list;
 
 }
