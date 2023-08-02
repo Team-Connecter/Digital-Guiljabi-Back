@@ -12,6 +12,9 @@ import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
+  @Query("SELECT r FROM Report r JOIN r.user u WHERE u = ?1")
+  List<Report> findByUser(Users user);
+
   Optional<Report> findByUserAndBoard(Users user, Board board);
 
   @Query("select r from Report r join r.board b join b.user where b = ?1")

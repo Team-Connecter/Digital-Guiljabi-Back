@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.report;
+package com.connecter.digitalguiljabiback.dto.report.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

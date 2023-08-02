@@ -5,10 +5,11 @@ import com.connecter.digitalguiljabiback.domain.Report;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.board.AdminBriefBoardInfo;
 import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
-import com.connecter.digitalguiljabiback.dto.report.BriefReportResponse;
-import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
-import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
-import com.connecter.digitalguiljabiback.dto.report.ReportSortType;
+import com.connecter.digitalguiljabiback.dto.report.*;
+import com.connecter.digitalguiljabiback.dto.report.response.BriefReportResponse;
+import com.connecter.digitalguiljabiback.dto.report.response.MyReportListResponse;
+import com.connecter.digitalguiljabiback.dto.report.response.MyReportResponse;
+import com.connecter.digitalguiljabiback.dto.report.response.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.ReportDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.BoardRepository;
@@ -109,5 +110,12 @@ public class ReportService {
     }
 
     reportRepository.delete(report);
+  }
+
+  public MyReportListResponse getMyReport(Users user) {
+    List<Report> reportList = reportRepository.findByUser(user);
+    List<MyReportResponse> list = MyReportResponse.convertList(reportList);
+
+    return new MyReportListResponse(list.size(), list);
   }
 }

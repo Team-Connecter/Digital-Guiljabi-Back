@@ -1,13 +1,11 @@
-package com.connecter.digitalguiljabiback.dto.report;
+package com.connecter.digitalguiljabiback.dto.report.response;
 
-import com.connecter.digitalguiljabiback.domain.Board;
 import com.connecter.digitalguiljabiback.domain.Report;
 import com.connecter.digitalguiljabiback.domain.Users;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

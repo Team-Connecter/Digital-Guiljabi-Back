@@ -1,10 +1,9 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.board.SortType;
 import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
-import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
-import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
+import com.connecter.digitalguiljabiback.dto.report.response.MyReportListResponse;
+import com.connecter.digitalguiljabiback.dto.report.response.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
 import com.connecter.digitalguiljabiback.dto.report.ReportSortType;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
@@ -12,14 +11,11 @@ import com.connecter.digitalguiljabiback.exception.ReportDuplicatedException;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import com.connecter.digitalguiljabiback.service.ReportService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Tag(name = "ReportController", description = "신고 관련 API")
@@ -51,6 +47,14 @@ public class ReportController {
 
     return ResponseEntity.ok().build();
   }
+
+  //내가 신고한 글 목록 조회
+  @GetMapping("/reports/my")
+  public ResponseEntity getMyReport(@AuthenticationPrincipal Users user) {
+    MyReportListResponse myReport = reportService.getMyReport(user);
+
+    return ResponseEntity.ok(myReport);
+  }
   
   //ADMIN ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   //신고 많은 순으로 board 조회(5회 이상만 보기 추가)
@@ -73,5 +77,4 @@ public class ReportController {
 
     return ResponseEntity.ok(byBoard);
   }
-
 }
