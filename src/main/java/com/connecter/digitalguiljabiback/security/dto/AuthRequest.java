@@ -18,8 +18,9 @@ import org.springframework.util.MultiValueMap;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class KakaoAuthRequest {
+public class AuthRequest {
     private String authorizationCode;
+    private String state;
 
     /**
      * API 요청 바디를 생성하는 메서드
@@ -29,7 +30,12 @@ public class KakaoAuthRequest {
     public MultiValueMap<String, String> makeBody() {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("code", authorizationCode);
+        body.add("state", state);
         return body;
+    }
+
+    public AuthRequest(String authorizationCode) {
+        this.authorizationCode = authorizationCode;
     }
 }
 

@@ -43,20 +43,20 @@ public class LoginService {
    * @return 인증 응답 DTO
    * @throws IllegalArgumentException 지원되지 않는 사용자일 경우 예외를 던집니다.
    */
-  public LoginResponseDTO loginOrCreate(UserRequest userDTO) {
-    Users user = userRepository.findByUid("KAKAO" + userDTO.getUid().toString())
+  public LoginResponseDTO loginOrCreate(UserRequest userDTO, OauthType oauthType) {
+    Users user = userRepository.findByUid(oauthType.name() + userDTO.getUid())
       .orElseGet(() -> null);
 
     if (user == null) {
       //회원가입
-      Users newUser = Users.makeUsers(OauthType.KAKAO.name() + userDTO.getUid(), passwordEncoder.encode(userDTO.getUid().toString()), OauthType.KAKAO);
+      Users newUser = Users.makeUsers(oauthType.name() + userDTO.getUid(), passwordEncoder.encode(userDTO.getUid()), oauthType);
       user = userRepository.save(newUser);
     }
 
     authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(
         user.getUsername(),
-        userDTO.getUid().toString()
+        userDTO.getUid()
       )
     );
 

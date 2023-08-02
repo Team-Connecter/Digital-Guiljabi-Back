@@ -1,16 +1,13 @@
-package com.connecter.digitalguiljabiback.security.oauth;
+package com.connecter.digitalguiljabiback.security.oauth.naver;
 
-import com.connecter.digitalguiljabiback.security.dto.KakaoAuthRequest;
+import com.connecter.digitalguiljabiback.security.dto.AuthRequest;
 import com.connecter.digitalguiljabiback.security.dto.KakaoUserResponse;
+import com.connecter.digitalguiljabiback.security.dto.NaverUserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-
-import java.net.URI;
+import java.io.UnsupportedEncodingException;
 
 
 /**
@@ -25,17 +22,17 @@ import java.net.URI;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class KakaoClient {
+public class NaverClient {
 
-    private final KakaoAuthClient authClient;
-    private final KakaoAuthUrlBuilder authUrlBuilder;
+    private final NaverAuthClient authClient;
+    private final NaverAuthUrlBuilder authUrlBuilder;
 
     /**
      * 카카오 인증 URL로 리다이렉트하는 메서드입니다.
      * @return 리다이렉트 응답
      */
-    public String redirectToKakaoAuth() {
-        String authUrl = authUrlBuilder.buildKakaoAuthUrl();
+    public String redirectToNaverAuth() {
+        String authUrl = authUrlBuilder.buildAuthUrl();
         log.info("카카오 로그인 주소 = {}", authUrl);
 
         return authUrl;
@@ -46,11 +43,11 @@ public class KakaoClient {
      * @param req KakaoAuthRequest 객체로부터 인증 정보를 받아옵니다.
      * @return 로그인 완료 메시지
      */
-    public KakaoUserResponse handleCallback(KakaoAuthRequest req) {
-        String accessToken = authClient.requestKakaoAccessToken(req);
+    public NaverUserResponse handleCallback(AuthRequest req) throws UnsupportedEncodingException {
+        String accessToken = authClient.requestAccessToken(req);
 
-        KakaoUserResponse userInfo = authClient.requestKakaoUserInfo(accessToken);
-        log.info("카카오 액세스 토근 발급 성공: {}", accessToken);
+        NaverUserResponse userInfo = authClient.requestUserInfo(accessToken);
+        log.info("네이버 액세스 토근 발급 성공: {}", accessToken);
 
         return userInfo;
     }

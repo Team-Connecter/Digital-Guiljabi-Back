@@ -1,9 +1,9 @@
-package com.connecter.digitalguiljabiback.security.oauth;
+package com.connecter.digitalguiljabiback.security.oauth.kakao;
 
 import com.connecter.digitalguiljabiback.config.properties.KakaoProperties;
 import com.connecter.digitalguiljabiback.exception.KakaoClientException;
-import com.connecter.digitalguiljabiback.security.dto.KakaoAuthRequest;
-import com.connecter.digitalguiljabiback.security.dto.KakaoAuthResponse;
+import com.connecter.digitalguiljabiback.security.dto.AuthRequest;
+import com.connecter.digitalguiljabiback.security.dto.AuthResponse;
 import com.connecter.digitalguiljabiback.security.dto.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class KakaoAuthClient {
      * @return 요청한 액세스 토큰 문자열
      * @throws KakaoClientException 카카오 API 호출 중 예외가 발생했을 경우
      */
-    public String requestKakaoAccessToken(KakaoAuthRequest request) {
+    public String requestAccessToken(AuthRequest request) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
@@ -52,7 +52,7 @@ public class KakaoAuthClient {
 
 
         try {
-            KakaoAuthResponse response = restTemplate.postForObject(kakaoProperties.getTokenUri(), httpEntity, KakaoAuthResponse.class);
+            AuthResponse response = restTemplate.postForObject(kakaoProperties.getTokenUri(), httpEntity, AuthResponse.class);
             if (response == null || response.getAccessToken() == null) {
                 throw new KakaoClientException("카카오 API에서 액세스 토큰을 가져오지 못했습니다.");
             }
@@ -68,7 +68,7 @@ public class KakaoAuthClient {
      * @return 사용자 정보를 담고 있는 KakaoUserInfoResponse 객체
      * @throws KakaoClientException 카카오 API 호출 중 예외가 발생했을 경우
      */
-    public KakaoUserResponse requestKakaoUserInfo(String accessToken) {
+    public KakaoUserResponse requestUserInfo(String accessToken) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         httpHeaders.set("Authorization", "Bearer " + accessToken);

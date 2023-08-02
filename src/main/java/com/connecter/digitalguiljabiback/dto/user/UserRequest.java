@@ -8,6 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class UserRequest{
-  private Long uid;
+  private String uid;
 }
 

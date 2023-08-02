@@ -3,7 +3,9 @@ package com.connecter.digitalguiljabiback.security.dto;
 import com.connecter.digitalguiljabiback.dto.user.UserRequest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,17 +17,28 @@ import lombok.extern.slf4j.Slf4j;
  * 작성일: 2023-07-30
  */
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Slf4j
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoUserResponse {
-    @JsonProperty("id")
-    private Long uid;
+public class NaverUserResponse {
+    @JsonProperty("response")
+    private ResponseData response;
 
-    public Long getUid() {
-        return uid;
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    static class ResponseData {
+        private String id;
     }
+
+    public String getId() {
+        return response.getId();
+    }
+
 
     public UserRequest toUserRequest() {
-        return new UserRequest(uid.toString());
+        return new UserRequest(this.response.id);
     }
+
 }

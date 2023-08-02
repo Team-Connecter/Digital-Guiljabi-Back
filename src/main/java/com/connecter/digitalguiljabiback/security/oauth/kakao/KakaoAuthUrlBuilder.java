@@ -1,6 +1,7 @@
-package com.connecter.digitalguiljabiback.security.oauth;
+package com.connecter.digitalguiljabiback.security.oauth.kakao;
 
 import com.connecter.digitalguiljabiback.config.properties.KakaoProperties;
+import com.connecter.digitalguiljabiback.security.oauth.AuthUrlBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class KakaoAuthUrlBuilder {
+public class KakaoAuthUrlBuilder implements AuthUrlBuilder {
 
     private final KakaoProperties kakaoProperties;
 
@@ -26,7 +27,8 @@ public class KakaoAuthUrlBuilder {
      * 카카오 인증 URL을 생성합니다.
      * @return 생성된 카카오 인증 URL 문자열
      */
-    public String buildKakaoAuthUrl() {
+    @Override
+    public String buildAuthUrl() {
         String authorizationUri = kakaoProperties.getAuthorizationUri();
         String clientId = encodeQueryParam(kakaoProperties.getClientId());
         String redirectUri = encodeQueryParam(kakaoProperties.getRedirectUri());
