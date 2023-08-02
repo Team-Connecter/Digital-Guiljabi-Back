@@ -14,7 +14,8 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
   Optional<Report> findByUserAndBoard(Users user, Board board);
 
-  List<Report> findByUser(Users user);
+  @Query("select r from Report r join r.board b join b.user where b = ?1")
+  List<Report> findByBoard(Board board);
 
   @Query(value = "select r.create_at from report r join board b where b.pk = ?1 ORDER BY r.create_at desc LIMIT 1", nativeQuery = true)
   Optional<LocalDateTime> findByRecentReportByBoard(Long boardPk);

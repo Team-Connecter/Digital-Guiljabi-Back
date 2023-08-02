@@ -3,6 +3,8 @@ package com.connecter.digitalguiljabiback.service;
 import com.connecter.digitalguiljabiback.domain.Board;
 import com.connecter.digitalguiljabiback.domain.Report;
 import com.connecter.digitalguiljabiback.domain.Users;
+import com.connecter.digitalguiljabiback.dto.report.BriefReportResponse;
+import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
 import com.connecter.digitalguiljabiback.exception.ReportDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.BoardRepository;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -44,10 +47,21 @@ public class ReportService {
     board.addReportCnt();
   }
 
-  public void getMyReport(Users user) {
-    List<Report> byUser = reportRepository.findByUser(user);
+//  public void getMyReport(Users user) {
+//    List<Report> byUser = reportRepository.findByUser(user);
+//
+//
+//
+//  }
 
+  public ReportBoardListResponse findByBoard(Long boardPk) {
+    Board board = boardRepository.findById(boardPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 Board가 존재하지 않습니다"));
 
+    List<Report> reportList = reportRepository.findByBoard(board);
 
+    List<BriefReportResponse> briefReportResponses = BriefReportResponse.convertList(reportList);
+
+    return new ReportBoardListResponse(reportList.size(), briefReportResponses);
   }
 }

@@ -3,6 +3,7 @@ package com.connecter.digitalguiljabiback.controller;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
+import com.connecter.digitalguiljabiback.dto.report.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
 import com.connecter.digitalguiljabiback.service.BoardService;
 import com.connecter.digitalguiljabiback.service.ReportService;
@@ -46,9 +47,13 @@ public class ReportController {
     return ResponseEntity.ok(response);
   }
 
-  //  @Min(value = 2, message = "page 크기는 1보다 커야합니다")
-  //  private Integer pageSize;
-  //  @Min(value = 1, message = "page는 0보다 커야합니다")
-  //  private Integer page;
-  //  private Boolean viewHigh5; //5개 이상
+  //게시글에 대한 신고 목록 조회
+  @GetMapping("/admin/boards/{boardPk}/reports")
+  public ResponseEntity getReportByBoard(@PathVariable Long boardPk) {
+    ReportBoardListResponse byBoard = reportService.findByBoard(boardPk);
+
+    return ResponseEntity.ok(byBoard);
+  }
+
+
 }
