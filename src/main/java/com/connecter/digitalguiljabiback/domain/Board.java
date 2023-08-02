@@ -120,4 +120,8 @@ public class Board {
         this.boardTags.addAll(boardTags);
         this.contents.addAll(contents);
     }
+
+    public void addReportCnt() {
+        this.reportCnt += 1;
+    }
 }
