@@ -1,7 +1,7 @@
 package com.connecter.digitalguiljabiback.security.oauth.kakao;
 
-import com.connecter.digitalguiljabiback.security.dto.AuthRequest;
-import com.connecter.digitalguiljabiback.security.dto.KakaoUserResponse;
+import com.connecter.digitalguiljabiback.dto.login.AuthRequest;
+import com.connecter.digitalguiljabiback.dto.login.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -9,12 +9,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * KakaoClient
- * 카카오와의 통신을 담당하는 클라이언트 클래스입니다.
+ * 카카오와의 통신을 담당하는 클라이언트 클래스
  * KakaoAuthClient를 사용하여 액세스 토큰을 요청하고 사용자 정보를 가져옵니다.
  * KakaoAuthUrlBuilder를 사용하여 카카오 인증 URL을 생성합니다.
- * 작성자: hyunjin
- * 버전: 1.0.0
- * 작성일: 2023-07-30
  */
 @Component
 @RequiredArgsConstructor
@@ -25,10 +22,10 @@ public class KakaoClient {
     private final KakaoAuthUrlBuilder authUrlBuilder;
 
     /**
-     * 카카오 인증 URL로 리다이렉트하는 메서드입니다.
+     * 카카오 인증 URL을 반환하는 메서드
      * @return 리다이렉트 응답
      */
-    public String redirectToKakaoAuth() {
+    public String getAuthUrl() {
         String authUrl = authUrlBuilder.buildAuthUrl();
         log.info("카카오 로그인 주소 = {}", authUrl);
 

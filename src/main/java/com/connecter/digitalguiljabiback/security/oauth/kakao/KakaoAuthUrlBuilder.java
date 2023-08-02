@@ -11,10 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * KakaoAuthUrlBuilder
- * 카카오 인증 URL을 생성하는 빌더 클래스입니다.
- * 작성자: hyunjin
- * 버전: 1.0.0
- * 작성일: 2023-07-30
+ * 카카오 인증 URL을 생성하는 빌더 클래스
  */
 @Component
 @RequiredArgsConstructor
