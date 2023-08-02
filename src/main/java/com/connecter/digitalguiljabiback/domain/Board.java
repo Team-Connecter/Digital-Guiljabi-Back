@@ -42,7 +42,7 @@ public class Board {
 
     @CreationTimestamp
     @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    private LocalDateTime updateAt = LocalDateTime.now();
 
     @Column(name = "thumbnail_url", length = 99999)
     private String thumbnailUrl = null;
@@ -64,7 +64,7 @@ public class Board {
     private int reportCnt = 0; //신고횟수는 5회 이상이 넘어가지 않기 때문에 Long보단 int가 좋을 것 같음
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST)
-    private List<BoardCategory> boardCategories;
+    private List<BoardCategory> boardCategories = new ArrayList<>();
 
     @NotNull
     @Column(name = "like_cnt")

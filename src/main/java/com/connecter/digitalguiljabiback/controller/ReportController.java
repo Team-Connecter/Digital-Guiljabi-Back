@@ -42,7 +42,7 @@ public class ReportController {
     @RequestParam(required = false, defaultValue = "1") Integer page,
     @RequestParam(required = false, defaultValue = "false") Boolean viewHigh5
   ) {
-    AdminBoardListResponse response = boardService.getBoardByReport(pageSize, page, viewHigh5);
+    AdminBoardListResponse response = reportService.getBoardByReport(pageSize, page, viewHigh5);
 
     return ResponseEntity.ok(response);
   }

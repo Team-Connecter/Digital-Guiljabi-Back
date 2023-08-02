@@ -20,8 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,14 +36,12 @@ public class BoardService {
   private final CategoryRepository categoryRepository;
   private final BoardCategoryRepository boardCategoryRepository;
   private final UserRepository userRepository;
-  private final BoardTagRepository boardTagRepository;
-  private final ReportRepository reportRepository;
   private final BoardLikeRepository boardLikeRepository;
 
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
 
-  public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws NoSuchElementException {
+  public Board makeBoard(Users user, AddBoardRequest addBoardRequest) throws NoSuchElementException {
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
@@ -66,7 +62,7 @@ public class BoardService {
 
     board.setInfo(boardTags, boardContents);
 
-    boardRepository.save(board);
+    return boardRepository.save(board);
   }
 
   //출처는 이런 걸로 구분함 ㅎ..
@@ -162,12 +158,7 @@ public class BoardService {
   }
 
   private List<String> sourceTextToStringList(String sources) {
-    List<String> sourceList = new ArrayList<>();
-    StringTokenizer st = new StringTokenizer(sources, sourceDelim);
-    while (st.hasMoreTokens())
-      sourceList.add(st.nextToken());
-
-    return sourceList;
+    return Arrays.asList(sources.split(sourceDelim));
   }
 
   public BoardListResponse getApprovedBoardList(BoardListRequest request) throws CategoryNotFoundException {
@@ -369,27 +360,6 @@ public class BoardService {
     boardLikeRepository.delete(likes);
   }
 
-  public AdminBoardListResponse getBoardByReport(Integer pageSize, Integer page, Boolean viewHigh5) {
-    Pageable pageable = PageRequest.of(page-1, pageSize);
 
-    List<Board> boardList;
-    List<LocalDateTime> recentReportedAtList = new ArrayList<>();
-
-    if (viewHigh5) {
-      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByReportCnt(5, pageable); //5회 이상인 것만 조회
-    } else {
-      boardList = boardRepository.findByReportCntGreaterThanEqualOrderByReportCnt(1, pageable); //1회 이상인 것만 조회
-    }
-
-    for (Board b: boardList) {
-      LocalDateTime ldt = reportRepository.findByRecentReportByBoard(b.getPk())
-        .orElseGet(() -> null);
-      recentReportedAtList.add(ldt);
-    }
-
-    List<AdminBriefBoardInfo> info = AdminBriefBoardInfo.convertList(boardList, recentReportedAtList);
-
-    return new AdminBoardListResponse(boardList.size(), info);
-  }
 
 }
