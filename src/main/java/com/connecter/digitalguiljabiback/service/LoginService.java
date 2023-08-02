@@ -2,8 +2,8 @@ package com.connecter.digitalguiljabiback.service;
 
 import com.connecter.digitalguiljabiback.domain.OauthType;
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.user.LoginResponseDTO;
-import com.connecter.digitalguiljabiback.dto.user.UserRequest;
+import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
+import com.connecter.digitalguiljabiback.dto.login.UserRequest;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,14 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * 사용자 서비스 클래스
  * 다양한 사용자 어댑터들을 활용하여 로그인 또는 회원 가입을 처리합니다.
- * <p>
  * 사용자 어댑터들은 UserDTO 객체를 받아서 해당 사용자에 맞게 로그인 또는 회원 가입을 수행합니다.
  * 이 클래스는 UserDTO 객체를 사용하여 적절한 사용자 어댑터를 선택하고,
  * 해당 어댑터를 통해 로그인 또는 회원 가입 처리를 수행합니다.
- * <p>
- * 작성자: hyunjin
- * 버전: 1.0.0
- * 작성일: 2023년 7월 30일
  */
 @Service
 @RequiredArgsConstructor
@@ -37,13 +32,12 @@ public class LoginService {
   private final PasswordEncoder passwordEncoder;
 
   /**
-   * 로그인 또는 회원 가입 처리를 수행합니다.
-   *
+   * 로그인 또는 회원 가입 처리를 수행
    * @param userDTO 로그인 또는 회원 가입에 필요한 사용자 정보 객체
+   * @param oauthType oauth 로그인 시 타입지정: KAKAO, NAVER 등
    * @return 인증 응답 DTO
-   * @throws IllegalArgumentException 지원되지 않는 사용자일 경우 예외를 던집니다.
    */
-  public LoginResponseDTO loginOrCreate(UserRequest userDTO, OauthType oauthType) {
+  public LoginResponse loginOrCreate(UserRequest userDTO, OauthType oauthType) {
     Users user = userRepository.findByUid(oauthType.name() + userDTO.getUid())
       .orElseGet(() -> null);
 
@@ -60,9 +54,10 @@ public class LoginService {
       )
     );
 
+    //토큰 생성
     String jwtToken = jwtService.generateAccessToken(user);
 
-    return LoginResponseDTO.builder()
+    return LoginResponse.builder()
       .token(jwtToken)
       .userPk(user.getPk())
       .build();

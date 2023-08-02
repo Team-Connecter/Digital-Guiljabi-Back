@@ -11,13 +11,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 
-/**
- * KakaoAuthUrlBuilder
- * 카카오 인증 URL을 생성하는 빌더 클래스입니다.
- * 작성자: hyunjin
- * 버전: 1.0.0
- * 작성일: 2023-07-30
- */
+// 네이버 인증 URL을 생성하는 빌더 클래스
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -26,8 +20,8 @@ public class NaverAuthUrlBuilder implements AuthUrlBuilder {
     private final NaverProperties naverProperties;
 
     /**
-     * 카카오 인증 URL을 생성합니다.
-     * @return 생성된 카카오 인증 URL 문자열
+     * 네이버 인증 URL을 생성
+     * @return 생성된 네이버 인증 URL 문자열
      */
     @Override
     public String buildAuthUrl() {

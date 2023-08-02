@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.user;
+package com.connecter.digitalguiljabiback.dto.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginResponseDTO {
+public class LoginResponse {
         private String token;
         private Long userPk;
 

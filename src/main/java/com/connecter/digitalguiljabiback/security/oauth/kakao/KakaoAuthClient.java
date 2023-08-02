@@ -2,9 +2,9 @@ package com.connecter.digitalguiljabiback.security.oauth.kakao;
 
 import com.connecter.digitalguiljabiback.config.properties.KakaoProperties;
 import com.connecter.digitalguiljabiback.exception.KakaoClientException;
-import com.connecter.digitalguiljabiback.security.dto.AuthRequest;
-import com.connecter.digitalguiljabiback.security.dto.AuthResponse;
-import com.connecter.digitalguiljabiback.security.dto.KakaoUserResponse;
+import com.connecter.digitalguiljabiback.dto.login.AuthRequest;
+import com.connecter.digitalguiljabiback.dto.login.AuthResponse;
+import com.connecter.digitalguiljabiback.dto.login.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -18,11 +18,8 @@ import org.springframework.web.client.RestTemplate;
 
 /**
  * KakaoAuthClient
- * 카카오 API와의 통신을 담당하는 클라이언트 클래스입니다.
- * 카카오 인증에 관련된 액세스 토큰 요청과 사용자 정보를 가져오는 기능을 제공합니다.
- * 작성자: hyunjin
- * 버전: 1.0.0
- * 작성일: 2023-07-30
+ * 카카오 API와의 통신을 담당하는 클라이언트 클래스
+ * 카카오 인증에 관련된 액세스 토큰 요청과 사용자 정보를 가져오는 기능을 제공
  */
 @Component
 @RequiredArgsConstructor
@@ -33,7 +30,7 @@ public class KakaoAuthClient {
     private final RestTemplate restTemplate;
 
     /**
-     * 카카오 API로 액세스 토큰을 요청합니다.
+     * 카카오 API로 액세스 토큰을 요청
      * @param request KakaoAuthRequest 객체로부터 인증 정보를 받아옵니다.
      * @return 요청한 액세스 토큰 문자열
      * @throws KakaoClientException 카카오 API 호출 중 예외가 발생했을 경우

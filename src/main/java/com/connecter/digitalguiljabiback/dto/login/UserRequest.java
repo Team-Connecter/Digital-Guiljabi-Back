@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.user;
+package com.connecter.digitalguiljabiback.dto.login;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
