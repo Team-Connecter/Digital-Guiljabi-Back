@@ -9,7 +9,9 @@ import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.NotFoundException;
+import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.*;
+import com.connecter.digitalguiljabiback.repository.specification.BoardSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.jpa.domain.Specification.where;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,7 +42,7 @@ public class BoardService {
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
 
-  public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws RuntimeException {
+  public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws NoSuchElementException {
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
@@ -114,9 +118,18 @@ public class BoardService {
     return findTag;
   }
 
-  public BoardResponse getBoardInfo(Long boardPk) throws RuntimeException {
+  public BoardResponse getBoardInfo(Long boardPk, Users user) throws NoSuchElementException {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글을 찾을 수 없습니다"));
+
+    Users writer = board.getUser();
+
+    //게시글이 승인되지 않았다면 관리자, 작성자만 볼 수 있음
+    if (board.getStatus() != BoardStatus.APPROVED) {
+      if (user == null || (user.getRole() != UserRole.ADMIN && writer.getPk() != user.getPk())) {
+        throw new NoSuchElementException("해당 글을 볼 수 없는 사용자입니다");
+      }
+    }
 
     //boardTag -> String tag list
     List<String> tagList = board.getBoardTags().stream()
@@ -125,24 +138,8 @@ public class BoardService {
       .collect(Collectors.toList());
 
     List<String> sourceList = sourceTextToStringList(board.getSources());
-
-    List<CardDto> cardDtoList = new ArrayList<>();
-    for (BoardContent boardContent : board.getContents()) {
-      CardDto cardDto = new CardDto(boardContent.getTitle(), boardContent.getImgUrl(), boardContent.getContent());
-      cardDtoList.add(cardDto);
-    }
-
-    List<CategoryResponse> categories = new ArrayList<>();
-    for(BoardCategory boardCategory: board.getBoardCategories()) {
-      Category category = boardCategory.getCategory();
-      CategoryResponse cr = CategoryResponse.builder()
-        .name(category.getName())
-        .pk(category.getPk())
-        .build();
-      categories.add(cr);
-    }
-
-    Users writer = board.getUser();
+    List<CardDto> cardDtoList = CardDto.convert(board.getContents());
+    List<CategoryResponse> categories = CategoryResponse.convert(board.getBoardCategories());
 
     BoardResponse boardResponse = BoardResponse.builder()
       .title(board.getTitle())
@@ -170,39 +167,57 @@ public class BoardService {
     return sourceList;
   }
 
-  public BoardListResponse getApprovedBoardList(BoardListRequest request) throws RuntimeException {
+  public BoardListResponse getApprovedBoardList(BoardListRequest request) throws CategoryNotFoundException {
     return getBoardList(request, BoardStatus.APPROVED);
   }
 
-  public BoardListResponse getWaitingBoardList(BoardListRequest request) throws RuntimeException {
+  public BoardListResponse getWaitingBoardList(BoardListRequest request) throws CategoryNotFoundException {
     return getBoardList(request, BoardStatus.WAITING);
   }
 
   //APPROVED된 것만 조회가능
-  public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) throws RuntimeException {
-    //  private Long categoryPk;
-    //  private String search;
-
+  public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) throws CategoryNotFoundException {
     //pageable객체 만들기
-    Pageable pageable = makePageable(request.getSortType(), request.getPage(), request.getPageSize());
+    Pageable pageable = makePageable(request.getSort(), request.getPage(), request.getPageSize());
 
     List<Board> list;
 
     //선택한 카테고리, 검색어가 존재한다면 해당 카테고리에 해당하는 검색어와 일치하는 글을 조회
-    if (request.getCategoryPk() != null && request.getSearch() != null) {
-//      Category category = categoryRepository.findById(request.getCategoryPk())
-//        .orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 없습니다"));
-//      list = boardRepository.findByCategoryAndSearch(category, request.getSearch());
-      throw new NoSuchElementException("에러");
+    if (request.getCategoryPk() != null && request.getQ() != null) {
+      Category category = categoryRepository.findById(request.getCategoryPk())
+        .orElseThrow(() -> new CategoryNotFoundException("해당하는 카테고리가 없습니다"));
+
+
+      list = boardRepository.findAll(
+        where(BoardSpecification.matchesSearchTerm(request.getQ())) //검색어와 매칭
+          .and(BoardSpecification.hasCategory(category)) //카테고리 일치
+      );
+
     } else if (request.getCategoryPk() != null) { //카테고리만 지정된 경우
-      throw new NoSuchElementException("에러");
-    } else if (request.getSearch() != null) { //검색어만 지정된 경우
-      throw new NoSuchElementException("에러");
+      Category category = categoryRepository.findById(request.getCategoryPk())
+        .orElseThrow(() -> new CategoryNotFoundException("해당하는 카테고리가 없습니다"));
+
+      list = boardRepository.findByCategory(category);
+
+    } else if (request.getQ() != null) { //검색어만 지정된 경우
+      list = boardRepository.findAll(
+        where(BoardSpecification.matchesSearchTerm(request.getQ())) //검색어와 매칭
+      );
+
     } else { //아무것도 지정 x -> 그냥 줌
       list = boardRepository.findByStatus(pageable, boardStatus).getContent();
     }
 
-    List<BriefBoardInfo> briefBoardInfoList = convertToBriefDto(list);
+    List<List<Tag>> tagList = new ArrayList<>();
+    for (Board b: list) {
+      List<Tag> byBoard = tagRepository.findTagByBoard(b)
+        .orElseGet(() -> new ArrayList<>());
+
+      tagList.add(byBoard);
+    }
+
+    //전체 조회의 경우 태그가 필요함
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)
@@ -212,51 +227,6 @@ public class BoardService {
     return boardListResponse;
   }
 
-  private List<BriefBoardInfo> convertToBriefDto(List<Board> list) throws RuntimeException {
-    return convertToBriefDto(list, false);
-  }
-
-  private List<BriefBoardInfo> convertToBriefDto(List<Board> list, boolean ismyData) throws RuntimeException {
-    List<BriefBoardInfo> breifList = new ArrayList<>();
-
-    for (Board b: list) {
-      BriefBoardInfo brbi;
-
-      if (ismyData) { //내 데이터면 -> 태그 필요 x
-        brbi= BriefBoardInfo.builder()
-          .boardPk(b.getPk())
-          .title(b.getTitle())
-          .thumbnail(b.getThumbnailUrl())
-          .updateAt(b.getUpdateAt())
-          .likeCnt(b.getLikeCnt())
-          .bookmarkCnt(b.getBookmarkCnt())
-          .status(b.getStatus())
-          .reason(b.getReason())
-          .build();
-      } else { //전체 조회면 -> 태그 필요
-        List<Tag> byBoard = tagRepository.findTagByBoard(b)
-          .orElseGet(() -> new ArrayList<>());
-
-        brbi= BriefBoardInfo.builder()
-          .boardPk(b.getPk())
-          .title(b.getTitle())
-          .thumbnail(b.getThumbnailUrl())
-          .updateAt(b.getUpdateAt())
-          .introduction(b.getIntroduction())
-          .tag(byBoard.stream()
-            .map(Tag::getName)
-            .toArray(String[]::new)
-          )
-          .likeCnt(b.getLikeCnt())
-          .bookmarkCnt(b.getBookmarkCnt())
-          .build();
-      }
-
-      breifList.add(brbi);
-    }
-
-    return breifList;
-  }
 
   private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) throws RuntimeException {
 
@@ -275,11 +245,14 @@ public class BoardService {
     return PageRequest.of(page-1, pageSize, sort);
   }
 
-  public void approve(Long boardId, List<Long> categoryPkList) throws RuntimeException {
+  public void approve(Long boardId, List<Long> categoryPkList) throws NoSuchElementException {
     Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
-    List<Category> categoryList = categoryRepository.findByPkIn(categoryPkList);
+    List<Category> categoryList = new ArrayList<>();
+
+    if (categoryPkList != null)
+      categoryRepository.findByPkIn(categoryPkList);
 
     //카테고리가 이전과 같지 않거나, 세팅된 적이 없으면
     if (board.getBoardCategories() == null || board.getBoardCategories() != boardCategoryRepository.findByCategoryPkIn(categoryPkList)) {
@@ -300,7 +273,7 @@ public class BoardService {
     board.approve();
   }
 
-  public void reject(Long boardId, String rejReason) {
+  public void reject(Long boardId, String rejReason) throws NoSuchElementException {
     Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
@@ -310,7 +283,7 @@ public class BoardService {
   public BoardListResponse getMyList(Users user) {
     List<Board> boardList = boardRepository.findByUser(user);
 
-    List<BriefBoardInfo> briefBoardInfoList = convertToBriefDto(boardList, true);
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(boardList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)
@@ -325,12 +298,12 @@ public class BoardService {
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
 
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
+      .orElseThrow(() -> new ForbiddenException("유저정보가 이상합니다. 500"));
 
     //글 작성자거나, admin이 아니라면 수정 불가능
-    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser) {
+    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser)
       throw new ForbiddenException("권한이 없는 사용자");
-    }
+
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
 
@@ -347,37 +320,30 @@ public class BoardService {
     );
 
     boardRepository.save(board);
+  }
 
+  public void deleteBoard(Users user, Long boardPk) throws NoSuchElementException, ForbiddenException{
+    Users findUser = userRepository.findById(user.getPk())
+      .orElseThrow(() -> new ForbiddenException("user를 찾을 수 없음"));
 
-//
-//    Board board = Board.builder()
-//      .user(findUser)
-//      .title(addBoardRequest.getTitle())
-//      .thumbnailUrl(addBoardRequest.getThumbnail())
-//      .introduction(addBoardRequest.getIntroduction())
-//      .sources(sourceText)
-//      .build();
-//
-//    List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
-//    List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
-//
-//    board.setInfo(boardTags, boardContents);
-//
-//    boardRepository.save(board);
+    Board board = boardRepository.findById(boardPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 게시판을 찾을 수 없음"));
 
+    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser) {
+      throw new ForbiddenException("권한이 없는 사용자입니다");
+    }
 
-
-
+    boardRepository.delete(board);
   }
 
   // 게시글 좋아요
   public void addLikeToBoard(Users user, Long boardId) {
 
     Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
+      .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
 
     Users findUser = userRepository.findById(user.getPk())
-            .orElseThrow(() -> new NotFoundException("해당하는 사용자가 없습니다."));
+      .orElseThrow(() -> new NotFoundException("해당하는 사용자가 없습니다."));
 
     Likes likes = Likes.makeLikes(findUser, board);
 
@@ -392,10 +358,10 @@ public class BoardService {
   // 게시글 좋아요 취소
   public void cancelLikeToBoard(Users user, Long boardId) {
     Board board = boardRepository.findById(boardId)
-            .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
+      .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
 
     Likes likes = boardLikeRepository.findByUserAndBoard(user, board)
-            .orElseThrow(() -> new NotFoundException("좋아요가 존재하지 않습니다."));
+      .orElseThrow(() -> new NotFoundException("좋아요가 존재하지 않습니다."));
 
     boardLikeRepository.delete(likes);
   }
