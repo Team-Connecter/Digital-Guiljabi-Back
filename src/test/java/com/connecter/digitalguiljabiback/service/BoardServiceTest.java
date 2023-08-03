@@ -1,12 +1,11 @@
 package com.connecter.digitalguiljabiback.service;
 
-import com.connecter.digitalguiljabiback.domain.Board;
-import com.connecter.digitalguiljabiback.domain.BoardStatus;
-import com.connecter.digitalguiljabiback.domain.OauthType;
-import com.connecter.digitalguiljabiback.domain.Users;
+import com.connecter.digitalguiljabiback.domain.*;
 import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
+import com.connecter.digitalguiljabiback.dto.category.AddCategoryRequest;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import org.junit.jupiter.api.*;
@@ -30,6 +29,8 @@ class BoardServiceTest {
 
   @Autowired
   private BoardService boardService;
+  @Autowired
+  private CategoryService categoryService;
   @Autowired
   private UserRepository userRepository;
 
@@ -130,6 +131,23 @@ class BoardServiceTest {
   }
 
   //정보글 승인 + 카테고리 등록 + 조회 확인
+//  @DisplayName("정보글 승인, 카테고리 등록")
+//  @Transactional
+//  @Order(3)
+//  @Test
+//  void approveBoard() {
+//    Users user1 = Users.makeUsers("KAKAO12341", "asdf", OauthType.KAKAO);
+//    Users saveUser1 = userRepository.save(user1);
+//
+//    AddBoardRequest request = new AddBoardRequest(title,introduction,thumbnail,cards,tags, sources);
+//
+//    Board newBoard = boardService.makeBoard(user1, request);
+//
+//    Category savedCategory = categoryService.add(new AddCategoryRequest("카테고리1", null));
+//
+//    BoardListRequest request = new BoardListRequest()
+//    boardService.getApprovedBoardList()
+//  }
 
   //정보글 승인거부
 
