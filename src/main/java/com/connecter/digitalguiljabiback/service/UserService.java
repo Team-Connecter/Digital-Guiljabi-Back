@@ -59,7 +59,7 @@ public class UserService {
   }
 
   public AllUserResponse getAll(int pageSize, int page) {
-    Pageable pageable = PageRequest.of(page,pageSize, Sort.Direction.DESC, "createAt");
+    Pageable pageable = PageRequest.of(page-1 ,pageSize, Sort.Direction.DESC, "createAt");
 
     List<Users> userList = userRepository.findAll(pageable).getContent();
 

@@ -56,6 +56,7 @@ public class BoardController {
   }
 
   //내가 쓴 글 모두 조회
+  @Secured("USER")
   @GetMapping("/boards/my")
   public ResponseEntity<BoardListResponse> getMyBoardList(@AuthenticationPrincipal Users user) {
     BoardListResponse myList = boardService.getMyList(user);
@@ -97,6 +98,17 @@ public class BoardController {
   public ResponseEntity cancelLikeToBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId) {
     boardService.cancelLikeToBoard(user, boardId);
     return ResponseEntity.ok().build();
+  }
+
+  //인기 게시글 조회
+  @GetMapping("/boards/popular")
+  public ResponseEntity<BoardListResponse> getBoradSortPopular(
+    @RequestParam(required = false, defaultValue = "10")int pageSize,
+    @RequestParam(required = false, defaultValue = "1")int page
+  ) {
+    BoardListResponse boardList = boardService.getPopularBoardList(pageSize, page);
+
+    return ResponseEntity.ok(boardList);
   }
 
   //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ

@@ -225,7 +225,7 @@ public class BoardService {
   private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) throws RuntimeException {
 
     Sort sort;
-    if (sortType == null || sortType == SortType.NEW)
+    if (sortType == null || sortType == SortType.POP)
       sort = Sort.by(Sort.Direction.DESC, "likeCnt");
     else
       sort = Sort.by(Sort.Direction.DESC, "updateAt");
@@ -361,5 +361,28 @@ public class BoardService {
   }
 
 
+  public BoardListResponse getPopularBoardList(int pageSize, int page) {
+    //pageable객체 만들기
+    Pageable pageable = makePageable(SortType.POP, page, pageSize);
 
+    List<Board> list = boardRepository.findAll(pageable).getContent();
+
+    List<List<Tag>> tagList = new ArrayList<>();
+    for (Board b: list) {
+      List<Tag> byBoard = tagRepository.findTagByBoard(b)
+        .orElseGet(() -> new ArrayList<>());
+
+      tagList.add(byBoard);
+    }
+
+    //전체 조회의 경우 태그가 필요함
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
+
+    BoardListResponse boardListResponse = BoardListResponse.builder()
+      .list(briefBoardInfoList)
+      .cnt(briefBoardInfoList.size())
+      .build();
+
+    return boardListResponse;
+  }
 }
