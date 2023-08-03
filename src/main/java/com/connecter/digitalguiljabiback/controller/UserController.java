@@ -23,6 +23,7 @@ public class UserController {
   private final KakaoClient kakaoClient;
   private final LoginService loginService;
 
+
   @GetMapping
   public ResponseEntity getUserInfo(@AuthenticationPrincipal Users user) {
     log.info("userDetails.getUsername() = {}", user.getUsername());

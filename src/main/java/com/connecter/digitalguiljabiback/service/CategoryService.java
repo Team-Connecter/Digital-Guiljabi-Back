@@ -27,7 +27,7 @@ public class CategoryService {
   private final CategoryRepository categoryRepository;
 
   @Transactional
-  public void add(AddCategoryRequest addCategoryRequest) throws CategoryNotFoundException, CategoryNameDuplicatedException {
+  public Category add(AddCategoryRequest addCategoryRequest) throws CategoryNotFoundException, CategoryNameDuplicatedException {
     String name = addCategoryRequest.getName();
     Long parentPk = addCategoryRequest.getParentCategoryPk();
 
@@ -53,7 +53,9 @@ public class CategoryService {
 
     //카테고리 추가
     Category category = Category.makeCategory(name);
-    addNewCategory(category, parentPk);
+    Category savedCategory = addNewCategory(category, parentPk);
+
+    return savedCategory;
   }
 
   private Category addNewCategory(Category category, Long parentPk) {
