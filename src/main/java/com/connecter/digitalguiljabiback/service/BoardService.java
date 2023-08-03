@@ -239,14 +239,14 @@ public class BoardService {
     return PageRequest.of(page-1, pageSize, sort);
   }
 
-  public void approve(Long boardId, List<Long> categoryPkList) throws NoSuchElementException {
-    Board board = boardRepository.findById(boardId)
+  public void approve(Long boardPk, List<Long> categoryPkList) throws NoSuchElementException {
+    Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
     List<Category> categoryList = new ArrayList<>();
 
     if (categoryPkList != null)
-      categoryRepository.findByPkIn(categoryPkList);
+      categoryList = categoryRepository.findByPkIn(categoryPkList);
 
     //카테고리가 이전과 같지 않거나, 세팅된 적이 없으면
     if (board.getBoardCategories() == null || board.getBoardCategories() != boardCategoryRepository.findByCategoryPkIn(categoryPkList)) {
@@ -257,9 +257,12 @@ public class BoardService {
           boardCategoryRepository.deleteById(bc.getPk());
       }
 
-      List<BoardCategory> boardCategoryList = categoryList.stream()
-        .map((Category c) -> BoardCategory.makeBoardCategory(c, board))
-        .collect(Collectors.toList());
+      List<BoardCategory> boardCategoryList = new ArrayList<>();
+      for (Category c: categoryList) {
+        BoardCategory bc = BoardCategory.makeBoardCategory(c, board);
+        boardCategoryList.add(bc);
+        boardCategoryRepository.save(bc);
+      }
 
       board.setBoardCategories(boardCategoryList);
     }
