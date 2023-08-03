@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@Tag(name = "BoardController", description = "정보글 관련 API")
+@Tag(name = "BoardController - Test", description = "정보글 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -119,7 +119,7 @@ public class BoardController {
 
 
   //승인되지 않은 글 모두 조회
-  @GetMapping("/admin/boards/waiting")
+  @GetMapping("/admin/boards/waiting") //@TODO 오류있으니 확인 - @ModelAttribute
   public ResponseEntity<BoardListResponse> getWaitingBoardList(@Valid @ModelAttribute BoardListRequest listBoardRequest) throws CategoryNotFoundException {
     BoardListResponse boardList = boardService.getWaitingBoardList(listBoardRequest);
 

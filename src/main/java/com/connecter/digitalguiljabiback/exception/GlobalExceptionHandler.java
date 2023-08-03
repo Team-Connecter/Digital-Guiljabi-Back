@@ -47,4 +47,10 @@ public class GlobalExceptionHandler {
     log.info("CategoryNameDuplicatedException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
+
+  @ExceptionHandler(ReportDuplicatedException.class)
+  protected ResponseEntity handlerReportDuplicatedException(ReportDuplicatedException e) {
+    log.info("ReportDuplicatedException = {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+  }
 }
