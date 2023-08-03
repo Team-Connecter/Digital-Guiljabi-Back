@@ -2,12 +2,18 @@ package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.dto.category.AddCategoryRequest;
 import com.connecter.digitalguiljabiback.dto.category.CategoryListResponse;
+import com.connecter.digitalguiljabiback.exception.CategoryNameDuplicatedException;
+import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.service.CategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.NoSuchElementException;
 
 
 @Tag(name = "CategoryController", description = "카테고리 관련 API입니다")
@@ -21,10 +27,10 @@ public class CategoryController {
 
   //[관리자]카테고리 추가
   @PostMapping("/admin/categories")
-  public ResponseEntity addCategory(@RequestBody AddCategoryRequest addCategoryRequest) {
+  public ResponseEntity addCategory(@RequestBody @Valid AddCategoryRequest addCategoryRequest) throws CategoryNotFoundException, CategoryNameDuplicatedException {
     categoryService.add(addCategoryRequest);
 
-    return ResponseEntity.ok().build();
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   //최상위 카테고리 조회
@@ -37,7 +43,7 @@ public class CategoryController {
 
   //직속 자식 찾기
   @GetMapping("/categories/{categoryPk}/children")
-  public ResponseEntity<CategoryListResponse> getChildren(@PathVariable Long categoryPk) {
+  public ResponseEntity<CategoryListResponse> getChildren(@PathVariable Long categoryPk) throws NoSuchElementException {
     CategoryListResponse ancestors = categoryService.getChildren(categoryPk);
 
     return ResponseEntity.ok(ancestors);
@@ -45,7 +51,7 @@ public class CategoryController {
 
   //내 조상 모두 찾아 먼 순서대로 내림차순 정렬(나 포함)
   @GetMapping("/categories/{categoryPk}/ancestor")
-  public ResponseEntity<CategoryListResponse> getMyAncestor(@PathVariable Long categoryPk) {
+  public ResponseEntity<CategoryListResponse> getMyAncestor(@PathVariable Long categoryPk) throws NoSuchElementException {
     CategoryListResponse ancestors = categoryService.getMyAncestor(categoryPk);
 
     return ResponseEntity.ok(ancestors);

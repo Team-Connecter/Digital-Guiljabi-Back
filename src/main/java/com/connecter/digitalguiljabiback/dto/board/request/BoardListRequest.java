@@ -10,10 +10,10 @@ import lombok.Getter;
 public class BoardListRequest {
   //전부 nullable
   private Long categoryPk;
-  private String search;
+  private String q;
   @Min(value = 2, message = "page 크기는 1보다 커야합니다")
   private Integer pageSize;
   @Min(value = 1, message = "page는 0보다 커야합니다")
   private Integer page;
-  private SortType sortType;
+  private SortType sort;
 }

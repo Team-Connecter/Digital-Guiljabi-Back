@@ -22,5 +22,7 @@ public class UsernameDuplicatedException extends RuntimeException {
     super(message, cause, enableSuppression, writableStackTrace);
   }
 
+
+
 }
 
