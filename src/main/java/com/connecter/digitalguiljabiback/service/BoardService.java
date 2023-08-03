@@ -4,6 +4,7 @@ import com.connecter.digitalguiljabiback.domain.*;
 import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
+import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,13 +36,12 @@ public class BoardService {
   private final CategoryRepository categoryRepository;
   private final BoardCategoryRepository boardCategoryRepository;
   private final UserRepository userRepository;
-  private final BoardTagRepository boardTagRepository;
   private final BoardLikeRepository boardLikeRepository;
 
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
 
-  public void makeBoard(Users user, AddBoardRequest addBoardRequest) throws NoSuchElementException {
+  public Board makeBoard(Users user, AddBoardRequest addBoardRequest) throws NoSuchElementException {
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
@@ -63,7 +62,7 @@ public class BoardService {
 
     board.setInfo(boardTags, boardContents);
 
-    boardRepository.save(board);
+    return boardRepository.save(board);
   }
 
   //출처는 이런 걸로 구분함 ㅎ..
@@ -159,12 +158,7 @@ public class BoardService {
   }
 
   private List<String> sourceTextToStringList(String sources) {
-    List<String> sourceList = new ArrayList<>();
-    StringTokenizer st = new StringTokenizer(sources, sourceDelim);
-    while (st.hasMoreTokens())
-      sourceList.add(st.nextToken());
-
-    return sourceList;
+    return Arrays.asList(sources.split(sourceDelim));
   }
 
   public BoardListResponse getApprovedBoardList(BoardListRequest request) throws CategoryNotFoundException {
@@ -365,4 +359,7 @@ public class BoardService {
 
     boardLikeRepository.delete(likes);
   }
+
+
+
 }

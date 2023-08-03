@@ -14,17 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
 
-//    //중복 아이디 확인
-//    @Transactional(readOnly = true)
-//    public boolean isExistId(String id) {
-//        Users user = userRepository.findById(id)
-//          .orElseGet(() -> null);
-//
-//        return (user == null)? false : true;
-//    }
+
+
 
 }

@@ -11,6 +11,7 @@ import com.connecter.digitalguiljabiback.service.LoginService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +37,7 @@ public class LoginController {
   public ResponseEntity<Map> getKakaoLoginUrl() {
     Map<String, String> map = new HashMap<>();
     map.put("loginUrl", kakaoClient.getAuthUrl());
-    return ResponseEntity.ok(map);
+    return ResponseEntity.status(HttpStatus.CREATED).body(map);
   }
 
   /**
@@ -62,7 +63,7 @@ public class LoginController {
   public ResponseEntity<Map> getNaverLoginUrl() {
     Map<String, String> map = new HashMap<>();
     map.put("loginUrl", naverClient.getAuthUrl());
-    return ResponseEntity.ok(map);
+    return ResponseEntity.status(HttpStatus.CREATED).body(map);
   }
 
   /**
@@ -76,7 +77,7 @@ public class LoginController {
   public ResponseEntity<LoginResponse> processNaverLoginCallback(
     @RequestParam("code") String authorizationCode,
     @RequestParam("state") String state
-  ) throws UnsupportedEncodingException {
+  ) {
     AuthRequest params = new AuthRequest(authorizationCode, state);
     NaverUserResponse response = naverClient.handleCallback(params);
 
