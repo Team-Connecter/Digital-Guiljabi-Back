@@ -46,6 +46,7 @@ class BoardServiceTest {
   private CardDto[] cards;
   private String[] tags;
   private String[] sources;
+  private String reason;
 
 
   @BeforeAll
@@ -61,6 +62,8 @@ class BoardServiceTest {
     sources = new String[3];
     for (int i =0; i<3; i++)
       sources[i] = "source" + i;
+
+    reason = "마음에 안듦";
   }
 
   @DisplayName("정보글 생성") //정보글 생성 시 엔티티가 잘 만들어지는지, get했을 때도 잘 불러와지는지 확인
@@ -215,8 +218,66 @@ class BoardServiceTest {
   }
 
   //정보글 승인거부
+  @DisplayName("정보글 승인거부")
+  @Transactional
+  @Order(5)
+  @Test
+  void rejectBoard() {
+    Users user1 = Users.makeUsers("KAKAO12341", "asdf", OauthType.KAKAO);
+    userRepository.save(user1);
 
-  //정보글 검색 잘되는지 확인
+    AddBoardRequest request = new AddBoardRequest(title,introduction,thumbnail,cards,tags, sources);
+
+    Board newBoard = boardService.makeBoard(user1, request);
+
+    //카테고리 만들기
+    Category savedCategory = categoryService.add(new AddCategoryRequest("카테고리1", null));
+
+    //승인거부하기
+    boardService.reject(newBoard.getPk(), reason);
+
+    //board 승인목록 조회 - 데이터가 없어야함
+    BoardListRequest request3 = new BoardListRequest(null, null, 10, 1, null);
+    BoardListResponse approvedBoardList = boardService.getApprovedBoardList(request3);
+
+    boolean hasData = false;
+    for (BriefBoardInfo info: approvedBoardList.getList()) {
+      if (info.getTitle().equals(title)) {
+        hasData = true;
+        break;
+      }
+    }
+
+    assertFalse(hasData);
+
+    //거부된 애들 조회
+    BoardListRequest listRequest = new BoardListRequest(null, null, null, null, null);
+    BoardListResponse boardList = boardService.getBoardList(listRequest, BoardStatus.REFUSAL);
+
+    hasData = false;
+    for (BriefBoardInfo info: boardList.getList()) {
+      if (info.getTitle().equals(title)) {
+        hasData = true;
+        break;
+      }
+    }
+    assertTrue(hasData);
+
+    //내 꺼 조회
+    BoardListResponse myList = boardService.getMyList(user1);
+    hasData = false;
+    for (BriefBoardInfo info: myList.getList()) {
+      if (info.getTitle().equals(title)) {
+        hasData = true;
+        assertEquals(info.getStatus(), BoardStatus.REFUSAL);
+        break;
+      }
+    }
+
+    assertTrue(hasData);
+  }
+
+  //태그로 검색 잘되는지 확인
 
   //정보글 수정
 

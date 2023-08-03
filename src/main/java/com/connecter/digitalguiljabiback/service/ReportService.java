@@ -124,8 +124,9 @@ public class ReportService {
       .orElseThrow(() -> new NoSuchElementException("해당 pk의 정보글이 존재하지 않습니다"));
 
     List<Report> reportList = reportRepository.findByBoard(board);
-    for(Report r: reportList) {
+    for(Report r: reportList)
       reportRepository.delete(r);
-    }
+
+    board.initReportCnt();
   }
 }
