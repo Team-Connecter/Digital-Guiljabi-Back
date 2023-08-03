@@ -19,14 +19,14 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Slf4j
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 @Service
 public class CategoryService {
   
   private final CategoryRepository categoryRepository;
 
-  @Transactional
+  //카테고리 추가
   public Category add(AddCategoryRequest addCategoryRequest) throws CategoryNotFoundException, CategoryNameDuplicatedException {
     String name = addCategoryRequest.getName();
     Long parentPk = addCategoryRequest.getParentCategoryPk();
@@ -104,6 +104,7 @@ public class CategoryService {
   }
 
   //직속 자식 찾기
+  @Transactional(readOnly = true)
   public CategoryListResponse getChildren(Long categoryPk) throws NoSuchElementException {
     categoryRepository.findById(categoryPk).orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
 
@@ -119,7 +120,8 @@ public class CategoryService {
     return listDto;
   }
 
-  //내 모든 조상 찾기
+  //내 모든 조상 찾기(나 포함)
+  @Transactional(readOnly = true)
   public CategoryListResponse getMyAncestor(Long categoryPk) throws NoSuchElementException {
     categoryRepository.findById(categoryPk).orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 존재하지 않습니다"));
 
@@ -134,5 +136,16 @@ public class CategoryService {
       .build();
 
     return listDto;
+  }
+
+  public void editCategoryName(Long categoryPk, String name) {
+    Category category = categoryRepository.findById(categoryPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+
+    category.updateName(name);
+  }
+
+  public void moveCategory(Long categoryPk, Long parentPk) {
+    categoryRepository.updateConnect(categoryPk, parentPk);
   }
 }

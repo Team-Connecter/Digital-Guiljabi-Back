@@ -61,9 +61,8 @@ public class Users implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
-    public void updateNickname(String nickname) {
-        this.nickname = nickname;
-    }
+    public void updateNickname(String nickname) { this.nickname = nickname; }
+    public void updateProfileImg(String profileUrl) { this.profileUrl = profileUrl; }
 
     public static Users makeUsers(String uidString, String passwords, OauthType oauthType) {
         Users user = new Users();
@@ -108,4 +107,10 @@ public class Users implements UserDetails {
         return true;
     }
 
+    public void updateInfo(String nickname, String introduction, String idvms, String id1365) {
+        this.nickname = (nickname != null)? nickname : this.nickname;
+        this.introduction = (introduction != null)? introduction : this.introduction;
+        this.idvms = (idvms != null)? idvms : this.idvms;
+        this.id1365 = (id1365 != null)? id1365 : this.id1365;
+    }
 }
