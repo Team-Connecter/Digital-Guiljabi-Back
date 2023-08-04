@@ -3,13 +3,9 @@ package com.connecter.digitalguiljabiback.service;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ReportServiceTest {
-
-
   //신고등록 테스트 (board에 신고횟수 증가 여부)
 
-
   //신고 5회 이상 board 가려지는지 확인
-
 
   //신고 같은 사람이 같은 board에 2번이상 불가능
 

@@ -1,21 +1,20 @@
 package com.connecter.digitalguiljabiback.service;
 
 import com.connecter.digitalguiljabiback.domain.Category;
-import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.category.AddCategoryRequest;
 import com.connecter.digitalguiljabiback.dto.category.CategoryListResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.CategoryNameDuplicatedException;
-import com.connecter.digitalguiljabiback.exception.ForbiddenException;
-import com.connecter.digitalguiljabiback.repository.BoardRepository;
-import com.connecter.digitalguiljabiback.repository.UserRepository;
+import com.connecter.digitalguiljabiback.repository.CategoryRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -29,6 +28,10 @@ public class CategoryServiceTest {
   private BoardService boardService;
   @Autowired
   private CategoryService categoryService;
+  @Autowired
+  private CategoryRepository categoryRepository;
+  @Autowired
+  private EntityManager em;
 
   private final String name1 = "카테고리1";
   private final String name2 = "카테고리2";
@@ -144,7 +147,7 @@ public class CategoryServiceTest {
   @Transactional
   @Order(5)
   @Test
-  void moveCategoryName() {
+  void moveCategory() {
     // -- category1 - category3
     // |
     // -- category2 - category4
@@ -222,7 +225,63 @@ public class CategoryServiceTest {
   }
   
   //카테고리 삭제 테스트
-  
-  //카테고리 이등 테스트
+  @DisplayName("카테고리 삭제 테스트")
+  @Transactional
+  @Order(6)
+  @Test
+  void deleteCategory() {
+    // -- category1 - category2 - category3
+    // |
+    // -- category4
+    Category category1 = categoryService.add(new AddCategoryRequest(name1, null));
+    Category category2 = categoryService.add(new AddCategoryRequest(name2, category1.getPk()));
+    Category category3 = categoryService.add(new AddCategoryRequest(name3, category2.getPk()));
+    Category category4 = categoryService.add(new AddCategoryRequest(name4, null));
+
+
+    //자식이 없는 경우
+    //내가 조상에서 삭제됐는지 확인
+    CategoryListResponse ancestorList = categoryService.getAncestorList();
+    boolean isAncestor = false;
+    for (CategoryResponse cr: ancestorList.getList()) {
+      if (cr.getPk() == category4.getPk()) {
+        isAncestor = true;
+        break;
+      }
+    }
+    assertTrue(isAncestor);
+
+    categoryService.delete(category4.getPk());
+
+    ancestorList = categoryService.getAncestorList();
+    isAncestor = false;
+    for (CategoryResponse cr: ancestorList.getList()) {
+      if (cr.getPk() == category4.getPk()) {
+        isAncestor = true;
+        break;
+      }
+    }
+    assertFalse(isAncestor);
+
+    //자식이 존재하는 경우
+    categoryService.delete(category2.getPk());
+
+    CategoryListResponse children = categoryService.getChildren(category1.getPk());
+    boolean isChild2 = false;
+    for (CategoryResponse cr: children.getList()) {
+      if (cr.getPk() == category2.getPk()) {
+        isChild2 = true;
+        break;
+      }
+    }
+    assertFalse(isChild2);
+
+    //자식까지 싹 사라졌는지 확인
+    assertThrows(NoSuchElementException.class, () -> {
+      Category category = categoryRepository.findById(category3.getPk())
+        .orElseThrow(() -> new NoSuchElementException("asdf"));
+    });
+  }
+
 
 }

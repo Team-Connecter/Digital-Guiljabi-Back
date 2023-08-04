@@ -1,15 +1,21 @@
 package com.connecter.digitalguiljabiback.repository;
 
 import com.connecter.digitalguiljabiback.domain.Category;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<Category, Long> {
+
 
   String findAncestors = """
     select * from category c where not exists(
@@ -30,8 +36,13 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
   @Procedure(procedureName = "insertCategory")
   void addConnect(@Param("cur_idx") Long categoryPk, @Param("parent_idx")Long parentCategoryPk);
 
+
+//  @Transactional
+//  @Modifying(clearAutomatically = true)
+//  @Query(value = "CALL deleteCategory(?1)", nativeQuery = true)
   @Procedure(procedureName = "deleteCategory")
   void deleteConnect(@Param("cur_idx") Long categoryPk);
+
 
   @Procedure(procedureName = "updateCategory")
   void updateConnect(@Param("cur_idx") Long categoryPk, @Param("parent_idx") Long parentCategoryPk);
