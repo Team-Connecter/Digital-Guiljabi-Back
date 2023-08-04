@@ -56,15 +56,17 @@ jobs:
       - name: SCP transfer
         uses: appleboy/scp-action@v0.1.4
         with:
+          username: ubuntu
           host: ${{ secrets.SERVER_IP }}
           port: 22
           key: ${{ secrets.PEM_KEY }}
-          source: "*.jar"
+          source: "./build/libs/*.jar"
           target: "~/cicd"
 
       - name: Execute remote commands
         uses: appleboy/ssh-action@v0.1.10
         with:
+          username: ubuntu
           host: ${{ secrets.SERVER_IP }}
           key: ${{ secrets.PEM_KEY }}
           port: 22
