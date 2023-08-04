@@ -44,3 +44,31 @@ jobs:
         name: BreadcrumbsDigital-Guiljabi-Back
         path: build/libs/*.jar
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: Digital-Guiljabi-Back
+
+      - name: SCP transfer
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          port: 22
+          key: ${{ secrets.PEM_KEY }}
+          source: "*.jar"
+          target: "~/cicd"
+
+      - name: Execute remote commands
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          key: ${{ secrets.PEM_KEY }}
+          port: 22
+          script: ~/cicd/script.sh
+      #          script: |
+      #            sudo fuser -k 8080/tcp
+      #            sudo nohup java -jar ~/cicd/*.jar &
