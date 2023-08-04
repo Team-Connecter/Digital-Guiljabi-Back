@@ -5,11 +5,9 @@ import com.connecter.digitalguiljabiback.dto.category.AddCategoryRequest;
 import com.connecter.digitalguiljabiback.dto.category.CategoryListResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.CategoryNameDuplicatedException;
-import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.CategoryRepository;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Slf4j
 @Transactional
@@ -160,8 +157,7 @@ public class CategoryService {
   }
 
   //자식까지 삭 삭제
-  @Transactional
-  public void delete(Long categoryPk) {
+  public void delete(Long categoryPk) throws NoSuchElementException {
     categoryRepository.findById(categoryPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
 

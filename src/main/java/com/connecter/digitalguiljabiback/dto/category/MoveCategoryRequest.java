@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.user;
+package com.connecter.digitalguiljabiback.dto.category;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class NicknameRequest {
-  @NotNull
-  private String nickname;
+public class MoveCategoryRequest {
+  //null가능 - null이면 가장 최상위 부모
+  private Long parentCategoryPk;
 }

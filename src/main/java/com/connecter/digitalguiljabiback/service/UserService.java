@@ -7,6 +7,7 @@ import com.connecter.digitalguiljabiback.dto.user.NicknameRequest;
 import com.connecter.digitalguiljabiback.dto.user.response.AllUserResponse;
 import com.connecter.digitalguiljabiback.dto.user.response.UsersInfoResponse;
 import com.connecter.digitalguiljabiback.dto.user.response.UsersResponse;
+import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,21 +27,27 @@ import java.util.NoSuchElementException;
 public class UserService {
     private final UserRepository userRepository;
 
-  public void changeUserNickname(Users user, NicknameRequest request) {
+  public void changeUserNickname(Users user, NicknameRequest request) throws NoSuchElementException, UsernameDuplicatedException {
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
+
+    Users findByNickname = userRepository.findByNickname(request.getNickname())
+      .orElseGet(null);
+
+    if (findByNickname != null)
+      throw new UsernameDuplicatedException("같은 닉네임의 유저가 이미 존재합니다");
 
     findUser.updateNickname(request.getNickname());
   }
 
-  public void changeProfileImg(Users user, ImgUrlRequest request) {
+  public void changeProfileImg(Users user, ImgUrlRequest request) throws NoSuchElementException {
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
 
     findUser.updateProfileImg(request.getImgUrl());
   }
 
-  public void changeInfo(Users user, InfoRequest request) {
+  public void changeInfo(Users user, InfoRequest request) throws NoSuchElementException {
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
 
@@ -55,6 +62,7 @@ public class UserService {
       .joinAt(user.getCreateAt())
       .idVms(user.getIdvms())
       .id21365(user.getId1365())
+      .imgUrl(user.getProfileUrl())
       .build();
   }
 
@@ -66,5 +74,12 @@ public class UserService {
     List<UsersResponse> responseList = UsersResponse.convertList(userList);
 
     return new AllUserResponse(responseList.size(), responseList);
+  }
+
+  public void delete(Users user) throws NoSuchElementException {
+    Users findUser = userRepository.findById(user.getPk())
+      .orElseThrow(() -> new NoSuchElementException("해당하는 user가 없습니다"));
+
+    userRepository.delete(findUser);
   }
 }

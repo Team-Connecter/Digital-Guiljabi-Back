@@ -17,4 +17,5 @@ public class UsersInfoResponse {
   private LocalDateTime joinAt;
   private String id21365;
   private String idVms;
+  private String imgUrl;
 }
