@@ -51,7 +51,7 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
-          name: Digital-Guiljabi-Back
+          name: BreadcrumbsDigital-Guiljabi-Back
 
       - name: SCP transfer
         uses: appleboy/scp-action@v0.1.4
