@@ -1,7 +1,9 @@
 package com.connecter.digitalguiljabiback.controller;
 
+import com.connecter.digitalguiljabiback.dto.NameRequest;
 import com.connecter.digitalguiljabiback.dto.category.AddCategoryRequest;
 import com.connecter.digitalguiljabiback.dto.category.CategoryListResponse;
+import com.connecter.digitalguiljabiback.dto.category.MoveCategoryRequest;
 import com.connecter.digitalguiljabiback.exception.CategoryNameDuplicatedException;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.service.CategoryService;
@@ -57,5 +59,28 @@ public class CategoryController {
     return ResponseEntity.ok(ancestors);
   }
 
+  //카테고리 이름만 바꾸기
+  @PatchMapping("/categories/{categoryPk}")
+  public ResponseEntity<CategoryListResponse> updateCategoryName(@PathVariable Long categoryPk, @RequestBody NameRequest request) throws NoSuchElementException {
+    categoryService.editCategoryName(categoryPk, request.getName());
+
+    return ResponseEntity.ok().build();
+  }
+
+  //카테고리 이동
+  @PatchMapping("/categories/{categoryPk}/move")
+  public ResponseEntity<CategoryListResponse> moveCategory(@PathVariable Long categoryPk, @RequestBody MoveCategoryRequest request) throws NoSuchElementException {
+    categoryService.moveCategory(categoryPk, request.getParentCategoryPk());
+
+    return ResponseEntity.ok().build();
+  }
+
+  //카테고리 삭제
+  @DeleteMapping("/categories/{categoryPk}")
+  public ResponseEntity deleteCategoryAndDescendant(@PathVariable Long categoryPk) throws NoSuchElementException {
+    categoryService.delete(categoryPk);
+
+    return ResponseEntity.ok().build();
+  }
 
 }
