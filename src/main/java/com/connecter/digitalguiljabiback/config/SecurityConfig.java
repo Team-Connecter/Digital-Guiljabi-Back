@@ -17,9 +17,8 @@ public class SecurityConfig {
 
     private final String[] whiteList = {
       "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**",
-      "/api/login/**",
-      "/error",
-      "/api/v1/boards/popular"
+      "/api/v1/users/", "/api/v1/users/login", "/api/login/**",
+      "/error"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -34,7 +33,6 @@ public class SecurityConfig {
             .requestMatchers(whiteList).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards/*").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards").permitAll()
-            .requestMatchers( "/api/v1/admin/**").hasRole("ADMIN")
             .anyRequest().authenticated()
           .and()
           .authenticationProvider(authenticationProvider)

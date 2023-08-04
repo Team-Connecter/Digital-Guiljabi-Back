@@ -107,10 +107,7 @@ public class Board {
     public void reject(String rejReason) {
         this.reason = rejReason;
         this.status = BoardStatus.REFUSAL;
-        this.reportCnt ++;
     }
-
-    public void initReportCnt() { this.reportCnt = 0; }
 
     public void edit(String title, String thumbnailUrl, String introduction, String sources, List<BoardTag> boardTags, List<BoardContent> contents) {
         this.boardTags.clear();
@@ -126,8 +123,5 @@ public class Board {
 
     public void addReportCnt() {
         this.reportCnt += 1;
-        if(reportCnt >= 5) {
-            this.status = BoardStatus.RESTRICTED;
-        }
     }
 }

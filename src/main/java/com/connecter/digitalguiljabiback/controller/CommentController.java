@@ -50,7 +50,7 @@ public class CommentController {
             @RequestParam(value = "page",required = false, defaultValue = "0") int page,
             @PathVariable Long boardPk)
     {
-        Pageable pageable = PageRequest.of(page-1, size);
+        Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok().body(commentService.getCommentList(pageable, boardPk));
 
