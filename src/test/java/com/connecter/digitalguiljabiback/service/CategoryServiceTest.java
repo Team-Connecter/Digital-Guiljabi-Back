@@ -6,10 +6,7 @@ import com.connecter.digitalguiljabiback.dto.category.CategoryListResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.CategoryNameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.CategoryRepository;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,16 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CategoryServiceTest {
-  private final Logger log = LoggerFactory.getLogger(getClass());
+//  private final Logger log = LoggerFactory.getLogger(getClass());
 
-  @Autowired
-  private BoardService boardService;
   @Autowired
   private CategoryService categoryService;
   @Autowired
   private CategoryRepository categoryRepository;
-  @Autowired
-  private EntityManager em;
 
   private final String name1 = "카테고리1";
   private final String name2 = "카테고리2";
