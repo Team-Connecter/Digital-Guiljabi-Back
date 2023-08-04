@@ -86,7 +86,7 @@ public class LoginController {
   public ResponseEntity tempSignUp(@RequestBody UserRequest userRequest) {
     loginService.tempSignUp(userRequest);
 
-    return ResponseEntity.status(HttpStatus.CREATED).build();
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping("/")

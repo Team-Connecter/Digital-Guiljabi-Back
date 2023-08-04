@@ -225,7 +225,7 @@ public class BoardService {
   private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) throws RuntimeException {
 
     Sort sort;
-    if (sortType == null || sortType == SortType.POP)
+    if (sortType == null || sortType == SortType.NEW)
       sort = Sort.by(Sort.Direction.DESC, "likeCnt");
     else
       sort = Sort.by(Sort.Direction.DESC, "updateAt");
@@ -239,14 +239,14 @@ public class BoardService {
     return PageRequest.of(page-1, pageSize, sort);
   }
 
-  public void approve(Long boardPk, List<Long> categoryPkList) throws NoSuchElementException {
-    Board board = boardRepository.findById(boardPk)
+  public void approve(Long boardId, List<Long> categoryPkList) throws NoSuchElementException {
+    Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
     List<Category> categoryList = new ArrayList<>();
 
     if (categoryPkList != null)
-      categoryList = categoryRepository.findByPkIn(categoryPkList);
+      categoryRepository.findByPkIn(categoryPkList);
 
     //카테고리가 이전과 같지 않거나, 세팅된 적이 없으면
     if (board.getBoardCategories() == null || board.getBoardCategories() != boardCategoryRepository.findByCategoryPkIn(categoryPkList)) {
@@ -257,12 +257,9 @@ public class BoardService {
           boardCategoryRepository.deleteById(bc.getPk());
       }
 
-      List<BoardCategory> boardCategoryList = new ArrayList<>();
-      for (Category c: categoryList) {
-        BoardCategory bc = BoardCategory.makeBoardCategory(c, board);
-        boardCategoryList.add(bc);
-        boardCategoryRepository.save(bc);
-      }
+      List<BoardCategory> boardCategoryList = categoryList.stream()
+        .map((Category c) -> BoardCategory.makeBoardCategory(c, board))
+        .collect(Collectors.toList());
 
       board.setBoardCategories(boardCategoryList);
     }
@@ -364,28 +361,5 @@ public class BoardService {
   }
 
 
-  public BoardListResponse getPopularBoardList(int pageSize, int page) {
-    //pageable객체 만들기
-    Pageable pageable = makePageable(SortType.POP, page, pageSize);
 
-    List<Board> list = boardRepository.findAll(pageable).getContent();
-
-    List<List<Tag>> tagList = new ArrayList<>();
-    for (Board b: list) {
-      List<Tag> byBoard = tagRepository.findTagByBoard(b)
-        .orElseGet(() -> new ArrayList<>());
-
-      tagList.add(byBoard);
-    }
-
-    //전체 조회의 경우 태그가 필요함
-    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
-
-    BoardListResponse boardListResponse = BoardListResponse.builder()
-      .list(briefBoardInfoList)
-      .cnt(briefBoardInfoList.size())
-      .build();
-
-    return boardListResponse;
-  }
 }

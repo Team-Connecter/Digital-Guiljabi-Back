@@ -28,6 +28,4 @@ public class Category {
         newCategory.name  = name;
         return newCategory;
     }
-
-    public void updateName(String name) { this.name = name; }
 }
