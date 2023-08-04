@@ -130,4 +130,8 @@ public class Board {
             this.status = BoardStatus.RESTRICTED;
         }
     }
+
+    public void deleteReport() {
+        this.reportCnt --;
+    }
 }

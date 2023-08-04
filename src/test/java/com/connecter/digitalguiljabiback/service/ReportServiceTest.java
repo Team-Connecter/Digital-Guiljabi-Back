@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,24 +92,20 @@ class ReportServiceTest {
   @Order(1)
   @Test
   void addReport() {
-    Users user2 = Users.makeUsers("KAKAO123411", "asdf", OauthType.KAKAO);
-    userRepository.save(user2);
-    Users user3 = Users.makeUsers("KAKAO12341235", "asdf", OauthType.KAKAO);
-    userRepository.save(user3);
-    Users user4 = Users.makeUsers("KAKAO123413", "asdf", OauthType.KAKAO);
-    userRepository.save(user4);
-    Users user5 = Users.makeUsers("KAKAO123414", "asdf", OauthType.KAKAO);
-    userRepository.save(user5);
-
-    //5번 신고하기
+    //신고하기
     ReportRequest reportRequest = ReportRequest.builder().type(ReportType.IRREL).content(reason).build();
-    reportService.addReport(user1, newBoard.getPk(), reportRequest);
-    reportService.addReport(user2, newBoard.getPk(), reportRequest);
-    reportService.addReport(user3, newBoard.getPk(), reportRequest);
-    reportService.addReport(user4, newBoard.getPk(), reportRequest);
-    reportService.addReport(user5, newBoard.getPk(), reportRequest);
+    Report report = reportService.addReport(user1, newBoard.getPk(), reportRequest);
 
-    assertEquals(BoardStatus.RESTRICTED, newBoard.getStatus());
+    assertEquals(1, newBoard.getReportCnt());
+    ReportBoardListResponse response = reportService.findByBoard(newBoard.getPk());
+    BriefReportResponse briefReportResponse = response.getRepList().get(0);
+
+    assertEquals(reason, briefReportResponse.getReason());
+    assertEquals(ReportType.IRREL, briefReportResponse.getType());
+    assertEquals(user1.getNickname(), briefReportResponse.getUsername());
+    assertEquals(user1.getPk(), briefReportResponse.getUserPk());
+    assertEquals(report.getPk(), briefReportResponse.getReportPk());
+    assertEquals(report.getCreateAt(), briefReportResponse.getReportedAt());
   }
 
   //신고 같은 사람이 같은 board에 2번이상 불가능
@@ -126,21 +123,42 @@ class ReportServiceTest {
     });
   }
 
-  @DisplayName("신고 5회 이상 가려지는지 확인") //Restricted
+  @DisplayName("신고 5회 이상 가려지는지 확인 + 최신순 정렬여부 확인") //Restricted
   @Transactional
   @Order(3)
   @Test
   void hide5More() {
-    //신고하기
+
+    Users user2 = Users.makeUsers("KAKAO123411", "asdf", OauthType.KAKAO);
+    userRepository.save(user2);
+    Users user3 = Users.makeUsers("KAKAO12341235", "asdf", OauthType.KAKAO);
+    userRepository.save(user3);
+    Users user4 = Users.makeUsers("KAKAO123413", "asdf", OauthType.KAKAO);
+    userRepository.save(user4);
+    Users user5 = Users.makeUsers("KAKAO123414", "asdf", OauthType.KAKAO);
+    userRepository.save(user5);
+
+    //5번 신고하기
     ReportRequest reportRequest = ReportRequest.builder().type(ReportType.IRREL).content(reason).build();
     reportService.addReport(user1, newBoard.getPk(), reportRequest);
+    reportService.addReport(user2, newBoard.getPk(), reportRequest);
+    reportService.addReport(user3, newBoard.getPk(), reportRequest);
+    reportService.addReport(user4, newBoard.getPk(), reportRequest);
+    reportService.addReport(user5, newBoard.getPk(), reportRequest);
 
-    assertThrows(ReportDuplicatedException.class, () -> {
-      reportService.addReport(user1, newBoard.getPk(), reportRequest);
-    });
+    List<Users> userList = List.of(new Users[]{user1, user2, user3, user4, user5});
+
+    //최신순 정렬 확인
+    ReportBoardListResponse byBoard = reportService.findByBoard(newBoard.getPk());
+    List<BriefReportResponse> repList = byBoard.getRepList();
+    for (int i = 0; i< repList.size(); i++) {
+      assertEquals(repList.get(i).getUserPk(), userList.get(i).getPk());
+    }
+
+    assertEquals(BoardStatus.RESTRICTED, newBoard.getStatus());
   }
 
-  @DisplayName("회원 탈퇴 시 user가 null이 되는지 테스트") //Restricted
+  @DisplayName("회원 탈퇴 시 user가 null이 되는지 테스트")
   @Transactional
   @Order(4)
   @Test
@@ -160,19 +178,56 @@ class ReportServiceTest {
     }
   }
 
+  //신고 5회 이상만 조회되는지 확인
+  @DisplayName("신고 5회 이상만 조회되는지 확인 + 삭제되는지 확인")
+  @Transactional
+  @Order(5)
+  @Test
+  void get5MoreReoprt() {
+    Users user2 = Users.makeUsers("KAKAO123411", "asdf", OauthType.KAKAO);
+    userRepository.save(user2);
+    Users user3 = Users.makeUsers("KAKAO12341235", "asdf", OauthType.KAKAO);
+    userRepository.save(user3);
+    Users user4 = Users.makeUsers("KAKAO123413", "asdf", OauthType.KAKAO);
+    userRepository.save(user4);
+    Users user5 = Users.makeUsers("KAKAO123414", "asdf", OauthType.KAKAO);
+    userRepository.save(user5);
 
+    //5번 신고하기
+    ReportRequest reportRequest = ReportRequest.builder().type(ReportType.IRREL).content(reason).build();
+    Report report = reportService.addReport(user1, newBoard.getPk(), reportRequest);
+    reportService.addReport(user2, newBoard.getPk(), reportRequest);
+    reportService.addReport(user3, newBoard.getPk(), reportRequest);
+    reportService.addReport(user4, newBoard.getPk(), reportRequest);
+    reportService.addReport(user5, newBoard.getPk(), reportRequest);
 
+    AdminBoardListResponse boardByReport = reportService.getBoardByReport(10, 1, true, null);
+    AdminBriefBoardInfo info = boardByReport.getList().get(0);
+    assertEquals(newBoard.getPk(), info.getBoardPk());
 
+    //삭제테스트
+    Long pk = report.getPk();
+    reportService.deleteReport(user1, report.getPk());
+
+    ReportBoardListResponse byBoard = reportService.findByBoard(newBoard.getPk());
+    assertEquals(4, newBoard.getReportCnt());
+    boolean hasData = false;
+    for (BriefReportResponse r :  byBoard.getRepList()) {
+      if (r.getReportPk() == pk) {
+        hasData = true;
+        break;
+      }
+    }
+    assertFalse(hasData);
+
+    //전체삭제 테스트
+    reportService.deleteAllReport(newBoard.getPk());
+    byBoard = reportService.findByBoard(newBoard.getPk());
+    assertEquals(0, newBoard.getReportCnt());
+    assertEquals(0, byBoard.getRepList().size());
+
+  }
 }
 
-//신고 삭제
-
-//신고 수정
-
-//신고 모두 삭제(board에 신고횟수~)
-
-//신고 최신순 정렬 조회 확인
-
-//신고 5회 이상만 조회되는지 확인
 
 

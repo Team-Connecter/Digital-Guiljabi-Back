@@ -1,5 +1,6 @@
 package com.connecter.digitalguiljabiback.dto.report.response;
 
+import com.connecter.digitalguiljabiback.domain.ReportType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,6 +16,7 @@ public class ReportBoardListResponse {
   private Long writerPk;
   private String writerName;
   private int cnt;
+
 
   private List<BriefReportResponse> repList;
 }
