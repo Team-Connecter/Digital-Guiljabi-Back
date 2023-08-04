@@ -24,7 +24,11 @@ public class BriefReportResponse {
     List<BriefReportResponse> list = new ArrayList<>();
     for (Report r: boardList) {
       Users user = r.getUser();
-      BriefReportResponse br = new BriefReportResponse(r.getPk(), r.getCreateAt(), user.getPk(), user.getNickname(), r.getContent());
+      BriefReportResponse br;
+      if (user != null)
+        br = new BriefReportResponse(r.getPk(), r.getCreateAt(), user.getPk(), user.getNickname(), r.getContent());
+      else
+        br = new BriefReportResponse(r.getPk(), r.getCreateAt(), null, null, r.getContent());
       list.add(br);
     }
 

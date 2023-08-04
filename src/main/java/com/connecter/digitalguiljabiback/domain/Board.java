@@ -126,5 +126,8 @@ public class Board {
 
     public void addReportCnt() {
         this.reportCnt += 1;
+        if(reportCnt >= 5) {
+            this.status = BoardStatus.RESTRICTED;
+        }
     }
 }

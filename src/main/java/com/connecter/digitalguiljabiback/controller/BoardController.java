@@ -12,6 +12,9 @@ import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundExce
 import com.connecter.digitalguiljabiback.service.BoardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -115,10 +118,17 @@ public class BoardController {
 
   //board 승인하기 + 카테고리 추기
   @PostMapping("/admin/boards/{boardPk}/approve")
-  public ResponseEntity approveBoard(@PathVariable Long boardPk, @RequestBody List<Long> categoryPkList) throws NoSuchElementException {
-    boardService.approve(boardPk, categoryPkList);
+  public ResponseEntity approveBoard(@PathVariable Long boardPk, @RequestBody ApproveBoardRequest request) throws NoSuchElementException {
+    boardService.approve(boardPk, request.getCategoryPkList());
 
     return ResponseEntity.ok().build();
+  }
+
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @Getter
+  class ApproveBoardRequest {
+    private List<Long> categoryPkList;
   }
 
   //board 승인 거절하기
