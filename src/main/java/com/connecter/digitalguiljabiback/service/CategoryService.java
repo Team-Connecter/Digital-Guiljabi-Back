@@ -8,6 +8,8 @@ import com.connecter.digitalguiljabiback.exception.CategoryNameDuplicatedExcepti
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.CategoryRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class CategoryService {
   
   private final CategoryRepository categoryRepository;
+  private final EntityManager em;
 
   //카테고리 추가
   public Category add(AddCategoryRequest addCategoryRequest) throws CategoryNotFoundException, CategoryNameDuplicatedException {
@@ -138,14 +141,33 @@ public class CategoryService {
     return listDto;
   }
 
-  public void editCategoryName(Long categoryPk, String name) {
+  //name은 절대 null이거나 ""면 안됨
+  public Category editCategoryName(Long categoryPk, String name) {
     Category category = categoryRepository.findById(categoryPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
 
     category.updateName(name);
+
+    return category;
+  }
+  
+  //자식까지 싹 이동
+  public void moveCategory(Long categoryPk, Long parentPk) {
+    categoryRepository.findById(categoryPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+
+    categoryRepository.updateConnect(categoryPk, parentPk);
   }
 
-  public void moveCategory(Long categoryPk, Long parentPk) {
-    categoryRepository.updateConnect(categoryPk, parentPk);
+  //자식까지 삭 삭제
+  @Transactional
+  public void delete(Long categoryPk) {
+    categoryRepository.findById(categoryPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+
+    categoryRepository.deleteConnect(categoryPk);
+
+    em.flush();
+    em.clear();
   }
 }
