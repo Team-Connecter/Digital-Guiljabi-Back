@@ -62,7 +62,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: root
           password: ${{ secrets.DEPLOYMENT_PASSWORD }}
-          source: "./build/libs/*.jar"
+          source: "*.jar"
           target: "~/cicd"
 
       - name: Execute remote SSH commands to restart server
