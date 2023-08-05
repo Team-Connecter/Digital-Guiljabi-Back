@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-@Tag(name = "BoardController - Test", description = "정보글 관련 API")
+@Tag(name = "BoardController", description = "정보글 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
