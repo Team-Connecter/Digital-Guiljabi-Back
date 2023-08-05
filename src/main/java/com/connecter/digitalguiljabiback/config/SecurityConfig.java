@@ -19,10 +19,11 @@ public class SecurityConfig {
       "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**",
       "/api/login/**",
       "/error",
-      "/api/v1/boards/popular"
+      "/api/v1/boards/popular", "/api/v1/users/nickname/*/exists"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
     private final AuthenticationProvider authenticationProvider;
 
     @Bean
@@ -34,11 +35,12 @@ public class SecurityConfig {
             .requestMatchers(whiteList).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards/*").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards").permitAll()
-            .requestMatchers( "/api/v1/admin/**").hasRole("ADMIN")
+            .requestMatchers( "/api/v1/admin/**").hasAuthority("ADMIN")
             .anyRequest().authenticated()
           .and()
           .authenticationProvider(authenticationProvider)
-          .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+          .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
 
         return http.build();
     }

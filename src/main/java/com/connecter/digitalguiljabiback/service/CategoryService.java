@@ -44,7 +44,7 @@ public class CategoryService {
       }
 
     } else {
-      //최상위 카테고리라면 중복name있는지 확인
+      //최상위 카테고리에 중복name있는지 확인
       for (Category fa: categoryRepository.findFirstAncestor()) {
         if (fa.getName().equals(name))
           throw new CategoryNameDuplicatedException("동일한 이름의 카테고리가 같은 레벨에 존재합니다");

@@ -31,10 +31,10 @@ public class UserService {
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
 
-    Users findByNickname = userRepository.findByNickname(request.getNickname())
-      .orElseGet(null);
+    if (findUser.getNickname().equals(request.getNickname()))
+      return;
 
-    if (findByNickname != null)
+    if (hasNickname(request.getNickname()))
       throw new UsernameDuplicatedException("같은 닉네임의 유저가 이미 존재합니다");
 
     findUser.updateNickname(request.getNickname());
@@ -61,7 +61,7 @@ public class UserService {
       .introduction(user.getIntroduction())
       .joinAt(user.getCreateAt())
       .idVms(user.getIdvms())
-      .id21365(user.getId1365())
+      .id1365(user.getId1365())
       .imgUrl(user.getProfileUrl())
       .build();
   }
@@ -81,5 +81,12 @@ public class UserService {
       .orElseThrow(() -> new NoSuchElementException("해당하는 user가 없습니다"));
 
     userRepository.delete(findUser);
+  }
+
+  public boolean hasNickname(String nickname) {
+    Users findByNickname = userRepository.findByNickname(nickname)
+      .orElseGet(() -> null);
+
+    return findByNickname != null;
   }
 }

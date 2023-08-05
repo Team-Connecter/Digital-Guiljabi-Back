@@ -280,7 +280,7 @@ class BoardServiceTest {
 
   //정보글 수정
 
-
+  //좋아요순 정렬
 
 
 
