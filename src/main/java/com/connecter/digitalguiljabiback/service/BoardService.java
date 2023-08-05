@@ -187,9 +187,6 @@ public class BoardService {
 
   //APPROVED된 것만 조회가능
   public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) throws CategoryNotFoundException {
-
-
-    log.info("@@: " + request.getPage() + " " + request.getPageSize() );
     //pageable객체 만들기
     Pageable pageable = makePageable(request.getSort(), request.getPage(), request.getPageSize());
 
@@ -263,8 +260,6 @@ public class BoardService {
 
     if (pageSize == null)
       pageSize = 10;
-
-    log.info("@@: " + page + " " + pageSize + " " + sort);
 
     return PageRequest.of(page-1, pageSize, sort);
   }
@@ -379,6 +374,8 @@ public class BoardService {
     if(!isClicked) {
       boardLikeRepository.save(likes);
     }
+
+    board.addLikeCnt();
 
   }
 

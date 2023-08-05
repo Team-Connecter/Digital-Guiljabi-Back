@@ -134,4 +134,12 @@ public class Board {
     public void deleteReport() {
         this.reportCnt --;
     }
+
+    public void addLikeCnt() {
+        this.likeCnt += 1;
+    }
+
+    public void addBookmarkCnt() {
+        this.bookmarkCnt += 1;
+    }
 }
