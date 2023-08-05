@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.bookmark;
+package com.connecter.digitalguiljabiback.dto.editRequest.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,17 +7,15 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Builder
-@Getter
 @AllArgsConstructor
+@Getter
+@Builder
 @NoArgsConstructor
-public class BookmarkResponse {
-
+public class MyEditRequestResponse {
     private Long boardPk;
     private String title;
     private String thumbnail;
     private LocalDateTime createAt;
     private Long likeCnt;
     private Long bookmarkCnt;
-
 }

@@ -10,6 +10,7 @@ import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 
@@ -36,6 +39,7 @@ public class UserController {
     return ResponseEntity.ok(userInfo);
   }
 
+  //닉네임 처음 등록
   @PostMapping("/users/info/nickname")
   public ResponseEntity changeUserNickname(
     @AuthenticationPrincipal Users user,
@@ -46,8 +50,19 @@ public class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
+  @GetMapping("/users/nickname/{nickname}/exists")
+  public ResponseEntity hasNickname(@PathVariable String nickname) {
+    Map<String, Boolean> map = new HashMap<>();
+    map.put("hasNickname", userService.hasNickname(nickname));
+
+    return ResponseEntity.ok(map);
+  }
+
   @PostMapping("/users/info/profile")
-  public ResponseEntity changeProfileImg(@AuthenticationPrincipal Users user, @RequestBody @Valid ImgUrlRequest request) throws NoSuchElementException {
+  public ResponseEntity changeProfileImg(
+    @AuthenticationPrincipal Users user,
+    @RequestBody @Valid ImgUrlRequest request
+  ) throws NoSuchElementException {
     userService.changeProfileImg(user, request);
 
     return ResponseEntity.ok().build();

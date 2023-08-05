@@ -5,6 +5,7 @@ import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
 import com.connecter.digitalguiljabiback.dto.login.UserRequest;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
+import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,12 +65,12 @@ public class LoginService {
       .build();
   }
 
-  public void tempSignUp(UserRequest userDto) {
+  public void tempSignUp(UserRequest userDto) throws UsernameDuplicatedException {
     Users user = userRepository.findByUid(userDto.getUid())
       .orElseGet(() -> null);
 
     if (user != null)
-      throw new ForbiddenException("해당하는 uid가 존재합니다");
+      throw new UsernameDuplicatedException("해당하는 uid가 존재합니다");
 
     Users newUser = Users.makeUsers(userDto.getUid(), passwordEncoder.encode(userDto.getUid()), null);
     userRepository.save(newUser);

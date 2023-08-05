@@ -25,10 +25,10 @@ public class Users implements UserDetails {
 
     @NotNull
     @Column(unique = true)
-    private String uid; //@TODO authId
+    private String uid;
 
     @NotNull
-    private String passwords; //@TODO delete
+    private String passwords;
 
     private OauthType oauthType;
 

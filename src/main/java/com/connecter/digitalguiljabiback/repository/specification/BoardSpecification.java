@@ -11,6 +11,10 @@ public class BoardSpecification {
     return (board, cq, cb) -> cb.equal(board.join("boardCategories").join("category"), category);
   }
 
+  public static Specification<Board> hasStatus(BoardStatus statue) {
+    return (board, cq, cb) -> cb.equal(board.get("status"), statue);
+  }
+
   public static Specification<Board> matchesSearchTerm(String searchTerm) {
     return (board, cq, cb) -> {
       Join<Board, BoardTag> boardTagJoin = board.join("boardTags");

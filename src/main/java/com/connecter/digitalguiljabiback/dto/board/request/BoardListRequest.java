@@ -3,9 +3,13 @@ package com.connecter.digitalguiljabiback.dto.board.request;
 import com.connecter.digitalguiljabiback.dto.board.SortType;
 import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class BoardListRequest {
   //전부 nullable

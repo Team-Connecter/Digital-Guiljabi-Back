@@ -30,11 +30,6 @@ public class CategoryServiceTest {
   private final String name2 = "카테고리2";
   private final String name3 = "카테고리3";
   private final String name4 = "카테고리4";
-
-  @BeforeAll
-  void setUp() {
-
-  }
   
   //카테고리 등록 테스트(조상)
   @DisplayName("카테고리 생성")
