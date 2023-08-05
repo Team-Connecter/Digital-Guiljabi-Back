@@ -347,6 +347,8 @@ public class BoardService {
       boardLikeRepository.save(likes);
     }
 
+    board.addLikeCnt();
+
   }
 
   // 게시글 좋아요 취소

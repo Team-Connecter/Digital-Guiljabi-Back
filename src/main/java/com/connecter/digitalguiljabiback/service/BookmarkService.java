@@ -46,6 +46,7 @@ public class BookmarkService {
             bookmarkRepository.save(bookmark);
         }
 
+        board.addBookmarkCnt();
 
     }
 
