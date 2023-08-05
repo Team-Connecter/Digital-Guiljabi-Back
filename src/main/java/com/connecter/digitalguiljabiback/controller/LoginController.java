@@ -1,10 +1,7 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.OauthType;
-import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
-import com.connecter.digitalguiljabiback.dto.login.AuthRequest;
-import com.connecter.digitalguiljabiback.dto.login.KakaoUserResponse;
-import com.connecter.digitalguiljabiback.dto.login.NaverUserResponse;
+import com.connecter.digitalguiljabiback.dto.login.*;
 import com.connecter.digitalguiljabiback.security.oauth.kakao.KakaoClient;
 import com.connecter.digitalguiljabiback.security.oauth.naver.NaverClient;
 import com.connecter.digitalguiljabiback.service.LoginService;
@@ -13,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -86,5 +80,19 @@ public class LoginController {
     LoginResponse loginResponseDTO = loginService.loginOrCreate(response.toUserRequest(), OauthType.NAVER);
 
     return ResponseEntity.ok(loginResponseDTO);
+  }
+
+  @PostMapping("/signup")
+  public ResponseEntity tempSignUp(@RequestBody UserRequest userRequest) {
+    loginService.tempSignUp(userRequest);
+
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/")
+  public ResponseEntity<LoginResponse> tempLogin(@RequestBody UserRequest userRequest) {
+    LoginResponse loginResponse = loginService.tempLogin(userRequest);
+
+    return ResponseEntity.ok(loginResponse);
   }
 }
