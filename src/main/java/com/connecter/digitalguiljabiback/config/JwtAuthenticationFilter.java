@@ -64,8 +64,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-            } else {
-                throw new JwtException("유효하지 않은 토큰");
             }
         }
 

@@ -27,7 +27,7 @@ spring:
         clientId: 78f9db867e8831b570efd5e479f72a08
         clientSecret: OVrR5jRNXuVhuiH6eSpPB6SGHhsmCRlu
         #TODO 배포시 리다이렉트 주소 변경해야함
-        redirectUri: http://localhost:8080/api/login/callback
+        redirectUri: http://49.50.174.34:8080/api/login/callback
         clientName: Kakao
         clientAuthenticationMethod: POST
         authorizationUri: https://kauth.kakao.com/oauth/authorize
@@ -39,7 +39,7 @@ spring:
         clientId: sQUbWJL0mJ0oFmSGbcbD
         clientSecret: NSNmc2Z1AT
         #TODO 배포시 리다이렉트 주소 변경해야함
-        redirectUri: http://localhost:8080/api/login/callback/naver
+        redirectUri: http://49.50.174.34/:8080/api/login/callback/naver
         clientName: Naver
         clientAuthenticationMethod: POST
         authorizationUri: https://nid.naver.com/oauth2.0/authorize
