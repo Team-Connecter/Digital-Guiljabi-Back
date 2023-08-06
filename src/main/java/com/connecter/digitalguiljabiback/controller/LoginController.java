@@ -12,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,7 +88,7 @@ public class LoginController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PostMapping("/")
+  @PostMapping
   public ResponseEntity<LoginResponse> tempLogin(@RequestBody UserRequest userRequest) {
     LoginResponse loginResponse = loginService.tempLogin(userRequest);
 
