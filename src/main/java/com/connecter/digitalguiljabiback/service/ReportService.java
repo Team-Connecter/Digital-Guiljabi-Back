@@ -36,7 +36,7 @@ public class ReportService {
   private final BoardRepository boardRepository;
 
 
-  public Report addReport(Users user, Long boardPk, ReportRequest request) throws NoSuchElementException, ReportDuplicatedException {
+  public void addReport(Users user, Long boardPk, ReportRequest request) throws NoSuchElementException, ReportDuplicatedException {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
 
@@ -49,12 +49,10 @@ public class ReportService {
 
     //새로 만들기
     report = Report.makeReport(user, board, request.getType(), request.getContent());
-    Report save = reportRepository.save(report);
+    reportRepository.save(report);
 
     //board의 reportCnt +1
     board.addReportCnt();
-
-    return save;
   }
 
   public ReportBoardListResponse findByBoard(Long boardPk) throws NoSuchElementException {
@@ -112,8 +110,6 @@ public class ReportService {
     }
 
     reportRepository.delete(report);
-    Board board = report.getBoard();
-    board.deleteReport();
   }
 
   public MyReportListResponse getMyReport(Users user) {
@@ -128,9 +124,8 @@ public class ReportService {
       .orElseThrow(() -> new NoSuchElementException("해당 pk의 정보글이 존재하지 않습니다"));
 
     List<Report> reportList = reportRepository.findByBoard(board);
-    for(Report r: reportList)
+    for(Report r: reportList) {
       reportRepository.delete(r);
-
-    board.initReportCnt();
+    }
   }
 }
