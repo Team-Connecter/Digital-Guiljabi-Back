@@ -61,7 +61,6 @@ public class LoginService {
 
     return LoginResponse.builder()
       .token(jwtToken)
-      .userPk(user.getPk())
       .build();
   }
 
@@ -92,7 +91,6 @@ public class LoginService {
 
     return LoginResponse.builder()
       .token(jwtToken)
-      .userPk(user.getPk())
       .build();
 
   }
