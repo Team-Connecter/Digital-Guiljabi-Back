@@ -223,6 +223,7 @@ public class BoardService {
     }
 
     List<List<Tag>> tagList = new ArrayList<>();
+    List<Users> userList = new ArrayList<>();
     for (Board b: list) {
       List<Tag> byBoard = tagRepository.findTagByBoard(b)
         .orElseGet(() -> new ArrayList<>());
@@ -230,10 +231,11 @@ public class BoardService {
       log.info("@@@: "+ byBoard);
 
       tagList.add(byBoard);
+      userList.add(b.getUser());
     }
 
     //전체 조회의 경우 태그가 필요함
-    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList, userList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)
@@ -398,15 +400,17 @@ public class BoardService {
     List<Board> list = boardRepository.findAll(pageable).getContent();
 
     List<List<Tag>> tagList = new ArrayList<>();
+    List<Users> userList = new ArrayList<>();
     for (Board b: list) {
       List<Tag> byBoard = tagRepository.findTagByBoard(b)
         .orElseGet(() -> new ArrayList<>());
 
       tagList.add(byBoard);
+      userList.add(b.getUser());
     }
 
     //전체 조회의 경우 태그가 필요함
-    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList, userList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)
