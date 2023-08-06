@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface TagRepository extends JpaRepository<Tag, Long> {
   Optional<Tag> findByName(String name);
 
-  @Query("select t from Tag t join BoardTag bt join bt.board b where b = ?1")
+  @Query("select t from BoardTag bt join bt.board b join bt.tag t where b = ?1")
   Optional<List<Tag>> findTagByBoard(Board b);
 }

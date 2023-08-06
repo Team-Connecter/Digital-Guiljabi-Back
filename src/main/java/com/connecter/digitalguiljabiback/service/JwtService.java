@@ -68,7 +68,12 @@ public class JwtService {
     }
 
     private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date()); //오늘 날짜 이전인지 확인하고 싶음 ㅇㅇ
+        try {
+            return System.currentTimeMillis() > extractExpiration(token).getTime();// 현재 시간이 토큰의 만료 시간 이전인지 확인
+        } catch (Exception e) {
+            log.info("@@@1234");
+            return false;
+        }
     }
 
     private Date extractExpiration(String token) {
