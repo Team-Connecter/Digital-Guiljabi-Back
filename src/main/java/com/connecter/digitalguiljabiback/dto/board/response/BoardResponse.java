@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class BoardResponse {
   private String title;
+  private String introduction;
   private Long writerPk;
   private String writerName;
   private LocalDateTime updateAt;
