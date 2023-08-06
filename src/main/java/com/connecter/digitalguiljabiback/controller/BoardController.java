@@ -3,7 +3,6 @@ package com.connecter.digitalguiljabiback.controller;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
-import com.connecter.digitalguiljabiback.dto.board.request.ApproveBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.RejectRequest;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
@@ -13,10 +12,6 @@ import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundExce
 import com.connecter.digitalguiljabiback.service.BoardService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -54,21 +49,13 @@ public class BoardController {
 
   //승인된 board 목록 조회 (검색, 카테고리별 확인~)
   @GetMapping("/boards")
-  public ResponseEntity<BoardListResponse> getApprevedBoardList(
-    @RequestParam(required = false) Long categoryPk,
-    @RequestParam(required = false) String q,
-    @RequestParam(required = false, defaultValue = "10") @Min(value = 2, message = "page 크기는 1보다 커야합니다") int pageSize,
-    @RequestParam(required = false) @Min(value = 1, message = "page는 0보다 커야합니다") int page,
-    @RequestParam(required = false, defaultValue = "NEW") SortType sort
-
-  ) throws CategoryNotFoundException {
-    BoardListResponse boardList = boardService.getApprovedBoardList(categoryPk, q, page, pageSize, sort);
+  public ResponseEntity<BoardListResponse> getApprevedBoardList(@ModelAttribute BoardListRequest listBoardRequest) throws CategoryNotFoundException {
+    BoardListResponse boardList = boardService.getApprovedBoardList(listBoardRequest);
 
     return ResponseEntity.ok(boardList);
   }
 
   //내가 쓴 글 모두 조회
-  @Secured("USER")
   @GetMapping("/boards/my")
   public ResponseEntity<BoardListResponse> getMyBoardList(@AuthenticationPrincipal Users user) {
     BoardListResponse myList = boardService.getMyList(user);
@@ -112,27 +99,15 @@ public class BoardController {
     return ResponseEntity.ok().build();
   }
 
-  //인기 게시글 조회
-  @GetMapping("/boards/popular")
-  public ResponseEntity<BoardListResponse> getBoradSortPopular(
-    @RequestParam(required = false, defaultValue = "10")int pageSize,
-    @RequestParam(required = false, defaultValue = "1")int page
-  ) {
-    BoardListResponse boardList = boardService.getPopularBoardList(pageSize, page);
-
-    return ResponseEntity.ok(boardList);
-  }
-
   //ADMIN기능 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
 
   //board 승인하기 + 카테고리 추기
   @PostMapping("/admin/boards/{boardPk}/approve")
-  public ResponseEntity approveBoard(@PathVariable Long boardPk, @RequestBody ApproveBoardRequest request) throws NoSuchElementException {
-    boardService.approve(boardPk, request.getCategoryPkList());
+  public ResponseEntity approveBoard(@PathVariable Long boardPk, @RequestBody List<Long> categoryPkList) throws NoSuchElementException {
+    boardService.approve(boardPk, categoryPkList);
 
     return ResponseEntity.ok().build();
   }
-
 
   //board 승인 거절하기
   @PostMapping("/admin/boards/{boardId}/reject")
@@ -152,6 +127,8 @@ public class BoardController {
   }
 
 
+
+
+
+
 }
-
-
