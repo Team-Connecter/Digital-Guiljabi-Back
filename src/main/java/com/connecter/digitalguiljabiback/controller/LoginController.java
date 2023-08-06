@@ -2,6 +2,7 @@ package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.OauthType;
 import com.connecter.digitalguiljabiback.dto.login.*;
+import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.security.oauth.kakao.KakaoClient;
 import com.connecter.digitalguiljabiback.security.oauth.naver.NaverClient;
 import com.connecter.digitalguiljabiback.service.LoginService;
@@ -83,10 +84,10 @@ public class LoginController {
   }
 
   @PostMapping("/signup")
-  public ResponseEntity tempSignUp(@RequestBody UserRequest userRequest) {
+  public ResponseEntity tempSignUp(@RequestBody UserRequest userRequest) throws UsernameDuplicatedException {
     loginService.tempSignUp(userRequest);
 
-    return ResponseEntity.ok().build();
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
   @PostMapping("/")
