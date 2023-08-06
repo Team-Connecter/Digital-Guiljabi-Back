@@ -141,6 +141,7 @@ public class BoardService {
     BoardResponse boardResponse = BoardResponse.builder()
       .title(board.getTitle())
       .introduction(board.getIntroduction())
+      .thumbnailUrl(board.getThumbnailUrl())
       .writerPk(writer.getPk())
       .writerName(writer.getNickname())
       .updateAt(board.getUpdateAt())
