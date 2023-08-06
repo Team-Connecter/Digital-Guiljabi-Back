@@ -4,7 +4,6 @@ import com.connecter.digitalguiljabiback.domain.*;
 import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
-import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
@@ -13,7 +12,6 @@ import com.connecter.digitalguiljabiback.exception.NotFoundException;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.*;
 import com.connecter.digitalguiljabiback.repository.specification.BoardSpecification;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -22,12 +20,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.springframework.data.jpa.domain.Specification.where;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -130,7 +124,7 @@ public class BoardService {
     //게시글이 승인되지 않았다면 관리자, 작성자만 볼 수 있음
     if (board.getStatus() != BoardStatus.APPROVED) {
       if (user == null || (user.getRole() != UserRole.ADMIN && writer.getPk() != user.getPk())) {
-        throw new NoSuchElementException("해당 글을 볼 수 없는 사용자입니다");
+        throw new ForbiddenException("해당 글을 볼 수 없는 사용자입니다");
       }
     }
 
@@ -146,6 +140,8 @@ public class BoardService {
 
     BoardResponse boardResponse = BoardResponse.builder()
       .title(board.getTitle())
+      .introduction(board.getIntroduction())
+      .thumbnailUrl(board.getThumbnailUrl())
       .writerPk(writer.getPk())
       .writerName(writer.getNickname())
       .updateAt(board.getUpdateAt())
@@ -223,6 +219,7 @@ public class BoardService {
     }
 
     List<List<Tag>> tagList = new ArrayList<>();
+    List<Users> userList = new ArrayList<>();
     for (Board b: list) {
       List<Tag> byBoard = tagRepository.findTagByBoard(b)
         .orElseGet(() -> new ArrayList<>());
@@ -230,10 +227,11 @@ public class BoardService {
       log.info("@@@: "+ byBoard);
 
       tagList.add(byBoard);
+      userList.add(b.getUser());
     }
 
     //전체 조회의 경우 태그가 필요함
-    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList, userList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)
@@ -398,15 +396,17 @@ public class BoardService {
     List<Board> list = boardRepository.findAll(pageable).getContent();
 
     List<List<Tag>> tagList = new ArrayList<>();
+    List<Users> userList = new ArrayList<>();
     for (Board b: list) {
       List<Tag> byBoard = tagRepository.findTagByBoard(b)
         .orElseGet(() -> new ArrayList<>());
 
       tagList.add(byBoard);
+      userList.add(b.getUser());
     }
 
     //전체 조회의 경우 태그가 필요함
-    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList);
+    List<BriefBoardInfo> briefBoardInfoList = BriefBoardInfo.convertList(list, tagList, userList);
 
     BoardListResponse boardListResponse = BoardListResponse.builder()
       .list(briefBoardInfoList)

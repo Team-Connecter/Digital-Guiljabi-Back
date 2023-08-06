@@ -31,7 +31,7 @@ public class UserService {
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
 
-    if (findUser.getNickname().equals(request.getNickname()))
+    if (findUser.getNickname() != null && findUser.getNickname().equals(request.getNickname()))
       return;
 
     if (hasNickname(request.getNickname()))

@@ -3,6 +3,7 @@ package com.connecter.digitalguiljabiback.dto.board;
 import com.connecter.digitalguiljabiback.domain.Board;
 import com.connecter.digitalguiljabiback.domain.BoardStatus;
 import com.connecter.digitalguiljabiback.domain.Tag;
+import com.connecter.digitalguiljabiback.domain.Users;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,7 @@ import java.util.List;
 public class BriefBoardInfo {
   private Long boardPk;
   private String title;
+  private String username;
   private String thumbnail;
   private LocalDateTime updateAt;
   private String introduction;
@@ -35,6 +37,7 @@ public class BriefBoardInfo {
     this.reason = reason;
   }
 
+  //내 데이터 조회
   public static List<BriefBoardInfo> convertList(List<Board> list) {
     List<BriefBoardInfo> breifList = new ArrayList<>();
 
@@ -59,7 +62,8 @@ public class BriefBoardInfo {
     return breifList;
   }
 
-  public static List<BriefBoardInfo> convertList(List<Board> list, List<List<Tag>> tagList) {
+  //전체 조회
+  public static List<BriefBoardInfo> convertList(List<Board> list, List<List<Tag>> tagList, List<Users> userList) {
     List<BriefBoardInfo> breifList = new ArrayList<>();
 
     for (int i =0; i<list.size(); i++) {
@@ -71,6 +75,7 @@ public class BriefBoardInfo {
       brbi = BriefBoardInfo.builder()
         .boardPk(b.getPk())
         .title(b.getTitle())
+        .username(userList.get(i).getNickname())
         .thumbnail(b.getThumbnailUrl())
         .updateAt(b.getUpdateAt())
         .introduction(b.getIntroduction())
