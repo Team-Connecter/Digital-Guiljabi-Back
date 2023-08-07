@@ -6,6 +6,7 @@ import com.connecter.digitalguiljabiback.dto.login.*;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.security.oauth.kakao.KakaoClient;
 import com.connecter.digitalguiljabiback.security.oauth.naver.NaverClient;
+import com.connecter.digitalguiljabiback.service.JwtService;
 import com.connecter.digitalguiljabiback.service.LoginService;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class LoginController {
   private final KakaoClient kakaoClient;
   private final NaverClient naverClient;
   private final LoginService loginService;
+  private final JwtService jwtService;
 
 
    //카카오 로그인 페이지 url을 반환
@@ -99,18 +101,19 @@ public class LoginController {
   }
 
   @PostMapping("/logout")
-  public ResponseEntity<Map> logout(@AuthenticationPrincipal Users user) {
+  public ResponseEntity<Map> logout(@AuthenticationPrincipal Users user, @RequestHeader(value="Authorization") String authHeader) {
     OauthType type = user.getOauthType();
     Map<String, String> map = new HashMap<>();
 
-    switch (type) {
-      case KAKAO -> {
-        map.put("logoutUrl", kakaoClient.getLogoutUrl());
-      }
-      case NAVER -> {
 
-      }
+    if (type == OauthType.KAKAO) {
+        map.put("logoutUrl", kakaoClient.getLogoutUrl());
     }
+
+    String token = authHeader.substring(7);
+    
+    //jwt토큰만료처리 -> 블랙리스트
+    jwtService.addBlackList(token);
 
     return ResponseEntity.ok(map);
   }
