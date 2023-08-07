@@ -13,13 +13,10 @@ public class KakaoProperties {
     private String redirectUri;
     private String tokenUri;
     private String userInfoUri;
+    private String logoutUri;
+    private String logoutRedirectUri;
     private String clientId;
     private String authorizationUri;
     private String grantType;
-
     private String clientSecret;
-//    private String[] scope;
-//    private String clientName;
-//    private String clientAuthenticationMethod;
-//    private String userNameAttribute;
 }
