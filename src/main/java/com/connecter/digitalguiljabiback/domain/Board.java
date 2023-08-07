@@ -141,4 +141,8 @@ public class Board {
     public void addBookmarkCnt() {
         this.bookmarkCnt += 1;
     }
+
+    public void hide() {
+        this.status = BoardStatus.WAITING;
+    }
 }

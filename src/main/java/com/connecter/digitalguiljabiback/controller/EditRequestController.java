@@ -75,4 +75,31 @@ public class EditRequestController {
         return ResponseEntity.ok().body(editRequestService.getEditRequestDetail(editReqPk));
     }
 
+    // 수정요청 무시하기
+    @DeleteMapping("/admin/edit-requests/ignore")
+    public ResponseEntity ignoreEditRequest(@PathVariable Long editReqPk) {
+        editRequestService.deleteEditReqiest(editReqPk);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // 글쓴이에게 수정요청사항 알리기 - 게시글 숨기지 않기
+    @PostMapping("/admin/board/{boardPk}/edit-request/nothidden")
+    public ResponseEntity notHideBoard(@PathVariable Long boardPk, @RequestBody EditRequestRequest request)
+    {
+        editRequestService.notifyEditRequest(boardPk, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+    // 글쓴이에게 수정요청사항 알리기 - 게시글 숨기기
+    @PostMapping("/admin/board/{boardPk}/edit-request/hidden")
+    public ResponseEntity hideBoard(@PathVariable Long boardPk, @RequestBody EditRequestRequest request)
+    {
+        editRequestService.notifyEditRequestAndHide(boardPk, request);
+
+        return ResponseEntity.ok().build();
+    }
+
+
 }

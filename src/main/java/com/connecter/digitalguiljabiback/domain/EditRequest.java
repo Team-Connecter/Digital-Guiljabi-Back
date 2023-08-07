@@ -46,4 +46,12 @@ public class EditRequest {
         return editRequest;
     }
 
+    public static EditRequest makeAdminEditRequest(Board board, String content) {
+        EditRequest editRequest = new EditRequest();
+        editRequest.board = board;
+        editRequest.content = content;
+
+        return editRequest;
+    }
+
 }
