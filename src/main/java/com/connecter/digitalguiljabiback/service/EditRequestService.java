@@ -102,23 +102,19 @@ public class EditRequestService {
         editRequestRepository.delete(editRequest);
     }
 
-    public void notifyEditRequest(Long boardPk, EditRequestRequest request) {
+    public void notifyEditRequest(Long boardPk, String reason) {
         Board board = boardRepository.findById(boardPk)
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
 
-        EditRequest editRequest = EditRequest.makeAdminEditRequest(board, request.getContent());
-
+        board.editRequest(reason);
     }
 
-    public void notifyEditRequestAndHide(Long boardPk, EditRequestRequest request) {
+    public void notifyEditRequestAndHide(Long boardPk, String reason) {
         Board board = boardRepository.findById(boardPk)
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
 
-        EditRequest editRequest = EditRequest.makeAdminEditRequest(board, request.getContent());
-
         // 게시글 숨기기
-        board.hide();
-
+        board.hide(reason);
     }
 
 

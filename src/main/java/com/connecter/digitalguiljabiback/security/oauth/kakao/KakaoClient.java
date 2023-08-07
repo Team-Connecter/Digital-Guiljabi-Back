@@ -45,4 +45,9 @@ public class KakaoClient {
 
         return userInfo;
     }
+
+    public String getLogoutUrl() {
+        String logoutUrl = authClient.getLogoutUrl();
+        return logoutUrl;
+    }
 }

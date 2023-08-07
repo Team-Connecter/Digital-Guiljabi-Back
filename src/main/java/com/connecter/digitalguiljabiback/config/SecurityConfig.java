@@ -23,7 +23,8 @@ public class SecurityConfig {
       "/swagger-resources/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**",
       "/api/login/**",
       "/error",
-      "/api/v1/boards/popular", "/api/v1/users/nickname/*/exists"
+      "/api/v1/boards/popular", "/api/v1/users/nickname/*/exists",
+      "/logoutPage" //TODO 삭제
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -33,8 +34,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-          .csrf()
-          .disable()
+          .csrf().disable()
           .authorizeHttpRequests()
             .requestMatchers(whiteList).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards/*").permitAll()
@@ -51,4 +51,6 @@ public class SecurityConfig {
 
         return http.build();
     }
+
+
 }
