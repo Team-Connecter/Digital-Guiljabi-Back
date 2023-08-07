@@ -94,4 +94,32 @@ public class EditRequestService {
 
         return editRequestDetailResponse;
     }
+
+    public void deleteEditReqiest(Long editReqPk) {
+        EditRequest editRequest = editRequestRepository.findById(editReqPk)
+                .orElseThrow(() -> new NoSuchElementException("해당 pk의 수정요청글이 존재하지 않습니다."));
+
+        editRequestRepository.delete(editRequest);
+    }
+
+    public void notifyEditRequest(Long boardPk, EditRequestRequest request) {
+        Board board = boardRepository.findById(boardPk)
+                .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
+
+        EditRequest editRequest = EditRequest.makeAdminEditRequest(board, request.getContent());
+
+    }
+
+    public void notifyEditRequestAndHide(Long boardPk, EditRequestRequest request) {
+        Board board = boardRepository.findById(boardPk)
+                .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
+
+        EditRequest editRequest = EditRequest.makeAdminEditRequest(board, request.getContent());
+
+        // 게시글 숨기기
+        board.hide();
+
+    }
+
+
 }
