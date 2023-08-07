@@ -142,7 +142,12 @@ public class Board {
         this.bookmarkCnt += 1;
     }
 
-    public void hide() {
+    public void hide(String reason) {
+        this.reason = reason;
         this.status = BoardStatus.WAITING;
+    }
+
+    public void editRequest(String reason) {
+        this.reason = reason;
     }
 }
