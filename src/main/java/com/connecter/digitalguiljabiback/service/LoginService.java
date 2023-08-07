@@ -4,7 +4,6 @@ import com.connecter.digitalguiljabiback.domain.OauthType;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
 import com.connecter.digitalguiljabiback.dto.login.UserRequest;
-import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -95,6 +94,15 @@ public class LoginService {
 
   }
 
+//  public void logout(Users user, OauthType oauthType) {
+//    if (oauthType == OauthType.KAKAO) {
+//
+//    } else if (oauthType == OauthType.NAVER) {
+//
+//    } else {
+//
+//    }
+//  }
 }
 
 

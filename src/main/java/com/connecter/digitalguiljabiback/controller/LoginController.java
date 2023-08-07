@@ -1,6 +1,7 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.OauthType;
+import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.login.*;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.security.oauth.kakao.KakaoClient;
@@ -11,13 +12,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/login")
+@RequestMapping("/api")
 @Slf4j
 public class LoginController {
 
@@ -25,8 +27,9 @@ public class LoginController {
   private final NaverClient naverClient;
   private final LoginService loginService;
 
+
    //카카오 로그인 페이지 url을 반환
-  @GetMapping("/kakao")
+  @GetMapping("/login/kakao")
   public ResponseEntity<Map> getKakaoLoginUrl() {
     Map<String, String> map = new HashMap<>();
     map.put("loginUrl", kakaoClient.getAuthUrl());
@@ -39,7 +42,7 @@ public class LoginController {
    * @return AuthResponseDTO 로그인 또는 회원 가입 결과를 담은 응답 DTO
    */
   @Hidden
-  @GetMapping("/callback")
+  @GetMapping("/login/callback")
   public ResponseEntity<LoginResponse> processKakaoLoginCallback(@RequestParam("code") String authorizationCode) {
     AuthRequest params = new AuthRequest(authorizationCode);
     KakaoUserResponse response = kakaoClient.handleCallback(params);
@@ -52,7 +55,7 @@ public class LoginController {
   }
 
   //네이버 로그인 페이지 url을 반환
-  @GetMapping("/naver")
+  @GetMapping("/login/naver")
   public ResponseEntity<Map> getNaverLoginUrl() {
     Map<String, String> map = new HashMap<>();
     map.put("loginUrl", naverClient.getAuthUrl());
@@ -66,7 +69,7 @@ public class LoginController {
    * @return AuthResponseDTO 로그인 또는 회원 가입 결과를 담은 응답 DTO
    */
   @Hidden
-  @GetMapping("/callback/naver")
+  @GetMapping("/login/callback/naver")
   public ResponseEntity<LoginResponse> processNaverLoginCallback(
     @RequestParam("code") String authorizationCode,
     @RequestParam("state") String state
@@ -81,17 +84,34 @@ public class LoginController {
     return ResponseEntity.ok(loginResponseDTO);
   }
 
-  @PostMapping("/signup")
+  @PostMapping("/login/signup")
   public ResponseEntity tempSignUp(@RequestBody UserRequest userRequest) throws UsernameDuplicatedException {
     loginService.tempSignUp(userRequest);
 
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
-  @PostMapping
+  @PostMapping("/login")
   public ResponseEntity<LoginResponse> tempLogin(@RequestBody UserRequest userRequest) {
     LoginResponse loginResponse = loginService.tempLogin(userRequest);
 
     return ResponseEntity.ok(loginResponse);
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<Map> logout(@AuthenticationPrincipal Users user) {
+    OauthType type = user.getOauthType();
+    Map<String, String> map = new HashMap<>();
+
+    switch (type) {
+      case KAKAO -> {
+        map.put("logoutUrl", kakaoClient.getLogoutUrl());
+      }
+      case NAVER -> {
+
+      }
+    }
+
+    return ResponseEntity.ok(map);
   }
 }

@@ -31,6 +31,8 @@ public class NaverAuthClient {
     private final NaverProperties naverProperties;
     private final RestTemplate restTemplate;
 
+
+
     /**
      * 네이버 API로 액세스 토큰을 요청합니다.
      * @param request AuthRequest 객체로부터 인증 정보를 받아옵니다.

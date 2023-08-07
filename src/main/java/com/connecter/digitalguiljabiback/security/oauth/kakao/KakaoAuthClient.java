@@ -29,6 +29,12 @@ public class KakaoAuthClient {
     private final KakaoProperties kakaoProperties;
     private final RestTemplate restTemplate;
 
+    public String getLogoutUrl() {
+        return kakaoProperties.getLogoutUri()
+          + "?client_id=" + kakaoProperties.getClientId()
+          + "&logout_redirect_uri=" + kakaoProperties.getLogoutRedirectUri();
+    }
+
     /**
      * 카카오 API로 액세스 토큰을 요청
      * @param request KakaoAuthRequest 객체로부터 인증 정보를 받아옵니다.
