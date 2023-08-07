@@ -76,7 +76,7 @@ public class EditRequestController {
     }
 
     // 수정요청 무시하기
-    @DeleteMapping("/admin/edit-requests/ignore")
+    @DeleteMapping("/admin/edit-requests/{editReqPk}/ignore")
     public ResponseEntity ignoreEditRequest(@PathVariable Long editReqPk) {
         editRequestService.deleteEditReqiest(editReqPk);
 
