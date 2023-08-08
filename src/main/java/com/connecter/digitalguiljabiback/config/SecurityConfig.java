@@ -27,6 +27,7 @@ public class SecurityConfig {
       "/api/login/**",
       "/error",
       "/api/v1/boards/popular", "/api/v1/users/nickname/*/exists",
+
       "/logoutPage" //TODO 삭제
     };
 
@@ -45,6 +46,7 @@ public class SecurityConfig {
             .requestMatchers(whiteList).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards/*").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/boards/*/comments").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/root").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/*/children").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/*/ancestor").permitAll()
@@ -69,16 +71,10 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://localhost:80/");
         configuration.addAllowedOrigin("https://timely-concha-38b820.netlify.app");
         configuration.addAllowedOrigin("https://timely-concha-38b820.netlify.app/");
-        configuration.addAllowedOrigin("https://boonbae.seol.pro");
-        configuration.addAllowedOrigin("https://boonbae.seol.pro/");
-        configuration.addAllowedOrigin("https://boonbae.seol.pro:443");
         configuration.addAllowedOrigin("https://timely-concha-38b820.netlify.app:443");
-//        configuration.addAllowedOrigin("*");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
-
-        //configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

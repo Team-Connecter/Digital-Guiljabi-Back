@@ -58,7 +58,7 @@ public class BoardController {
     @RequestParam(required = false) Long categoryPk,
     @RequestParam(required = false) String q,
     @RequestParam(required = false, defaultValue = "10") @Min(value = 2, message = "page 크기는 1보다 커야합니다") int pageSize,
-    @RequestParam(required = false) @Min(value = 1, message = "page는 0보다 커야합니다") int page,
+    @RequestParam(required = false, defaultValue = "1") @Min(value = 1, message = "page는 0보다 커야합니다") int page,
     @RequestParam(required = false, defaultValue = "NEW") SortType sort
 
   ) throws CategoryNotFoundException {
