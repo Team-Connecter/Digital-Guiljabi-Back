@@ -318,7 +318,7 @@ public class BoardService {
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
 
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new ForbiddenException("유저정보가 이상합니다. 500"));
+      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
 
     //글 작성자거나, admin이 아니라면 수정 불가능
     if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser)
