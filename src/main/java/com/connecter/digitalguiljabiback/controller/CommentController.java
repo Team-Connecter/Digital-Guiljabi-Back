@@ -25,7 +25,7 @@ public class CommentController {
     private final CommentService commentService;
 
     // 댓글 작성 (회원만)
-    @Secured("USER")
+//    @Secured("USER")
     @PostMapping("/boards/{boardPk}/comments")
     public ResponseEntity makeComment(@AuthenticationPrincipal Users user, @PathVariable Long boardPk,
                                       @RequestBody AddCommentRequest addCommentRequest)
