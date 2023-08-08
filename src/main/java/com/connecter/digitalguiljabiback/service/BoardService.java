@@ -342,6 +342,35 @@ public class BoardService {
     boardRepository.save(board);
   }
 
+  public void editBoardV2(Users user, Long boardId, AddBoardRequest addBoardRequest) {
+    Board board = boardRepository.findById(boardId)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
+
+    Users findUser = userRepository.findById(user.getPk())
+      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
+
+    //글 작성자거나, admin이 아니라면 수정 불가능
+    if (findUser.getRole() != UserRole.ADMIN && board.getUser() != findUser)
+      throw new ForbiddenException("권한이 없는 사용자");
+
+    //source string배열을 올 텍스트로 바꿈
+    String sourceText = sourceStringListToText(addBoardRequest.getSources());
+
+    List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
+    List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
+
+    board.edit(
+      addBoardRequest.getTitle(),
+      addBoardRequest.getThumbnail(),
+      addBoardRequest.getIntroduction(),
+      sourceText,
+      boardTags,
+      boardContents
+    );
+
+    boardRepository.save(board);
+  }
+
   public void deleteBoard(Users user, Long boardPk) throws NoSuchElementException, ForbiddenException{
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new ForbiddenException("user를 찾을 수 없음"));
