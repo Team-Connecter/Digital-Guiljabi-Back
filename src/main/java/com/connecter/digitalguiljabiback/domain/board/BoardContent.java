@@ -1,13 +1,10 @@
-package com.connecter.digitalguiljabiback.domain;
+package com.connecter.digitalguiljabiback.domain.board;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

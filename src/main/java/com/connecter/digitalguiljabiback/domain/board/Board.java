@@ -1,8 +1,8 @@
-package com.connecter.digitalguiljabiback.domain;
+package com.connecter.digitalguiljabiback.domain.board;
 
+import com.connecter.digitalguiljabiback.domain.*;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -121,6 +121,9 @@ public class Board {
         this.sources = sources;
         this.boardTags.addAll(boardTags);
         this.contents.addAll(contents);
+
+        this.updateAt = LocalDateTime.now();
+        this.status = BoardStatus.WAITING;
     }
 
     public void addReportCnt() {

@@ -1,6 +1,6 @@
 package com.connecter.digitalguiljabiback.dto.report.response;
 
-import com.connecter.digitalguiljabiback.domain.Board;
+import com.connecter.digitalguiljabiback.domain.board.Board;
 import com.connecter.digitalguiljabiback.domain.Report;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

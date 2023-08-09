@@ -1,7 +1,7 @@
 package com.connecter.digitalguiljabiback.dto.board;
 
 
-import com.connecter.digitalguiljabiback.domain.BoardContent;
+import com.connecter.digitalguiljabiback.domain.board.BoardContent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
