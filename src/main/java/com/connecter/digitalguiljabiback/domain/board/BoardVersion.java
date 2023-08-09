@@ -54,6 +54,19 @@ public class BoardVersion {
   //구분자 \n
   private String tags;
 
+  public static BoardVersion convert(Board board, String categoryString, String tagString) {
+    return BoardVersion.builder()
+      .board(board)
+      .createAt(board.getUpdateAt())
+      .title(board.getTitle())
+      .thumbnailUrl(board.getThumbnailUrl())
+      .introduction(board.getIntroduction())
+      .sources(board.getSources())
+      .categories(categoryString)
+      .tags(tagString)
+      .build();
+  }
+
   public void addVersionContents(List<BoardVersionContent> versionContentList) {
     this.boardVersionContents = versionContentList;
   }

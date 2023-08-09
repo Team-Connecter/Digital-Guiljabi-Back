@@ -274,7 +274,6 @@ public class BoardService {
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
     List<Category> categoryList = new ArrayList<>();
-
     if (categoryPkList != null)
       categoryList = categoryRepository.findByPkIn(categoryPkList);
 
@@ -321,15 +320,7 @@ public class BoardService {
   }
 
   public void editBoard(Users user, Long boardId, AddBoardRequest addBoardRequest) {
-    Board board = boardRepository.findById(boardId)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
-
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
-
-    //글 작성자거나, admin이 아니라면 수정 불가능
-    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser)
-      throw new ForbiddenException("권한이 없는 사용자");
+    Board board = verifyWriterAndfindBoard(user, boardId);
 
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
@@ -350,43 +341,13 @@ public class BoardService {
   }
 
   public void editBoardV2(Users user, Long boardId, AddBoardRequest addBoardRequest) {
-    Board board = boardRepository.findById(boardId)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
-
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
-
-    //글 작성자거나, admin이 아니라면 수정 불가능
-    if (findUser.getRole() != UserRole.ADMIN && board.getUser() != findUser)
-      throw new ForbiddenException("권한이 없는 사용자");
-
-    StringBuilder categories = new StringBuilder();
-
-    for(BoardCategory boardCategory: board.getBoardCategories()) {
-      Category category = boardCategory.getCategory();
-      categories.append(category.getName());
-      categories.append("\n");
-    }
-
-    StringBuilder tagBuilder = new StringBuilder();
-
-    for (BoardTag bt: board.getBoardTags()) {
-      tagBuilder.append(bt.getTag().getName());
-      tagBuilder.append("\n");
-    }
+    Board board = verifyWriterAndfindBoard(user, boardId);
 
     //version을 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-    BoardVersion boardVersion = BoardVersion.builder()
-      .board(board)
-      .createAt(board.getUpdateAt())
-      .title(board.getTitle())
-      .thumbnailUrl(board.getThumbnailUrl())
-      .introduction(board.getIntroduction())
-      .sources(board.getSources())
-      .categories(categories.substring(0, categories.length()))
-      .tags(tagBuilder.substring(0, tagBuilder.length()))
-      .build();
+    String categoryString = getCategoryString(board.getBoardCategories());
+    String tagString = getTagString(board.getBoardTags());
 
+    BoardVersion boardVersion = BoardVersion.convert(board, categoryString, tagString);
     versionRepository.save(boardVersion);
 
     List<BoardVersionContent> versionContentList = new ArrayList<>();
@@ -451,6 +412,37 @@ public class BoardService {
     boardRepository.save(board);
   }
 
+  private String getCategoryString(List<BoardCategory> boardCategoryList) {
+    StringBuilder categoryBuilder = new StringBuilder();
+    for(BoardCategory bc: boardCategoryList) {
+      categoryBuilder.append(bc.getCategory().getName());
+      categoryBuilder.append("\n");
+    }
+    return categoryBuilder.toString();
+  }
+
+  private String getTagString(List<BoardTag> boardTagList) {
+    StringBuilder tagBuilder = new StringBuilder();
+    for (BoardTag bt: boardTagList) {
+      tagBuilder.append(bt.getTag().getName());
+      tagBuilder.append("\n");
+    }
+    return tagBuilder.toString();
+  }
+
+  private Board verifyWriterAndfindBoard(Users user, Long boardId) {
+    Board board = boardRepository.findById(boardId)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
+
+    Users findUser = userRepository.findById(user.getPk())
+      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
+
+    //글 작성자거나, admin이 아니라면 수정 불가능
+    if (findUser.getRole() != UserRole.ADMIN && board.getUser() != findUser)
+      throw new ForbiddenException("권한이 없는 사용자");
+    return board;
+  }
+
   private String getContentDiff(List<CardDto> oldContents, List<CardDto> newContents) {
     StringBuilder sb = new StringBuilder();
     int i =0; //old
@@ -458,23 +450,14 @@ public class BoardService {
     while (i<oldContents.size() && j < newContents.size()) {
       String oldSubTitle = oldContents.get(i).getSubTitle();
       String newSubTitle = newContents.get(j).getSubTitle();
-      if (!oldSubTitle.equals(newSubTitle)) {
-        sb.append("- "); sb.append(oldSubTitle);
-        sb.append("\n");
-        sb.append("+ "); sb.append(newSubTitle);
-      }
+      sb = compareAndAppendDiff(sb, oldSubTitle, newSubTitle);
 
       String oldImg = oldContents.get(i).getImgUrl();
       String newImg = newContents.get(j).getImgUrl();
-      if (!oldImg.equals(newImg)) {
-        sb.append("- "); sb.append(oldImg);
-        sb.append("\n");
-        sb.append("+ "); sb.append(newImg);
-      }
+      sb = compareAndAppendDiff(sb, oldImg, newImg);
 
       List<String> oldContent = List.of(oldContents.get(i).getContent().split("\n"));
       List<String> newContent = List.of(newContents.get(j).getContent().split("\n"));
-
       String contentDiff = getDiff(oldContent, newContent);
       if (contentDiff != null)
         sb.append(contentDiff);
@@ -482,23 +465,15 @@ public class BoardService {
       i++; j++;
     }
 
+    //oldContent가 남았으면 모두 삭제
     while (i<oldContents.size()) {
-      sb.append("- "); sb.append(oldContents.get(i).getSubTitle());
-      sb.append("\n");
-      sb.append("- "); sb.append(oldContents.get(i).getImgUrl());
-      sb.append("\n");
-      sb.append("- "); sb.append(oldContents.get(i).getContent());
-      sb.append("\n");
+      sb = removeContentDiff(sb, newContents.get(i));
       i++;
     }
 
+    //newContent가 남았으면 모두 추가
     while (j<newContents.size()) {
-      sb.append("+ "); sb.append(newContents.get(j).getSubTitle());
-      sb.append("\n");
-      sb.append("+ "); sb.append(newContents.get(j).getImgUrl());
-      sb.append("\n");
-      sb.append("+ "); sb.append(newContents.get(j).getContent());
-      sb.append("\n");
+      sb = insertContentDiff(sb, newContents.get(j));
       j++;
     }
 
@@ -506,6 +481,38 @@ public class BoardService {
       return null;
 
     return sb.substring(0, sb.length());
+  }
+
+  private StringBuilder removeContentDiff(StringBuilder sb, CardDto cardDto) {
+    sb.append("- "); sb.append(cardDto.getSubTitle());
+    sb.append("\n");
+    sb.append("- "); sb.append(cardDto.getImgUrl());
+    sb.append("\n");
+    sb.append("- "); sb.append(cardDto.getContent());
+    sb.append("\n");
+
+    return sb;
+  }
+
+  private StringBuilder insertContentDiff(StringBuilder sb, CardDto cardDto) {
+    sb.append("+ "); sb.append(cardDto.getSubTitle());
+    sb.append("\n");
+    sb.append("+ "); sb.append(cardDto.getImgUrl());
+    sb.append("\n");
+    sb.append("+ "); sb.append(cardDto.getContent());
+    sb.append("\n");
+
+    return sb;
+  }
+
+  private StringBuilder compareAndAppendDiff(StringBuilder sb, String oldString, String newString) {
+    if (!oldString.equals(newString)) {
+      sb.append("- "); sb.append(oldString);
+      sb.append("\n");
+      sb.append("+ "); sb.append(newString);
+    }
+
+    return sb;
   }
 
   private String getDiff(List<String> oldList, List<String> newList) {
