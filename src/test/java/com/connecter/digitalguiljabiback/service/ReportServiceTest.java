@@ -1,27 +1,23 @@
 package com.connecter.digitalguiljabiback.service;
 
 import com.connecter.digitalguiljabiback.domain.*;
+import com.connecter.digitalguiljabiback.domain.board.Board;
+import com.connecter.digitalguiljabiback.domain.board.BoardStatus;
 import com.connecter.digitalguiljabiback.dto.board.AdminBriefBoardInfo;
-import com.connecter.digitalguiljabiback.dto.board.BriefBoardInfo;
 import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
-import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
 import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
-import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.category.AddCategoryRequest;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
-import com.connecter.digitalguiljabiback.dto.report.ReportSortType;
 import com.connecter.digitalguiljabiback.dto.report.response.BriefReportResponse;
 import com.connecter.digitalguiljabiback.dto.report.response.ReportBoardListResponse;
 import com.connecter.digitalguiljabiback.exception.ReportDuplicatedException;
-import com.connecter.digitalguiljabiback.repository.BoardRepository;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;

@@ -1,6 +1,7 @@
 package com.connecter.digitalguiljabiback.service;
 
 import com.connecter.digitalguiljabiback.domain.*;
+import com.connecter.digitalguiljabiback.domain.board.*;
 import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
@@ -11,6 +12,9 @@ import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.NotFoundException;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.*;
+import com.connecter.digitalguiljabiback.repository.board.BoardVersionContentRepository;
+import com.connecter.digitalguiljabiback.repository.board.BoardVersionRepository;
+import com.connecter.digitalguiljabiback.repository.board.VersionDiffRepository;
 import com.connecter.digitalguiljabiback.repository.specification.BoardSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,9 @@ public class BoardService {
   private final BoardCategoryRepository boardCategoryRepository;
   private final UserRepository userRepository;
   private final BoardLikeRepository boardLikeRepository;
+  private final BoardVersionContentRepository versionContentRepository;
+  private final BoardVersionRepository versionRepository;
+  private final VersionDiffRepository versionDiffRepository;
 
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
@@ -267,7 +274,6 @@ public class BoardService {
       .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
 
     List<Category> categoryList = new ArrayList<>();
-
     if (categoryPkList != null)
       categoryList = categoryRepository.findByPkIn(categoryPkList);
 
@@ -314,15 +320,7 @@ public class BoardService {
   }
 
   public void editBoard(Users user, Long boardId, AddBoardRequest addBoardRequest) {
-    Board board = boardRepository.findById(boardId)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
-
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
-
-    //글 작성자거나, admin이 아니라면 수정 불가능
-    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser)
-      throw new ForbiddenException("권한이 없는 사용자");
+    Board board = verifyWriterAndfindBoard(user, boardId);
 
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
@@ -343,16 +341,59 @@ public class BoardService {
   }
 
   public void editBoardV2(Users user, Long boardId, AddBoardRequest addBoardRequest) {
-    Board board = boardRepository.findById(boardId)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
+    Board board = verifyWriterAndfindBoard(user, boardId);
 
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
+    //version을 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    String categoryString = getCategoryString(board.getBoardCategories());
+    String tagString = getTagString(board.getBoardTags());
 
-    //글 작성자거나, admin이 아니라면 수정 불가능
-    if (findUser.getRole() != UserRole.ADMIN && board.getUser() != findUser)
-      throw new ForbiddenException("권한이 없는 사용자");
+    BoardVersion boardVersion = BoardVersion.convert(board, categoryString, tagString);
+    versionRepository.save(boardVersion);
 
+    List<BoardVersionContent> versionContentList = new ArrayList<>();
+    for (BoardContent bc: board.getContents()) {
+      BoardVersionContent bvc = BoardVersionContent.convert(bc, boardVersion);
+      versionContentRepository.save(bvc);
+      versionContentList.add(bvc);
+    }
+
+    boardVersion.addVersionContents(versionContentList);
+
+    //변경사항 비교 및 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    String titleDiff = getDiff(board.getTitle(), addBoardRequest.getTitle());
+    String thumbnailDiff = getDiff(board.getThumbnailUrl(), addBoardRequest.getThumbnail());
+    String introductionDiff = getDiff(board.getIntroduction(), addBoardRequest.getIntroduction());
+
+    List<String> oldTagList = board.getBoardTags().stream()
+      .map(BoardTag::getTag)
+      .map(Tag::getName)
+      .collect(Collectors.toList());
+
+    String tagDiff = getDiff(oldTagList, List.of(addBoardRequest.getTags()));
+
+    List<CardDto> cardDtoList = new ArrayList<>();
+    for (BoardContent boardContent : board.getContents()) {
+      CardDto cardDto = new CardDto(boardContent.getTitle(), boardContent.getImgUrl(), boardContent.getContent());
+      cardDtoList.add(cardDto);
+    }
+
+    String contentDiff = getContentDiff(cardDtoList, List.of(addBoardRequest.getCards()));
+
+    VersionDiff versionDiff = VersionDiff.builder()
+      .title(titleDiff)
+      .thumbnailUrl(thumbnailDiff)
+      .introduction(introductionDiff)
+      .sources(getDiff(sourceTextToStringList(board.getSources()), List.of(addBoardRequest.getSources())))
+      .contents(contentDiff)
+      .tags(tagDiff)
+      .build();
+
+    versionDiffRepository.save(versionDiff);
+
+    boardVersion.addVersionDiff(versionDiff);
+
+
+    //정보글을 변경 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
 
@@ -369,6 +410,168 @@ public class BoardService {
     );
 
     boardRepository.save(board);
+  }
+
+  private String getCategoryString(List<BoardCategory> boardCategoryList) {
+    StringBuilder categoryBuilder = new StringBuilder();
+    for(BoardCategory bc: boardCategoryList) {
+      categoryBuilder.append(bc.getCategory().getName());
+      categoryBuilder.append("\n");
+    }
+    return categoryBuilder.toString();
+  }
+
+  private String getTagString(List<BoardTag> boardTagList) {
+    StringBuilder tagBuilder = new StringBuilder();
+    for (BoardTag bt: boardTagList) {
+      tagBuilder.append(bt.getTag().getName());
+      tagBuilder.append("\n");
+    }
+    return tagBuilder.toString();
+  }
+
+  private Board verifyWriterAndfindBoard(Users user, Long boardId) {
+    Board board = boardRepository.findById(boardId)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
+
+    Users findUser = userRepository.findById(user.getPk())
+      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
+
+    //글 작성자거나, admin이 아니라면 수정 불가능
+    if (findUser.getRole() != UserRole.ADMIN && board.getUser() != findUser)
+      throw new ForbiddenException("권한이 없는 사용자");
+    return board;
+  }
+
+  private String getContentDiff(List<CardDto> oldContents, List<CardDto> newContents) {
+    StringBuilder sb = new StringBuilder();
+    int i =0; //old
+    int j =0; //new
+    while (i<oldContents.size() && j < newContents.size()) {
+      String oldSubTitle = oldContents.get(i).getSubTitle();
+      String newSubTitle = newContents.get(j).getSubTitle();
+      sb = compareAndAppendDiff(sb, oldSubTitle, newSubTitle);
+
+      String oldImg = oldContents.get(i).getImgUrl();
+      String newImg = newContents.get(j).getImgUrl();
+      sb = compareAndAppendDiff(sb, oldImg, newImg);
+
+      List<String> oldContent = List.of(oldContents.get(i).getContent().split("\n"));
+      List<String> newContent = List.of(newContents.get(j).getContent().split("\n"));
+      String contentDiff = getDiff(oldContent, newContent);
+      if (contentDiff != null)
+        sb.append(contentDiff);
+
+      i++; j++;
+    }
+
+    //oldContent가 남았으면 모두 삭제
+    while (i<oldContents.size()) {
+      sb = removeContentDiff(sb, newContents.get(i));
+      i++;
+    }
+
+    //newContent가 남았으면 모두 추가
+    while (j<newContents.size()) {
+      sb = insertContentDiff(sb, newContents.get(j));
+      j++;
+    }
+
+    if (sb.length() == 0)
+      return null;
+
+    return sb.substring(0, sb.length());
+  }
+
+  private StringBuilder removeContentDiff(StringBuilder sb, CardDto cardDto) {
+    sb.append("- "); sb.append(cardDto.getSubTitle());
+    sb.append("\n");
+    sb.append("- "); sb.append(cardDto.getImgUrl());
+    sb.append("\n");
+    sb.append("- "); sb.append(cardDto.getContent());
+    sb.append("\n");
+
+    return sb;
+  }
+
+  private StringBuilder insertContentDiff(StringBuilder sb, CardDto cardDto) {
+    sb.append("+ "); sb.append(cardDto.getSubTitle());
+    sb.append("\n");
+    sb.append("+ "); sb.append(cardDto.getImgUrl());
+    sb.append("\n");
+    sb.append("+ "); sb.append(cardDto.getContent());
+    sb.append("\n");
+
+    return sb;
+  }
+
+  private StringBuilder compareAndAppendDiff(StringBuilder sb, String oldString, String newString) {
+    if (!oldString.equals(newString)) {
+      sb.append("- "); sb.append(oldString);
+      sb.append("\n");
+      sb.append("+ "); sb.append(newString);
+    }
+
+    return sb;
+  }
+
+  private String getDiff(List<String> oldList, List<String> newList) {
+    StringBuilder sb = new StringBuilder();
+    int i =0; //old
+    int j =0; //new
+    while (i<oldList.size() && j < newList.size()) {
+      if (oldList.get(i).equals(newList.get(i))) {
+        i++; j++;
+        continue;
+      }
+
+      int k = i+1; //old
+      while (k < oldList.size() && !oldList.get(k).equals(newList.get(j)))
+        k++;
+
+      if (k >= oldList.size()) {
+        // 추가
+        sb.append("+ "); sb.append(newList.get(j));
+        sb.append("\n");
+        j++;
+      } else {
+        // k까지 나머지 싹 다 -
+        for (int t = i; t<k; t++) {
+          sb.append("- "); sb.append(oldList.get(t));
+          sb.append("\n");
+        }
+        j = k+1; i ++;
+      }
+    }
+
+    while (i<oldList.size()) {
+      sb.append("- "); sb.append(oldList.get(i));
+      sb.append("\n");
+      i++;
+    }
+
+    while (j<newList.size()) {
+      sb.append("+ "); sb.append(newList.get(j));
+      sb.append("\n");
+      j++;
+    }
+
+    if (sb.length() == 0)
+      return null;
+
+    return sb.substring(0, sb.length());
+  }
+
+  //- oldString
+  //+ newString
+  private String getDiff(String oldString, String newString) {
+    if (oldString.equals(newString))
+      return null;
+
+    String st = "- " + oldString +
+      "\n" +
+      "+ " + newString;
+    return st;
   }
 
   public void deleteBoard(Users user, Long boardPk) throws NoSuchElementException, ForbiddenException{

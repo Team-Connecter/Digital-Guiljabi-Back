@@ -1,13 +1,10 @@
-package com.connecter.digitalguiljabiback.domain;
+package com.connecter.digitalguiljabiback.domain.board;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,9 +25,11 @@ public class BoardContent {
     //subtitle은 null이 될 수 있음 -> nullable
     private String title;
 
-    @Column(name = "img_url")
+    @Column(name = "img_url", length = 99999)
     private String imgUrl;
 
+    @Lob
+    @Column(length = 999999999)
     private String content;
 
     public static BoardContent makeBoardContent(Board board, String title, String imgUrl, String content) {
