@@ -141,6 +141,10 @@ public class Board {
         this.likeCnt += 1;
     }
 
+    public void deleteLikeCnt() {
+        this.likeCnt--;
+    }
+
     public void addBookmarkCnt() {
         this.bookmarkCnt += 1;
     }
