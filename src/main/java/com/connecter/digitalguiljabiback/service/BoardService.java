@@ -380,6 +380,7 @@ public class BoardService {
       .board(board)
       .createAt(board.getUpdateAt())
       .title(board.getTitle())
+      .thumbnailUrl(board.getThumbnailUrl())
       .introduction(board.getIntroduction())
       .sources(board.getSources())
       .categories(categories.substring(0, categories.length()))

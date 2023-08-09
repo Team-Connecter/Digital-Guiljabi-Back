@@ -1,5 +1,6 @@
 package com.connecter.digitalguiljabiback.controller;
 
+import com.connecter.digitalguiljabiback.dto.boardVersion.VersionDiffDTO;
 import com.connecter.digitalguiljabiback.dto.boardVersion.VersionInfo;
 import com.connecter.digitalguiljabiback.dto.boardVersion.VersionListResponse;
 import com.connecter.digitalguiljabiback.service.BoardVersionService;
@@ -40,8 +41,15 @@ public class BoardVersionController {
 
     return ResponseEntity.ok(response);
   }
-  
 
+  @Operation(summary = "히스토리 변경내역 조회", description = "이전 버전과 비교해 변경된 내용을 조회합니다")
+  @Parameter(name = "boardVersionPk", description = "버전의 pk")
+  @GetMapping("/board-version/{boardVersionPk}/diff")
+  public ResponseEntity<VersionDiffDTO> getDiff(@PathVariable Long boardVersionPk) {
+    VersionDiffDTO response = boardVersionService.getVersionDiff(boardVersionPk);
+
+    return ResponseEntity.ok(response);
+  }
 
 
 }

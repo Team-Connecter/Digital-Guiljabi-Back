@@ -26,9 +26,11 @@ public class BoardVersionContent {
   //subtitle은 null이 될 수 있음 -> nullable
   private String title;
 
-  @Column(name = "img_url")
+  @Column(name = "img_url", length = 99999)
   private String imgUrl;
 
+  @Lob
+  @Column(length = 999999999)
   private String content;
 
   public static BoardVersionContent convert(BoardContent bc, BoardVersion boardVersion) {

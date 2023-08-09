@@ -35,6 +35,9 @@ public class BoardVersion {
   @NotNull
   private String title;
 
+  @Column(name = "thumbnail_url", length = 99999)
+  private String thumbnailUrl = null;
+
   @Lob
   @Column(length = 999999999)
   private String introduction;
