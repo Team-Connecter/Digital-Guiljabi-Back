@@ -400,9 +400,9 @@ public class BoardService {
     boolean isClicked = boardLikeRepository.existsByUserAndBoard(user, board);
     if(!isClicked) {
       boardLikeRepository.save(likes);
+      board.addLikeCnt();
     }
 
-    board.addLikeCnt();
 
   }
 
@@ -414,9 +414,12 @@ public class BoardService {
     Likes likes = boardLikeRepository.findByUserAndBoard(user, board)
       .orElseThrow(() -> new NotFoundException("좋아요가 존재하지 않습니다."));
 
-    boardLikeRepository.delete(likes);
+    boolean isClicked = boardLikeRepository.existsByUserAndBoard(user, board);
+    if(isClicked) {
+      boardLikeRepository.delete(likes);
+      board.deleteLikeCnt();
+    }
 
-    board.deleteLikeCnt();
   }
 
 
