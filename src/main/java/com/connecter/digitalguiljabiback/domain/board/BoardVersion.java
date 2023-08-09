@@ -48,6 +48,7 @@ public class BoardVersion {
   @OneToMany(mappedBy = "boardVersion", cascade = CascadeType.ALL, orphanRemoval = true) //boardcontent를 삭제하지 않아도 삭제됨 @TODO 테스트
   private List<BoardVersionContent> boardVersionContents = new ArrayList<BoardVersionContent>();
 
+  //구분자 \n
   private String tags;
 
   public void addVersionContents(List<BoardVersionContent> versionContentList) {

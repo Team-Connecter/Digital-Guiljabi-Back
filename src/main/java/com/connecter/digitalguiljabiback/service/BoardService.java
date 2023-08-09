@@ -368,7 +368,6 @@ public class BoardService {
       categories.append("\n");
     }
 
-
     StringBuilder tagBuilder = new StringBuilder();
 
     for (BoardTag bt: board.getBoardTags()) {
