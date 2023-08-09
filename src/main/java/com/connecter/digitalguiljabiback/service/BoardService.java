@@ -415,6 +415,8 @@ public class BoardService {
       .orElseThrow(() -> new NotFoundException("좋아요가 존재하지 않습니다."));
 
     boardLikeRepository.delete(likes);
+
+    board.deleteLikeCnt();
   }
 
 
