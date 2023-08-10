@@ -18,7 +18,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
-@Tag(name = "ReportController", description = "신고 관련 API")
+@Tag(name = "신고", description = "신고 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j

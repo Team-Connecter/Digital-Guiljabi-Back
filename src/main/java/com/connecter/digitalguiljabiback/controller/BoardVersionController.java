@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "BoardVersionController", description = "정보글 버전 관련 API")
+@Tag(name = "정보글 버전(히스토리)", description = "정보글 버전 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j

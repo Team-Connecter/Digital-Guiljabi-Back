@@ -1,26 +1,48 @@
 package com.connecter.digitalguiljabiback.controller;
 
+import com.connecter.digitalguiljabiback.domain.Users;
+import com.connecter.digitalguiljabiback.repository.UserRepository;
+import com.connecter.digitalguiljabiback.service.JwtService;
 import com.connecter.digitalguiljabiback.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
+@Tag(name = "JWT 토큰", description = "JWT 토큰이 유효한지 확인하는 API입니다.")
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
 @RestController
 public class TokenController {
 
-  private final UserService userService;
+  private final JwtService jwtService;
+  private final UserRepository userRepository;
 
+  @Tag(name = "토큰 유효성 검사", description = """
+    토큰 유효성을 검사합니다. 항상 200을 반환함<br>
+    token을 <Authorization 헤더>에 넣어 보내면 알아서 유효성을 검사해 true, false를 보내줍니다.
+    """)
   @GetMapping("/token/validate")
-  public ResponseEntity validateJwtToken() {
+  public ResponseEntity validateJwtToken(@RequestHeader(value="Authorization", required = false) String authHeader) {
+    boolean isTokenValid = false;
 
-    return ResponseEntity.ok().build();
+    if (authHeader != null) {
+      String token = authHeader.substring(7);
+      String uid = jwtService.extractUsername(token);
+
+      Users user = userRepository.findByUid(uid)
+        .orElseGet(() -> null);
+
+      if (user != null && jwtService.isTokenValid(token, user))
+        isTokenValid = true;
+    }
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("isTokenValid", isTokenValid);
+    return ResponseEntity.ok(response);
   }
 }

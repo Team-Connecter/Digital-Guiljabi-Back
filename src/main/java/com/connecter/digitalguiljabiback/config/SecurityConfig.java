@@ -27,7 +27,7 @@ public class SecurityConfig {
       "/api/login/**",
       "/error",
       "/api/v1/boards/popular", "/api/v1/users/nickname/*/exists",
-
+      "/api/v1/token/validate",
       "/logoutPage" //TODO 삭제
     };
 

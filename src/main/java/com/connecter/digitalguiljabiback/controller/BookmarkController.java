@@ -13,7 +13,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "BookmarkController", description = "북마크 관련 API")
+@Tag(name = "북마크", description = "북마크 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j

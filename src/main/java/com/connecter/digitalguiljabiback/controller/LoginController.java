@@ -9,6 +9,7 @@ import com.connecter.digitalguiljabiback.security.oauth.naver.NaverClient;
 import com.connecter.digitalguiljabiback.service.JwtService;
 import com.connecter.digitalguiljabiback.service.LoginService;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
+@Tag(name = "로그인", description = "로그인 관련 API입니다")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
