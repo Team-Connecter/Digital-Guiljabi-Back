@@ -185,7 +185,6 @@ class BoardServiceTest {
 
     boolean hasData = false;
     for (BriefBoardInfo info: approvedBoardList.getList()) {
-      log.info("@@: " + info.getTitle());
       if (info.getTitle().equals(title)) {
         hasData = true;
         break;

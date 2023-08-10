@@ -42,8 +42,7 @@ public class BoardVersionService {
 
   //해당 버전의 내용을 출력
   public VersionInfo getVersion(Long boardVersionPk) {
-    BoardVersion boardVersion = boardVersionRepository.findById(boardVersionPk)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 boardVersion이 없습니다"));
+    BoardVersion boardVersion = findBoardVersion(boardVersionPk);
 
     List<BoardVersionContent> contentList = boardVersion.getBoardVersionContents();
 
@@ -60,11 +59,15 @@ public class BoardVersionService {
 
   //해당 버전의 변경내용 조회
   public VersionDiffDTO getVersionDiff(Long boardVersionPk) {
+    BoardVersion boardVersion = findBoardVersion(boardVersionPk);
+
+    return VersionDiffDTO.convert(boardVersion.getVersionDiff());
+  }
+
+  private BoardVersion findBoardVersion(Long boardVersionPk) {
     BoardVersion boardVersion = boardVersionRepository.findById(boardVersionPk)
       .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 boardVersion이 없습니다"));
 
-    VersionDiff versionDiff = boardVersion.getVersionDiff();
-
-    return VersionDiffDTO.convert(versionDiff);
+    return boardVersion;
   }
 }
