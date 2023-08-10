@@ -16,7 +16,12 @@ import java.util.Collections;
 @OpenAPIDefinition(
   info = @Info(
     title = "디지털길잡이 백엔드 API 명세서",
-    description = "디지털길잡이 백엔드 API 명세입니다",
+    description = """
+      디지털길잡이 백엔드 API 명세입니다.
+      
+      401: 만료된 토큰 or 유효하지 않은 토큰 사용
+      500: 서버에러
+      """,
     version = "v1"
   )
 )

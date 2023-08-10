@@ -10,6 +10,7 @@ import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.NotFoundException;
+import com.connecter.digitalguiljabiback.exception.ServerException;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.*;
 import com.connecter.digitalguiljabiback.repository.board.BoardVersionContentRepository;
@@ -46,10 +47,10 @@ public class BoardService {
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
 
-  public Board makeBoard(Users user, AddBoardRequest addBoardRequest) throws NoSuchElementException {
+  public Board makeBoard(Users user, AddBoardRequest addBoardRequest){
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
+      .orElseThrow(() -> new ServerException("해당하는 사용자가 없습니다"));
 
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
@@ -169,13 +170,7 @@ public class BoardService {
   }
 
   public BoardListResponse getApprovedBoardList(Long categoryPk, String q, int page,int pageSize, SortType sort) throws CategoryNotFoundException {
-    BoardListRequest request = BoardListRequest.builder()
-      .categoryPk(categoryPk)
-      .q(q)
-      .page(page)
-      .pageSize(pageSize)
-      .sort(sort)
-      .build();
+    BoardListRequest request = BoardListRequest.makeRequest(categoryPk, q, pageSize, page, sort);
     return getBoardList(request, BoardStatus.APPROVED);
   }
 
@@ -197,7 +192,6 @@ public class BoardService {
 
     //선택한 카테고리, 검색어가 존재한다면 해당 카테고리에 해당하는 검색어와 일치하는 글을 조회
     if (request.getCategoryPk() != null && request.getQ() != null) {
-      log.info("@@!");
       Category category = categoryRepository.findById(request.getCategoryPk())
         .orElseThrow(() -> new CategoryNotFoundException("해당하는 카테고리가 없습니다"));
 
@@ -208,14 +202,12 @@ public class BoardService {
       list = boardRepository.findAll(spec,pageable).getContent();
 
     } else if (request.getCategoryPk() != null) { //카테고리만 지정된 경우
-      log.info("@@2");
       Category category = categoryRepository.findById(request.getCategoryPk())
         .orElseThrow(() -> new CategoryNotFoundException("해당하는 카테고리가 없습니다"));
 
       list = boardRepository.findByCategoryAndStatus(category, boardStatus, pageable);
 
     } else if (request.getQ() != null) { //검색어만 지정된 경우
-      log.info("@@3");
       Specification<Board> spec = Specification.where(BoardSpecification.matchesSearchTerm(request.getQ())) //검색어와 매칭
         .and(BoardSpecification.hasStatus(boardStatus)); //해당 status를 가짐
 
@@ -231,8 +223,6 @@ public class BoardService {
       List<Tag> byBoard = tagRepository.findTagByBoard(b)
         .orElseGet(() -> new ArrayList<>());
 
-      log.info("@@@: "+ byBoard);
-
       tagList.add(byBoard);
       userList.add(b.getUser());
     }
@@ -247,7 +237,6 @@ public class BoardService {
 
     return boardListResponse;
   }
-
 
   private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) throws RuntimeException {
 
