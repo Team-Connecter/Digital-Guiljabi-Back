@@ -7,6 +7,7 @@ import com.connecter.digitalguiljabiback.dto.user.NicknameRequest;
 import com.connecter.digitalguiljabiback.dto.user.response.AllUserResponse;
 import com.connecter.digitalguiljabiback.dto.user.response.UsersInfoResponse;
 import com.connecter.digitalguiljabiback.dto.user.response.UsersResponse;
+import com.connecter.digitalguiljabiback.exception.InternalServerException;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,9 +41,9 @@ public class UserService {
     findUser.updateNickname(request.getNickname());
   }
 
-  public void changeProfileImg(Users user, ImgUrlRequest request) throws NoSuchElementException {
+  public void changeProfileImg(Users user, ImgUrlRequest request) throws InternalServerException {
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
+      .orElseThrow(() -> new InternalServerException("해당하는 사용자가 없습니다"));
 
     findUser.updateProfileImg(request.getImgUrl());
   }
@@ -78,7 +79,7 @@ public class UserService {
 
   public void delete(Users user) throws NoSuchElementException {
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("해당하는 user가 없습니다"));
+      .orElseThrow(() -> new InternalServerException("해당하는 user가 없습니다"));
 
     userRepository.delete(findUser);
   }

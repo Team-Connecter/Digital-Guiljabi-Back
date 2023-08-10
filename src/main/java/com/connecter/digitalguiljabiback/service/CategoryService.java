@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @Slf4j
 @Transactional
@@ -105,8 +104,8 @@ public class CategoryService {
 
   //직속 자식 찾기
   @Transactional(readOnly = true)
-  public CategoryListResponse getChildren(Long categoryPk) throws NoSuchElementException {
-    categoryRepository.findById(categoryPk).orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+  public CategoryListResponse getChildren(Long categoryPk) throws CategoryNotFoundException {
+    categoryRepository.findById(categoryPk).orElseThrow(() -> new CategoryNotFoundException("해당하는 pk의 카테고리가 존재하지 않습니다"));
 
     List<Category> children = categoryRepository.findChildren(categoryPk);
 
@@ -122,8 +121,8 @@ public class CategoryService {
 
   //내 모든 조상 찾기(나 포함)
   @Transactional(readOnly = true)
-  public CategoryListResponse getMyAncestor(Long categoryPk) throws NoSuchElementException {
-    categoryRepository.findById(categoryPk).orElseThrow(() -> new NoSuchElementException("해당하는 카테고리가 존재하지 않습니다"));
+  public CategoryListResponse getMyAncestor(Long categoryPk) throws CategoryNotFoundException {
+    categoryRepository.findById(categoryPk).orElseThrow(() -> new CategoryNotFoundException("해당하는 카테고리가 존재하지 않습니다"));
 
     List<Category> children = categoryRepository.findMyAncestor(categoryPk)
       .orElseGet(() -> new ArrayList<>());
@@ -141,7 +140,7 @@ public class CategoryService {
   //name은 절대 null이거나 ""면 안됨
   public Category editCategoryName(Long categoryPk, String name) {
     Category category = categoryRepository.findById(categoryPk)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+      .orElseThrow(() -> new CategoryNotFoundException("해당하는 pk의 카테고리가 존재하지 않습니다"));
 
     category.updateName(name);
 
@@ -149,17 +148,37 @@ public class CategoryService {
   }
   
   //자식까지 싹 이동
-  public void moveCategory(Long categoryPk, Long parentPk) {
-    categoryRepository.findById(categoryPk)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+  public void moveCategory(Long categoryPk, Long parentPk) throws CategoryNameDuplicatedException, CategoryNotFoundException {
+    Category category = categoryRepository.findById(categoryPk)
+      .orElseThrow(() -> new CategoryNotFoundException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+
+    //같은 부모 밑에 같은 이름의 카테고리가 있는지 확인
+    if (parentPk != null) {
+      //해당하는 카테고리가 있는지 확인
+      categoryRepository.findById(parentPk)
+        .orElseThrow(() -> new CategoryNotFoundException("해당하는 부모 카테고리가 없습니다"));
+
+      //같은 레벨에 같은 이름의 카테고리가 존재하는지 확인
+      for (Category c: categoryRepository.findChildren(parentPk)) {
+        if (c.getName().equals(category.getName()))
+          throw new CategoryNameDuplicatedException("동일한 이름의 카테고리가 같은 레벨에 존재합니다");
+      }
+
+    } else {
+      //최상위 카테고리에 중복name있는지 확인
+      for (Category fa: categoryRepository.findFirstAncestor()) {
+        if (fa.getName().equals(category.getName()))
+          throw new CategoryNameDuplicatedException("동일한 이름의 카테고리가 같은 레벨에 존재합니다");
+      }
+    }
 
     categoryRepository.updateConnect(categoryPk, parentPk);
   }
 
   //자식까지 삭 삭제
-  public void delete(Long categoryPk) throws NoSuchElementException {
+  public void delete(Long categoryPk) throws CategoryNotFoundException {
     categoryRepository.findById(categoryPk)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 카테고리가 존재하지 않습니다"));
+      .orElseThrow(() -> new CategoryNotFoundException("해당하는 pk의 카테고리가 존재하지 않습니다"));
 
     categoryRepository.deleteConnect(categoryPk);
 
