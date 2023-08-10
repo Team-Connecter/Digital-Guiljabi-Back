@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.NoSuchElementException;
 
 
-@Tag(name = "카테고리", description = "카테고리 관련 API입니다")
+@Tag(name = "카테고리", description = "카테고리 관련 API")
 @RequiredArgsConstructor
 @RestController
 @Slf4j
@@ -29,9 +29,8 @@ public class CategoryController {
 
   private final CategoryService categoryService;
 
-  @Secured("ADMIN")
   @Operation(summary = "카테고리 추가", description = """
-    [관리자] 카테고리를 추가합니다.<br>
+    [관리자]<br>
     parentCategoryPk는 추가하는 카테고리의 부모 카테고리입니다. 최상위 카테고리로 만들고싶다면 parentCategoryPk를 null로 넣어주세요.<br>
     201: 성공<br>
     403: 권한없음<br>
@@ -46,7 +45,7 @@ public class CategoryController {
   }
   
   @Operation(summary = "최상위 카테고리 조회", description = """
-    [모두 접근가능] 최상위 카테고리를 조회합니다<br>200: 성공
+    [모두 접근가능]<br>200: 성공
     """)
   @GetMapping("/categories/root")
   public ResponseEntity<CategoryListResponse> getFirstCategory() {

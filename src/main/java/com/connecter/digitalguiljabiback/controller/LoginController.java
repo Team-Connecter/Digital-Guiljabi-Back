@@ -9,6 +9,7 @@ import com.connecter.digitalguiljabiback.security.oauth.naver.NaverClient;
 import com.connecter.digitalguiljabiback.service.JwtService;
 import com.connecter.digitalguiljabiback.service.LoginService;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Tag(name = "로그인", description = "로그인 관련 API입니다")
+@Tag(name = "로그인", description = "로그인 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -31,8 +32,11 @@ public class LoginController {
   private final LoginService loginService;
   private final JwtService jwtService;
 
-
-   //카카오 로그인 페이지 url을 반환
+  @Operation(summary = "카카오 로그인 페이지 url 받기", description = """
+    [모두 접근가능] 카카오로 로그인할 수 있는 url을 받아옵니다.<br>
+    회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
+    201: 성공
+    """)
   @GetMapping("/login/kakao")
   public ResponseEntity<Map> getKakaoLoginUrl() {
     Map<String, String> map = new HashMap<>();
@@ -58,7 +62,11 @@ public class LoginController {
     return ResponseEntity.ok(loginResponseDTO);
   }
 
-  //네이버 로그인 페이지 url을 반환
+  @Operation(summary = "네이버 로그인 페이지 url 받기", description = """
+    [모두 접근가능] 네이버로 로그인할 수 있는 url을 받아옵니다.<br>
+    회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
+    201: 성공
+    """)
   @GetMapping("/login/naver")
   public ResponseEntity<Map> getNaverLoginUrl() {
     Map<String, String> map = new HashMap<>();
@@ -88,6 +96,12 @@ public class LoginController {
     return ResponseEntity.ok(loginResponseDTO);
   }
 
+  @Operation(summary = "임시 회원가입", description = """
+    [모두 접근가능] uid로 임시 회원가입을 할 수 있습니다.<br>
+    회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
+    201: 성공<br>
+    409: 같은 uid가 이미 존재함
+    """)
   @PostMapping("/login/signup")
   public ResponseEntity tempSignUp(@RequestBody UserRequest userRequest) throws UsernameDuplicatedException {
     loginService.tempSignUp(userRequest);
@@ -95,6 +109,11 @@ public class LoginController {
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
+  @Operation(summary = "임시 로그인", description = """
+    [모두 접근가능] uid로 임시 로그인을 할 수 있습니다.<br>
+    200: 성공<br>
+    403: 가입하지 않은 uid
+    """)
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> tempLogin(@RequestBody UserRequest userRequest) {
     LoginResponse loginResponse = loginService.tempLogin(userRequest);
@@ -102,15 +121,19 @@ public class LoginController {
     return ResponseEntity.ok(loginResponse);
   }
 
+  @Operation(summary = "로그아웃", description = """
+    [로그인 필요] 로그아웃을 합니다.<br> 
+    카카오 로그아웃의 경우 logout url이 반환되고, jwt토큰이 만료됩니다<br>
+    네이버, 일반 로그아웃의 경우 jwt토큰만 만료됩니다<br>
+    200: 성공<br>
+    """)
   @PostMapping("/logout")
   public ResponseEntity<Map> logout(@AuthenticationPrincipal Users user, @RequestHeader(value="Authorization") String authHeader) {
     OauthType type = user.getOauthType();
     Map<String, String> map = new HashMap<>();
 
-
-    if (type == OauthType.KAKAO) {
+    if (type == OauthType.KAKAO)
         map.put("logoutUrl", kakaoClient.getLogoutUrl());
-    }
 
     String token = authHeader.substring(7);
     

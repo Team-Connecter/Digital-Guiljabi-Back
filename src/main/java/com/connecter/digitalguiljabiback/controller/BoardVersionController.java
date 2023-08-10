@@ -24,7 +24,7 @@ public class BoardVersionController {
 
   private final BoardVersionService boardVersionService;
 
-  @Operation(summary = "정보글 히스토리 조회", description = "정보글의 히스토리를 조회합니다")
+  @Operation(summary = "정보글의 히스토리 조회")
   @Parameter(name = "boardPk", description = "정보글의 pk")
   @GetMapping("/board/{boardPk}/history")
   public ResponseEntity<VersionListResponse> getBoardVersionList(@PathVariable Long boardPk) {
@@ -33,7 +33,7 @@ public class BoardVersionController {
     return ResponseEntity.ok(response);
   }
 
-  @Operation(summary = "히스토리 상세 조회", description = "히스토리를 상세 조회합니다")
+  @Operation(summary = "히스토리 상세 조회")
   @Parameter(name = "boardVersionPk", description = "버전의 pk")
   @GetMapping("/board-version/{boardVersionPk}")
   public ResponseEntity<VersionInfo> getBoardVersion(@PathVariable Long boardVersionPk) {
