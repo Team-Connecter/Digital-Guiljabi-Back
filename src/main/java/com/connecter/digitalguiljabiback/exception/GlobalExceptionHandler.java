@@ -2,16 +2,11 @@ package com.connecter.digitalguiljabiback.exception;
 
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.ErrorResponse;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
@@ -53,10 +48,10 @@ public class GlobalExceptionHandler {
     log.info("ReportDuplicatedException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
-
-  @ExceptionHandler(ServerException.class)
-  protected ResponseEntity handlerServerException(ServerException e) {
-    log.info("ServerException = {}", e.getMessage());
+  
+  @ExceptionHandler(InternalServerException.class)
+  protected ResponseEntity handlerInternalServerException(InternalServerException e) {
+    log.info("InternalServerException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
   }
 }

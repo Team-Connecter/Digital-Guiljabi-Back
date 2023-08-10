@@ -4,6 +4,7 @@ import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.comment.AddCommentRequest;
 import com.connecter.digitalguiljabiback.dto.comment.CommentListResponse;
 import com.connecter.digitalguiljabiback.service.CommentService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,11 @@ public class CommentController {
 
     private final CommentService commentService;
 
-    // 댓글 작성 (회원만)
-//    @Secured("USER")
+    @Operation(summary = "댓글 작성", description = """
+    [로그인 필요]<br>
+    200: 성공<br>
+    403: 권한없음<br>
+    """)
     @PostMapping("/boards/{boardPk}/comments")
     public ResponseEntity makeComment(@AuthenticationPrincipal Users user, @PathVariable Long boardPk,
                                       @RequestBody AddCommentRequest addCommentRequest)
@@ -34,7 +38,11 @@ public class CommentController {
         return ResponseEntity.ok().build();
     }
 
-    // 댓글 삭제 (작성자, 관리자)
+    @Operation(summary = "댓글 삭제", description = """
+    [로그인 필요] 댓글 작성자, 관리자만 삭제가 가능합니다<br>
+    200: 성공<br>
+    403: 권한없음<br>
+    """)
     @DeleteMapping("/comments/{commentPk}")
     public ResponseEntity deleteComment(@AuthenticationPrincipal Users user, @PathVariable Long commentPk)
     {
@@ -42,7 +50,10 @@ public class CommentController {
         return ResponseEntity.ok().build();
     }
 
-    // 특정 게시글에 대한 모든 댓글 불러오기 (Any)
+    @Operation(summary = "정 게시글에 대한 모든 댓글 불러오기", description = """
+    [모두 접근가능]<br>
+    200: 성공
+    """)
     @GetMapping("/boards/{boardPk}/comments")
     public ResponseEntity<CommentListResponse> getCommentList(
             // 최신순

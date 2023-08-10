@@ -10,7 +10,7 @@ import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
 import com.connecter.digitalguiljabiback.exception.NotFoundException;
-import com.connecter.digitalguiljabiback.exception.ServerException;
+import com.connecter.digitalguiljabiback.exception.InternalServerException;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
 import com.connecter.digitalguiljabiback.repository.*;
 import com.connecter.digitalguiljabiback.repository.board.BoardVersionContentRepository;
@@ -50,7 +50,8 @@ public class BoardService {
   public Board makeBoard(Users user, AddBoardRequest addBoardRequest){
     //굳이 안넣어도 될듯
     Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new ServerException("해당하는 사용자가 없습니다"));
+      .orElseThrow(() -> new InternalServerException("해당하는 사용자가 없습니다"));
+
 
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
