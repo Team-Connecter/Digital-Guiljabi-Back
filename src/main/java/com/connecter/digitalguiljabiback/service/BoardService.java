@@ -38,7 +38,6 @@ public class BoardService {
   private final TagRepository tagRepository;
   private final CategoryRepository categoryRepository;
   private final BoardCategoryRepository boardCategoryRepository;
-  private final UserRepository userRepository;
   private final BoardLikeRepository boardLikeRepository;
   private final BoardVersionContentRepository versionContentRepository;
   private final BoardVersionRepository versionRepository;
@@ -48,15 +47,12 @@ public class BoardService {
   private final String sourceDelim = "\tl\tL\t@ls";
 
   public Board makeBoard(Users user, AddBoardRequest addBoardRequest){
-    //굳이 안넣어도 될듯
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new InternalServerException("해당하는 사용자가 없습니다"));
 
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceListToText(addBoardRequest.getSources());
 
     Board board = Board.builder()
-      .user(findUser)
+      .user(user)
       .title(addBoardRequest.getTitle())
       .thumbnailUrl(addBoardRequest.getThumbnail())
       .introduction(addBoardRequest.getIntroduction())
@@ -131,9 +127,7 @@ public class BoardService {
   }
 
   public BoardResponse getBoardInfo(Long boardPk, Users user) throws NoSuchElementException {
-    Board board = boardRepository.findById(boardPk)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글을 찾을 수 없습니다"));
-
+    Board board = findBoard(boardPk);
     Users writer = board.getUser();
 
     //게시글이 승인되지 않았다면 관리자, 작성자만 볼 수 있음
@@ -191,6 +185,7 @@ public class BoardService {
   }
 
   //APPROVED된 것만 조회가능
+  @Transactional(readOnly = true)
   public BoardListResponse getBoardList(BoardListRequest request, BoardStatus boardStatus) throws CategoryNotFoundException {
     //pageable객체 만들기
     Pageable pageable = makePageable(request.getSort(), request.getPage(), request.getPageSize());
@@ -266,8 +261,7 @@ public class BoardService {
   }
 
   public void approve(Long boardPk, List<Long> categoryPkList) throws NoSuchElementException {
-    Board board = boardRepository.findById(boardPk)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
+    Board board = findBoard(boardPk);
 
     List<Category> categoryList = new ArrayList<>();
     if (categoryPkList != null)
@@ -295,13 +289,19 @@ public class BoardService {
     board.approve();
   }
 
-  public void reject(Long boardId, String rejReason) throws NoSuchElementException {
-    Board board = boardRepository.findById(boardId)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 board가 없습니다"));
-
+  public void reject(Long boardPk, String rejReason) throws NoSuchElementException {
+    Board board = findBoard(boardPk);
     board.reject(rejReason);
   }
 
+  private Board findBoard(Long boardPk) {
+    Board board = boardRepository.findById(boardPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 정보글을 찾을 수 없습니다"));
+
+    return board;
+  }
+
+  @Transactional(readOnly = true)
   public BoardListResponse getMyList(Users user) {
     List<Board> boardList = boardRepository.findByUser(user);
 
@@ -315,7 +315,7 @@ public class BoardService {
     return boardListResponse;
   }
 
-  //버전 저장 x 버전 edit
+  //버전 저장 x edit
   public void editBoard(Users user, Long boardId, AddBoardRequest addBoardRequest) {
     Board board = verifyWriterAndfindBoard(user, boardId);
 
@@ -340,7 +340,6 @@ public class BoardService {
   public void editBoardV2(Users user, Long boardId, AddBoardRequest addBoardRequest) {
     Board board = verifyWriterAndfindBoard(user, boardId);
 
-
     //변경사항 비교 및 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
     String newTitle = addBoardRequest.getTitle();
     String newThumbnail = addBoardRequest.getThumbnail();
@@ -348,7 +347,8 @@ public class BoardService {
     List<String> newTagList = addBoardRequest.getTags();
     List<String> newSources = addBoardRequest.getSources();
 
-    String titleDiff = (newTitle != null)? getDiff(board.getTitle(), newTitle): null; //변경사항이 없다면 null
+    //변경사항이 없다면 null
+    String titleDiff = (newTitle != null)? getDiff(board.getTitle(), newTitle): null;
     String thumbnailDiff = (newThumbnail != null)? getDiff(board.getThumbnailUrl(), newThumbnail): null;
     String introductionDiff = (newIntroduction != null)? getDiff(board.getIntroduction(), newIntroduction): null;
 
@@ -377,15 +377,7 @@ public class BoardService {
       return;
     }
 
-    VersionDiff versionDiff = VersionDiff.builder()
-      .title(titleDiff)
-      .thumbnailUrl(thumbnailDiff)
-      .introduction(introductionDiff)
-      .sources(sourceDiff)
-      .contents(contentDiff)
-      .tags(tagDiff)
-      .build();
-
+    VersionDiff versionDiff = VersionDiff.makeVersionDiff(titleDiff, thumbnailDiff, introductionDiff, sourceDiff, contentDiff, tagDiff);
     versionDiffRepository.save(versionDiff);
 
     //version을 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
@@ -406,20 +398,11 @@ public class BoardService {
     boardVersion.addVersionDiff(versionDiff);
 
     //정보글을 변경 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-    //source string배열을 올 텍스트로 바꿈
-    String sourceText = sourceListToText(addBoardRequest.getSources());
-
-    List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
+    String sourceText = sourceListToText(newSources);
+    List<BoardTag> boardTags = makeBoardTag(board, newTagList);
     List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
 
-    board.edit(
-      addBoardRequest.getTitle(),
-      addBoardRequest.getThumbnail(),
-      addBoardRequest.getIntroduction(),
-      sourceText,
-      boardTags,
-      boardContents
-    );
+    board.edit(newTitle, newThumbnail, newIntroduction, sourceText, boardTags, boardContents);
 
     boardRepository.save(board);
   }
@@ -446,11 +429,8 @@ public class BoardService {
     Board board = boardRepository.findById(boardId)
       .orElseThrow(() -> new NoSuchElementException("해당하는 정보글이 없습니다"));
 
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NoSuchElementException("유저정보가 이상합니다. 500"));
-
     //글 작성자거나, admin이 아니라면 수정 불가능
-    if (findUser.getRole() != UserRole.ADMIN && board.getUser() != findUser)
+    if (user.getRole() != UserRole.ADMIN && board.getUser() != user)
       throw new ForbiddenException("권한이 없는 사용자");
     return board;
   }
@@ -577,41 +557,31 @@ public class BoardService {
   //- oldString
   //+ newString
   private String getDiff(String oldString, String newString) {
-    String st = null;
+    StringBuilder sb = new StringBuilder();
 
     if (!oldString.equals(newString)) {
-      st = "- " + oldString +
-        "\n" +
-        "+ " + newString;
+      sb.append("- ");sb.append(oldString);
+      sb.append("\n");
+      sb.append("+ ");sb.append(newString);
     }
 
-    return st;
+    return (sb.length() == 0)? null : sb.toString();
   }
 
   public void deleteBoard(Users user, Long boardPk) throws NoSuchElementException, ForbiddenException{
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new ForbiddenException("user를 찾을 수 없음"));
+    Board board = findBoard(boardPk);
 
-    Board board = boardRepository.findById(boardPk)
-      .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 게시판을 찾을 수 없음"));
-
-    if (user.getRole() != UserRole.ADMIN && board.getUser() != findUser) {
+    if (user.getRole() != UserRole.ADMIN && board.getUser() != user)
       throw new ForbiddenException("권한이 없는 사용자입니다");
-    }
 
     boardRepository.delete(board);
   }
 
   // 게시글 좋아요
-  public void addLikeToBoard(Users user, Long boardId) {
+  public void addLikeToBoard(Users user, Long boardPk) {
+    Board board = findBoard(boardPk);
 
-    Board board = boardRepository.findById(boardId)
-      .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
-
-    Users findUser = userRepository.findById(user.getPk())
-      .orElseThrow(() -> new NotFoundException("해당하는 사용자가 없습니다."));
-
-    Likes likes = Likes.makeLikes(findUser, board);
+    Likes likes = Likes.makeLikes(user, board);
 
     // 이전에 좋아요를 눌렀는지 확인
     boolean isClicked = boardLikeRepository.existsByUserAndBoard(user, board);
@@ -624,9 +594,8 @@ public class BoardService {
   }
 
   // 게시글 좋아요 취소
-  public void cancelLikeToBoard(Users user, Long boardId) {
-    Board board = boardRepository.findById(boardId)
-      .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
+  public void cancelLikeToBoard(Users user, Long boardPk) {
+    Board board = findBoard(boardPk);
 
     Likes likes = boardLikeRepository.findByUserAndBoard(user, board)
       .orElseThrow(() -> new NotFoundException("좋아요가 존재하지 않습니다."));
@@ -639,7 +608,7 @@ public class BoardService {
 
   }
 
-
+  @Transactional(readOnly = true)
   public BoardListResponse getPopularBoardList(int pageSize, int page) {
     //pageable객체 만들기
     Pageable pageable = makePageable(SortType.POP, page, pageSize);
