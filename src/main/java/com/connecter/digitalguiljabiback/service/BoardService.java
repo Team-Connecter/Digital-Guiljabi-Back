@@ -53,7 +53,7 @@ public class BoardService {
       .orElseThrow(() -> new InternalServerException("해당하는 사용자가 없습니다"));
 
     //source string배열을 올 텍스트로 바꿈
-    String sourceText = sourceStringListToText(addBoardRequest.getSources());
+    String sourceText = sourceListToText(addBoardRequest.getSources());
 
     Board board = Board.builder()
       .user(findUser)
@@ -72,11 +72,16 @@ public class BoardService {
   }
 
   //출처는 이런 걸로 구분함 ㅎ..
-  private String sourceStringListToText(String[] source) {
+  private String sourceListToText(List<String> source) {
+    if (source == null)
+      return null;
     return String.join(sourceDelim, source);
   }
 
   private List<BoardContent> getBoardContent(Board board, CardDto[] cards) {
+    if (cards == null)
+      return null;
+
     List<BoardContent> boardContents = new ArrayList<>();
     List<BoardContent> originBCList = board.getContents();
 
@@ -98,7 +103,9 @@ public class BoardService {
     return boardContents;
   }
 
-  private List<BoardTag> makeBoardTag(Board board, String[] tags) {
+  private List<BoardTag> makeBoardTag(Board board, List<String> tags) {
+    if (tags == null)
+      return null;
     List<BoardTag> boardTags = new ArrayList<>();
 
     for (String tag: tags) {
@@ -308,11 +315,12 @@ public class BoardService {
     return boardListResponse;
   }
 
+  //버전 저장 x 버전 edit
   public void editBoard(Users user, Long boardId, AddBoardRequest addBoardRequest) {
     Board board = verifyWriterAndfindBoard(user, boardId);
 
     //source string배열을 올 텍스트로 바꿈
-    String sourceText = sourceStringListToText(addBoardRequest.getSources());
+    String sourceText = sourceListToText(addBoardRequest.getSources());
 
     List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
     List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
@@ -332,6 +340,54 @@ public class BoardService {
   public void editBoardV2(Users user, Long boardId, AddBoardRequest addBoardRequest) {
     Board board = verifyWriterAndfindBoard(user, boardId);
 
+
+    //변경사항 비교 및 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+    String newTitle = addBoardRequest.getTitle();
+    String newThumbnail = addBoardRequest.getThumbnail();
+    String newIntroduction = addBoardRequest.getIntroduction();
+    List<String> newTagList = addBoardRequest.getTags();
+    List<String> newSources = addBoardRequest.getSources();
+
+    String titleDiff = (newTitle != null)? getDiff(board.getTitle(), newTitle): null; //변경사항이 없다면 null
+    String thumbnailDiff = (newThumbnail != null)? getDiff(board.getThumbnailUrl(), newThumbnail): null;
+    String introductionDiff = (newIntroduction != null)? getDiff(board.getIntroduction(), newIntroduction): null;
+
+    List<String> oldTagList = board.getBoardTags().stream()
+      .map(BoardTag::getTag)
+      .map(Tag::getName)
+      .collect(Collectors.toList());
+
+    String tagDiff = (newTagList != null)? getDiff(oldTagList, newTagList): null;
+
+    String contentDiff = null;
+    if (addBoardRequest.getCards() != null) {
+      List<CardDto> cardDtoList = new ArrayList<>();
+      for (BoardContent boardContent : board.getContents()) {
+        CardDto cardDto = new CardDto(boardContent.getTitle(), boardContent.getImgUrl(), boardContent.getContent());
+        cardDtoList.add(cardDto);
+      }
+
+      contentDiff = getContentDiff(cardDtoList, List.of(addBoardRequest.getCards()));
+    }
+
+    String sourceDiff = (newSources != null)? getDiff(sourceTextToStringList(board.getSources()), newSources) : null;
+
+    if (titleDiff == null && thumbnailDiff == null && introductionDiff == null && sourceDiff == null && contentDiff == null && tagDiff == null) {
+      //변경사항 없음
+      return;
+    }
+
+    VersionDiff versionDiff = VersionDiff.builder()
+      .title(titleDiff)
+      .thumbnailUrl(thumbnailDiff)
+      .introduction(introductionDiff)
+      .sources(sourceDiff)
+      .contents(contentDiff)
+      .tags(tagDiff)
+      .build();
+
+    versionDiffRepository.save(versionDiff);
+
     //version을 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
     String categoryString = getCategoryString(board.getBoardCategories());
     String tagString = getTagString(board.getBoardTags());
@@ -347,44 +403,11 @@ public class BoardService {
     }
 
     boardVersion.addVersionContents(versionContentList);
-
-    //변경사항 비교 및 저장 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-    String titleDiff = getDiff(board.getTitle(), addBoardRequest.getTitle());
-    String thumbnailDiff = getDiff(board.getThumbnailUrl(), addBoardRequest.getThumbnail());
-    String introductionDiff = getDiff(board.getIntroduction(), addBoardRequest.getIntroduction());
-
-    List<String> oldTagList = board.getBoardTags().stream()
-      .map(BoardTag::getTag)
-      .map(Tag::getName)
-      .collect(Collectors.toList());
-
-    String tagDiff = getDiff(oldTagList, List.of(addBoardRequest.getTags()));
-
-    List<CardDto> cardDtoList = new ArrayList<>();
-    for (BoardContent boardContent : board.getContents()) {
-      CardDto cardDto = new CardDto(boardContent.getTitle(), boardContent.getImgUrl(), boardContent.getContent());
-      cardDtoList.add(cardDto);
-    }
-
-    String contentDiff = getContentDiff(cardDtoList, List.of(addBoardRequest.getCards()));
-
-    VersionDiff versionDiff = VersionDiff.builder()
-      .title(titleDiff)
-      .thumbnailUrl(thumbnailDiff)
-      .introduction(introductionDiff)
-      .sources(getDiff(sourceTextToStringList(board.getSources()), List.of(addBoardRequest.getSources())))
-      .contents(contentDiff)
-      .tags(tagDiff)
-      .build();
-
-    versionDiffRepository.save(versionDiff);
-
     boardVersion.addVersionDiff(versionDiff);
-
 
     //정보글을 변경 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
     //source string배열을 올 텍스트로 바꿈
-    String sourceText = sourceStringListToText(addBoardRequest.getSources());
+    String sourceText = sourceListToText(addBoardRequest.getSources());
 
     List<BoardTag> boardTags = makeBoardTag(board, addBoardRequest.getTags());
     List<BoardContent> boardContents = getBoardContent(board, addBoardRequest.getCards());
@@ -473,22 +496,19 @@ public class BoardService {
   }
 
   private StringBuilder removeContentDiff(StringBuilder sb, CardDto cardDto) {
-    sb.append("- "); sb.append(cardDto.getSubTitle());
-    sb.append("\n");
-    sb.append("- "); sb.append(cardDto.getImgUrl());
-    sb.append("\n");
-    sb.append("- "); sb.append(cardDto.getContent());
-    sb.append("\n");
-
-    return sb;
+    return modifyContentDiff(sb, cardDto, "-");
   }
 
   private StringBuilder insertContentDiff(StringBuilder sb, CardDto cardDto) {
-    sb.append("+ "); sb.append(cardDto.getSubTitle());
+    return modifyContentDiff(sb, cardDto, "+");
+  }
+
+  private StringBuilder modifyContentDiff(StringBuilder sb, CardDto cardDto, String m) {
+    sb.append(m+ " "); sb.append(cardDto.getSubTitle());
     sb.append("\n");
-    sb.append("+ "); sb.append(cardDto.getImgUrl());
+    sb.append(m+ " "); sb.append(cardDto.getImgUrl());
     sb.append("\n");
-    sb.append("+ "); sb.append(cardDto.getContent());
+    sb.append(m+ " "); sb.append(cardDto.getContent());
     sb.append("\n");
 
     return sb;
@@ -505,6 +525,9 @@ public class BoardService {
   }
 
   private String getDiff(List<String> oldList, List<String> newList) {
+    if (newList == null)
+      return null;
+
     StringBuilder sb = new StringBuilder();
     int i =0; //old
     int j =0; //new
@@ -554,12 +577,14 @@ public class BoardService {
   //- oldString
   //+ newString
   private String getDiff(String oldString, String newString) {
-    if (oldString.equals(newString))
-      return null;
+    String st = null;
 
-    String st = "- " + oldString +
-      "\n" +
-      "+ " + newString;
+    if (!oldString.equals(newString)) {
+      st = "- " + oldString +
+        "\n" +
+        "+ " + newString;
+    }
+
     return st;
   }
 

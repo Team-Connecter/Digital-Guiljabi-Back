@@ -48,6 +48,7 @@ public class BoardVersionService {
 
     return VersionInfo.builder()
       .title(boardVersion.getTitle())
+      .thumbnailUrl(boardVersion.getThumbnailUrl())
       .introduction(boardVersion.getIntroduction())
       .createAt(boardVersion.getCreateAt())
       .cardCnt(contentList.size())
