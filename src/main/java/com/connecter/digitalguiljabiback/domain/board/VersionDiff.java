@@ -3,7 +3,6 @@ package com.connecter.digitalguiljabiback.domain.board;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Builder
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,5 +33,17 @@ public class VersionDiff {
   private String contents;
 
   private String tags;
+
+  public static VersionDiff makeVersionDiff(String titleDiff, String thumbnailDiff, String introductionDiff, String sourceDiff, String contentDiff, String tagDiff) {
+    VersionDiff vd = new VersionDiff();
+    vd.title = titleDiff;
+    vd.thumbnailUrl = thumbnailDiff;
+    vd.introduction = introductionDiff;
+    vd.sources = sourceDiff;
+    vd.contents = contentDiff;
+    vd.tags = tagDiff;
+
+    return vd;
+  }
 
 }
