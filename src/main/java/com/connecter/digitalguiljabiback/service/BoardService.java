@@ -52,6 +52,7 @@ public class BoardService {
     Users findUser = userRepository.findById(user.getPk())
       .orElseThrow(() -> new InternalServerException("해당하는 사용자가 없습니다"));
 
+
     //source string배열을 올 텍스트로 바꿈
     String sourceText = sourceStringListToText(addBoardRequest.getSources());
 

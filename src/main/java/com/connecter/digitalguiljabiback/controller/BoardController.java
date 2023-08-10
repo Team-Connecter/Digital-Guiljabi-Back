@@ -64,7 +64,6 @@ public class BoardController {
     return ResponseEntity.ok(boardInfo);
   }
 
-  //승인된 board 목록 조회 (검색, 카테고리별 확인~)
   @Operation(summary = "정보글 목록 조회", description = """
     [모두 접근가능] 승인이 완료된 글만 조회됩니다<br>
     200: 성공
@@ -118,8 +117,6 @@ public class BoardController {
 
     return ResponseEntity.ok().build();
   }
-
-
 
   @Operation(summary = "정보글 삭제", description = """
   [로그인 필요] 작성자 or 관리자만 정보글을 삭제 가능<br>

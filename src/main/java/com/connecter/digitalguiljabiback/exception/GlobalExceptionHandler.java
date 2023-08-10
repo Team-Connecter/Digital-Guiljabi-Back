@@ -48,10 +48,10 @@ public class GlobalExceptionHandler {
     log.info("ReportDuplicatedException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
-
+  
   @ExceptionHandler(InternalServerException.class)
-  protected ResponseEntity handlerServerException(InternalServerException e) {
-    log.info("ServerException = {}", e.getMessage());
+  protected ResponseEntity handlerInternalServerException(InternalServerException e) {
+    log.info("InternalServerException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
   }
 }
