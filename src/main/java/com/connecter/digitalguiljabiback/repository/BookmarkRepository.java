@@ -1,6 +1,6 @@
 package com.connecter.digitalguiljabiback.repository;
 
-import com.connecter.digitalguiljabiback.domain.Board;
+import com.connecter.digitalguiljabiback.domain.board.Board;
 import com.connecter.digitalguiljabiback.domain.Bookmark;
 import com.connecter.digitalguiljabiback.domain.Users;
 import org.springframework.data.domain.Page;

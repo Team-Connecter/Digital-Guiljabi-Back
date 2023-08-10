@@ -1,5 +1,6 @@
-package com.connecter.digitalguiljabiback.domain;
+package com.connecter.digitalguiljabiback.domain.board;
 
+import com.connecter.digitalguiljabiback.domain.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,9 @@
 package com.connecter.digitalguiljabiback.repository.specification;
 
 import com.connecter.digitalguiljabiback.domain.*;
+import com.connecter.digitalguiljabiback.domain.board.Board;
+import com.connecter.digitalguiljabiback.domain.board.BoardStatus;
+import com.connecter.digitalguiljabiback.domain.board.BoardTag;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;

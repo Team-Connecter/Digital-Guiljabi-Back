@@ -1,13 +1,7 @@
 package com.connecter.digitalguiljabiback.repository;
 
-import com.connecter.digitalguiljabiback.domain.Board;
-import com.connecter.digitalguiljabiback.domain.BoardTag;
-import com.connecter.digitalguiljabiback.domain.Tag;
+import com.connecter.digitalguiljabiback.domain.board.BoardTag;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
-import java.util.Optional;
 
 public interface BoardTagRepository extends JpaRepository<BoardTag, Long> {
 
