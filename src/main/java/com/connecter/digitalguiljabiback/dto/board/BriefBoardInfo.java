@@ -1,7 +1,7 @@
 package com.connecter.digitalguiljabiback.dto.board;
 
-import com.connecter.digitalguiljabiback.domain.Board;
-import com.connecter.digitalguiljabiback.domain.BoardStatus;
+import com.connecter.digitalguiljabiback.domain.board.Board;
+import com.connecter.digitalguiljabiback.domain.board.BoardStatus;
 import com.connecter.digitalguiljabiback.domain.Tag;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.fasterxml.jackson.annotation.JsonInclude;

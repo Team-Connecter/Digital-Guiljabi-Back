@@ -1,5 +1,6 @@
-package com.connecter.digitalguiljabiback.domain;
+package com.connecter.digitalguiljabiback.domain.board;
 
+import com.connecter.digitalguiljabiback.domain.Tag;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

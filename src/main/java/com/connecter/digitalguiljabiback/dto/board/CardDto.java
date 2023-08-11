@@ -1,7 +1,8 @@
 package com.connecter.digitalguiljabiback.dto.board;
 
 
-import com.connecter.digitalguiljabiback.domain.BoardContent;
+import com.connecter.digitalguiljabiback.domain.board.BoardContent;
+import com.connecter.digitalguiljabiback.domain.board.BoardVersionContent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,18 @@ public class CardDto {
 
     return cardDtoList;
   }
+
+  public static List<CardDto> versionConvert(List<BoardVersionContent> versionList) {
+    List<CardDto> cardDtoList = new ArrayList<>();
+
+    for (BoardVersionContent versionContent : versionList) {
+      CardDto cardDto = new CardDto(versionContent.getTitle(), versionContent.getImgUrl(), versionContent.getContent());
+      cardDtoList.add(cardDto);
+    }
+
+    return cardDtoList;
+  }
+
+
 
 }

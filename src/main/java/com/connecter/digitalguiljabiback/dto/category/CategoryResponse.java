@@ -1,6 +1,6 @@
 package com.connecter.digitalguiljabiback.dto.category;
 
-import com.connecter.digitalguiljabiback.domain.BoardCategory;
+import com.connecter.digitalguiljabiback.domain.board.BoardCategory;
 import com.connecter.digitalguiljabiback.domain.Category;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

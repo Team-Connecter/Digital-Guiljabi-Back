@@ -27,8 +27,8 @@ public class SecurityConfig {
       "/api/login/**",
       "/error",
       "/api/v1/boards/popular", "/api/v1/users/nickname/*/exists",
-
-      "/logoutPage" //TODO 삭제
+      "/api/v1/token/validate",
+      "/logoutPage"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -46,6 +46,7 @@ public class SecurityConfig {
             .requestMatchers(whiteList).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards/*").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/v1/boards/popular").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/boards/*/comments").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/root").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/*/children").permitAll()

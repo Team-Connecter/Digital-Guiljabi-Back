@@ -1,6 +1,6 @@
 package com.connecter.digitalguiljabiback.service;
 
-import com.connecter.digitalguiljabiback.domain.Board;
+import com.connecter.digitalguiljabiback.domain.board.Board;
 import com.connecter.digitalguiljabiback.domain.Report;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.board.AdminBriefBoardInfo;
@@ -123,7 +123,7 @@ public class ReportService {
     return new MyReportListResponse(list.size(), list);
   }
 
-  public void deleteAllReport(Long boardPk) {
+  public void deleteAllReport(Long boardPk) throws NoSuchElementException {
     Board board = boardRepository.findById(boardPk)
       .orElseThrow(() -> new NoSuchElementException("해당 pk의 정보글이 존재하지 않습니다"));
 

@@ -1,6 +1,8 @@
 package com.connecter.digitalguiljabiback.service;
 
 import com.connecter.digitalguiljabiback.domain.*;
+import com.connecter.digitalguiljabiback.domain.board.Board;
+import com.connecter.digitalguiljabiback.domain.board.BoardStatus;
 import com.connecter.digitalguiljabiback.dto.board.BriefBoardInfo;
 import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
@@ -183,7 +185,6 @@ class BoardServiceTest {
 
     boolean hasData = false;
     for (BriefBoardInfo info: approvedBoardList.getList()) {
-      log.info("@@: " + info.getTitle());
       if (info.getTitle().equals(title)) {
         hasData = true;
         break;
