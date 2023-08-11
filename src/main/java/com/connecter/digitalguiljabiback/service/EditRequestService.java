@@ -8,6 +8,11 @@ import com.connecter.digitalguiljabiback.dto.editRequest.EditRequestRequest;
 import com.connecter.digitalguiljabiback.exception.NotFoundException;
 import com.connecter.digitalguiljabiback.repository.BoardRepository;
 import com.connecter.digitalguiljabiback.repository.EditRequestRepository;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.cloud.StorageClient;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -16,7 +21,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -28,6 +37,18 @@ public class EditRequestService {
 
     private final EditRequestRepository editRequestRepository;
     private final BoardRepository boardRepository;
+
+    @Valid("${app.firebase-bucket}")
+    private String firebaseBucket;
+
+    public void notifyReason(String reason)
+            throws IOException, FirebaseAuthException {
+        Bucket bucket = StorageClient.getInstance().bucket(firebaseBucket);
+        InputStream content = new ByteArrayInputStream(file.getBytes());
+        Blob blob = bucket.create(nameFile.toString(), content, file.getContentType());
+        return blob.getMediaLink();
+    }
+
 
     public void addRequest(Users user, Long boardPk, EditRequestRequest editRequestRequest)
     {
