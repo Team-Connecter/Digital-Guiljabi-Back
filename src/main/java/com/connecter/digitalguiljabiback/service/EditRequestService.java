@@ -38,17 +38,6 @@ public class EditRequestService {
     private final EditRequestRepository editRequestRepository;
     private final BoardRepository boardRepository;
 
-    @Valid("${app.firebase-bucket}")
-    private String firebaseBucket;
-
-    public void notifyReason(String reason)
-            throws IOException, FirebaseAuthException {
-        Bucket bucket = StorageClient.getInstance().bucket(firebaseBucket);
-        InputStream content = new ByteArrayInputStream(file.getBytes());
-        Blob blob = bucket.create(nameFile.toString(), content, file.getContentType());
-        return blob.getMediaLink();
-    }
-
 
     public void addRequest(Users user, Long boardPk, EditRequestRequest editRequestRequest)
     {
