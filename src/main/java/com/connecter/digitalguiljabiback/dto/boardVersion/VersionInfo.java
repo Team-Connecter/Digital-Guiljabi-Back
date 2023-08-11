@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class VersionInfo {
   private String title;
+  private String thumbnailUrl;
   private String introduction;
   private LocalDateTime createAt;
   private int cardCnt;

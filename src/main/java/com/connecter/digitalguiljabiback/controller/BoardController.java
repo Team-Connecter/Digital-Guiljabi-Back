@@ -42,6 +42,7 @@ public class BoardController {
   @Operation(summary = "정보글 쓰기", description = """
     [로그인 필요] 정보글이 작성되면 승인대기상태로 감<br>
     201: 성공<br>
+    400: 필요한 값을 넣지 않음(모든 값은 not null)<br>
     403: 권한없음
     """)
   @PostMapping("/boards")
@@ -102,6 +103,7 @@ public class BoardController {
 
   @Operation(summary = "정보글 수정", description = """
   [로그인 필요] 작성자 or 관리자만 정보글을 수정 가능<br>
+  null로 들어오면 해당 값은 수정되지 않음<br>
   200: 성공<br>
   403: 수정할 권한 없음<br>
   404: 해당하는 pk의 정보글이 없음

@@ -114,15 +114,20 @@ public class Board {
   }
 
   public void edit(String title, String thumbnailUrl, String introduction, String sources, List<BoardTag> boardTags, List<BoardContent> contents) {
-    this.boardTags.clear();
-    this.contents.clear();
-
-    this.title = title;
+    this.title = (title != null)? title : this.title;
     this.thumbnailUrl = Objects.nonNull(thumbnailUrl) ? thumbnailUrl : this.thumbnailUrl;
-    this.introduction = introduction;
-    this.sources = sources;
-    this.boardTags.addAll(boardTags);
-    this.contents.addAll(contents);
+    this.introduction = (introduction != null)? introduction : this.introduction;
+    this.sources = (sources != null)? sources : this.sources;
+
+    if (boardTags != null) {
+      this.boardTags.clear();
+      this.boardTags.addAll(boardTags);
+    }
+
+    if (contents != null) {
+      this.contents.clear();
+      this.contents.addAll(contents);
+    }
 
     this.updateAt = LocalDateTime.now();
     this.status = BoardStatus.WAITING;
