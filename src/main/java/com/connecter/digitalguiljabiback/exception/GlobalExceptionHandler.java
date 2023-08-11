@@ -18,6 +18,11 @@ public class GlobalExceptionHandler {
     log.info("UsernameDuplicatedException = {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.CONFLICT).build();
   }
+  @ExceptionHandler(TokenInValidException.class)
+  protected ResponseEntity handlerTokenInValidException(TokenInValidException e) {
+    log.info("TokenInValidException = {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+  }
 
   @ExceptionHandler(NoSuchElementException.class)
   protected ResponseEntity handlerNoSuchElementException(NoSuchElementException e) {

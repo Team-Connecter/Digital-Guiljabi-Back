@@ -28,7 +28,7 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = """
     [로그인 필요]<br>
     200: 성공<br>
-    403: 권한없음<br>
+    403: 권한없음
     """)
     @PostMapping("/boards/{boardPk}/comments")
     public ResponseEntity makeComment(@AuthenticationPrincipal Users user, @PathVariable Long boardPk,
@@ -41,7 +41,7 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = """
     [로그인 필요] 댓글 작성자, 관리자만 삭제가 가능합니다<br>
     200: 성공<br>
-    403: 권한없음<br>
+    403: 권한없음
     """)
     @DeleteMapping("/comments/{commentPk}")
     public ResponseEntity deleteComment(@AuthenticationPrincipal Users user, @PathVariable Long commentPk)
