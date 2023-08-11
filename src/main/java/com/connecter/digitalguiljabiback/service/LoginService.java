@@ -1,11 +1,14 @@
 package com.connecter.digitalguiljabiback.service;
 
 import com.connecter.digitalguiljabiback.domain.OauthType;
+import com.connecter.digitalguiljabiback.domain.RefreshToken;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
 import com.connecter.digitalguiljabiback.dto.login.UserRequest;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
+import com.connecter.digitalguiljabiback.repository.RefreshTokenRepository;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +16,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -28,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class LoginService {
   private final UserRepository userRepository;
+  private final RefreshTokenRepository refreshTokenRepository;
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final PasswordEncoder passwordEncoder;
@@ -38,7 +46,7 @@ public class LoginService {
    * @param oauthType oauth 로그인 시 타입지정: KAKAO, NAVER 등
    * @return 인증 응답 DTO
    */
-  public LoginResponse loginOrCreate(UserRequest userDTO, OauthType oauthType) {
+  public LoginResponse loginOrCreate(UserRequest userDTO, OauthType oauthType, HttpServletRequest request) {
     Users user = userRepository.findByUid(oauthType.name() + userDTO.getUid())
       .orElseGet(() -> null);
 
@@ -55,12 +63,46 @@ public class LoginService {
       )
     );
 
-    //토큰 생성
-    String jwtToken = jwtService.generateAccessToken(user);
+    //엑세스 토큰 생성
+    String accessToken = jwtService.generateAccessToken(user);
+    String refreshToken = jwtService.generateRefreshToken(user);
 
-    return LoginResponse.builder()
-      .token(jwtToken)
-      .build();
+    refreshTokenRepository.save(
+      RefreshToken.makeRefreshToken(refreshToken, getClientIp(request), user, jwtService.extractExpiration(refreshToken))
+    );
+
+    return LoginResponse.makeResponse(accessToken, refreshToken);
+  }
+
+  public static String getClientIp(HttpServletRequest request) {
+    String clientIp = null;
+    boolean isIpInHeader = false;
+
+    List<String> headerList = new ArrayList<>();
+    headerList.add("X-Forwarded-For");
+    headerList.add("HTTP_CLIENT_IP");
+    headerList.add("HTTP_X_FORWARDED_FOR");
+    headerList.add("HTTP_X_FORWARDED");
+    headerList.add("HTTP_FORWARDED_FOR");
+    headerList.add("HTTP_FORWARDED");
+    headerList.add("Proxy-Client-IP");
+    headerList.add("WL-Proxy-Client-IP");
+    headerList.add("HTTP_VIA");
+    headerList.add("IPV6_ADR");
+
+    for (String header : headerList) {
+      clientIp = request.getHeader(header);
+      if (StringUtils.hasText(clientIp) && !clientIp.equals("unknown")) {
+        isIpInHeader = true;
+        break;
+      }
+    }
+
+    if (!isIpInHeader) {
+      clientIp = request.getRemoteAddr();
+    }
+
+    return clientIp;
   }
 
   public void tempSignUp(UserRequest userDto) throws UsernameDuplicatedException {
@@ -74,7 +116,7 @@ public class LoginService {
     userRepository.save(newUser);
   }
 
-  public LoginResponse tempLogin(UserRequest userDto) {
+  public LoginResponse tempLogin(UserRequest userDto, HttpServletRequest request) {
     Users user = userRepository.findByUid(userDto.getUid())
       .orElseGet(() -> null);
 
@@ -86,23 +128,15 @@ public class LoginService {
     );
 
     //토큰 생성
-    String jwtToken = jwtService.generateAccessToken(user);
+    String accessToken = jwtService.generateAccessToken(user);
+    String refreshToken = jwtService.generateRefreshToken(user);
 
-    return LoginResponse.builder()
-      .token(jwtToken)
-      .build();
+    refreshTokenRepository.save(
+      RefreshToken.makeRefreshToken(refreshToken, getClientIp(request), user, jwtService.extractExpiration(refreshToken))
+    );
 
+    return LoginResponse.makeResponse(accessToken, refreshToken);
   }
-
-//  public void logout(Users user, OauthType oauthType) {
-//    if (oauthType == OauthType.KAKAO) {
-//
-//    } else if (oauthType == OauthType.NAVER) {
-//
-//    } else {
-//
-//    }
-//  }
 }
 
 

@@ -11,6 +11,7 @@ import com.connecter.digitalguiljabiback.service.LoginService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -51,13 +52,13 @@ public class LoginController {
    */
   @Hidden
   @GetMapping("/login/callback")
-  public ResponseEntity<LoginResponse> processKakaoLoginCallback(@RequestParam("code") String authorizationCode) {
+  public ResponseEntity<LoginResponse> processKakaoLoginCallback(@RequestParam("code") String authorizationCode, HttpServletRequest request) {
     AuthRequest params = new AuthRequest(authorizationCode);
     KakaoUserResponse response = kakaoClient.handleCallback(params);
 
     log.info("사용자 UID: {}", response.getUid());
 
-    LoginResponse loginResponseDTO = loginService.loginOrCreate(response.toUserRequest(), OauthType.KAKAO);
+    LoginResponse loginResponseDTO = loginService.loginOrCreate(response.toUserRequest(), OauthType.KAKAO, request);
 
     return ResponseEntity.ok(loginResponseDTO);
   }
@@ -84,14 +85,15 @@ public class LoginController {
   @GetMapping("/login/callback/naver")
   public ResponseEntity<LoginResponse> processNaverLoginCallback(
     @RequestParam("code") String authorizationCode,
-    @RequestParam("state") String state
+    @RequestParam("state") String state,
+    HttpServletRequest request
   ) {
     AuthRequest params = new AuthRequest(authorizationCode, state);
     NaverUserResponse response = naverClient.handleCallback(params);
 
     log.info("사용자 UID: {}", response.getId());
 
-    LoginResponse loginResponseDTO = loginService.loginOrCreate(response.toUserRequest(), OauthType.NAVER);
+    LoginResponse loginResponseDTO = loginService.loginOrCreate(response.toUserRequest(), OauthType.NAVER, request);
 
     return ResponseEntity.ok(loginResponseDTO);
   }
@@ -115,8 +117,8 @@ public class LoginController {
     403: 가입하지 않은 uid
     """)
   @PostMapping("/login")
-  public ResponseEntity<LoginResponse> tempLogin(@RequestBody UserRequest userRequest) {
-    LoginResponse loginResponse = loginService.tempLogin(userRequest);
+  public ResponseEntity<LoginResponse> tempLogin(@RequestBody UserRequest userRequest, HttpServletRequest request) {
+    LoginResponse loginResponse = loginService.tempLogin(userRequest, request);
 
     return ResponseEntity.ok(loginResponse);
   }
