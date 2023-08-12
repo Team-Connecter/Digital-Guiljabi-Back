@@ -21,7 +21,7 @@ repositories {
     mavenCentral()
 }
 
-jar.enabled = false 
+jar.enabled = false
 
 dependencies {
 
@@ -64,6 +64,13 @@ task copyPrivate(type: Copy) {
     copy {
         from './Digital-Guiljabi-Back-Submodule'
         include "*.yml"
+
+        from './Digital-Guiljabi-Back-Submodule'
+        include "*.properties"
+
+        from './Digital-Guiljabi-Back-Submodule'
+        include "*.json"
+
         into 'src/main/resources'
     }
 }
