@@ -24,6 +24,7 @@ public class UsersResponse {
   private String id1365;
   private String idVms;
   private UserRole role;
+  private boolean isAccountNonLocked;
 
   public static List<UsersResponse> convertList(List<Users> userList) {
     List<UsersResponse> responses = new ArrayList<>();
@@ -36,6 +37,7 @@ public class UsersResponse {
         .introduction(u.getIntroduction())
         .id1365(u.getId1365())
         .idVms(u.getIdvms())
+        .isAccountNonLocked(u.isAccountNonLocked())
         .role(u.getRole())
         .build();
 

@@ -67,7 +67,8 @@ public class BoardController {
 
   @Operation(summary = "정보글 목록 조회", description = """
     [모두 접근가능] 승인이 완료된 글만 조회됩니다<br>
-    200: 성공
+    sort: ① POP(인기순) ② NEW(최신순)<br>
+    200: 성공<br>
     """)
   @Parameters({
     @Parameter(name = "categoryPk", description = "카테고리의 pk (nullable)"),
@@ -90,10 +91,15 @@ public class BoardController {
   }
 
   @Operation(summary = "내가 쓴 글 조회", description = """
-  [로그인 필요] 대기중, 승인완료 등 내가 쓴 글 모두 조회<br>
-  200: 성공<br>
-  403: 로그인 필요
-  """)
+    [로그인 필요] 대기중, 승인완료 등 내가 쓴 글 모두 조회<br>
+    ① RESTRICTED: 신고 5회 이상 받고 제한된 글 (안보임)<br>
+    ② EDIT_REQUEST: 수정이 필요하여 작성자에게 요청이 간 상태 (안보임)<br>
+    ③ REFUSAL: 승인거절 (안보임)<br>
+    ④ APPROVED: 승인된 글 (보임)<br>
+    ⑤ WAITING: 승인을 기다리는 글 (안보임)<br>
+    200: 성공<br>
+    403: 로그인 필요
+    """)
   @GetMapping("/boards/my")
   public ResponseEntity<BoardListResponse> getMyBoardList(@AuthenticationPrincipal Users user) {
     BoardListResponse myList = boardService.getMyList(user);

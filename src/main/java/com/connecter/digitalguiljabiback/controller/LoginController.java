@@ -114,7 +114,7 @@ public class LoginController {
   @Operation(summary = "임시 로그인", description = """
     [모두 접근가능] uid로 임시 로그인을 할 수 있습니다.<br>
     200: 성공<br>
-    403: 가입하지 않은 uid
+    403: 가입하지 않은 uid or 정지된 회원
     """)
   @PostMapping("/login")
   public ResponseEntity<LoginResponse> tempLogin(@RequestBody UserRequest userRequest, HttpServletRequest request) {
