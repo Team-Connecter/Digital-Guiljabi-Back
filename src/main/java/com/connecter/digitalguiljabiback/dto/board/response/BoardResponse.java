@@ -20,6 +20,7 @@ public class BoardResponse {
   private String introduction;
   private Long writerPk;
   private String writerName;
+  private String writerProfileUrl;
   private LocalDateTime updateAt;
   private int cardCnt;
   private List<CardDto> cards;

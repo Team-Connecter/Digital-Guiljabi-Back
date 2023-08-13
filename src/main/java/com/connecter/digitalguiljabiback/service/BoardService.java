@@ -154,6 +154,7 @@ public class BoardService {
       .thumbnailUrl(board.getThumbnailUrl())
       .writerPk(writer.getPk())
       .writerName(writer.getNickname())
+      .writerProfileUrl(writer.getProfileUrl())
       .updateAt(board.getUpdateAt())
       .cardCnt(cardDtoList.size())
       .cards(cardDtoList)

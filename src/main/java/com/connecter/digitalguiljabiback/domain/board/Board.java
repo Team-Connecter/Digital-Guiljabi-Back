@@ -157,6 +157,10 @@ public class Board {
     this.bookmarkCnt += 1;
   }
 
+  public void cancelBookmarkCnt() {
+    this.bookmarkCnt -= 1;
+  }
+
   public void hide(String reason) {
     this.reason = reason;
     this.status = BoardStatus.WAITING;
