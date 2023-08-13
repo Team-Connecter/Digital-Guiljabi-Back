@@ -58,6 +58,8 @@ public class Users implements UserDetails {
 
     private String idvms;
 
+    private boolean isAccountNonLocked = true;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bookmark> bookmarks = new ArrayList<>();
 
@@ -87,22 +89,22 @@ public class Users implements UserDetails {
         return uid;
     }
 
-    @Override
+    @Override //만료여부
     public boolean isAccountNonExpired() {
         return true;
     }
 
-    @Override
+    @Override //잠긴 사용자
     public boolean isAccountNonLocked() {
-        return true;
+        return isAccountNonLocked;
     }
 
-    @Override
+    @Override //자격증명 만료
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
-    @Override
+    @Override //활성화, 비활성화 여부
     public boolean isEnabled() { //활성화상태인가? - 휴면상태 관리
         return true;
     }
@@ -112,5 +114,13 @@ public class Users implements UserDetails {
         this.introduction = (introduction != null)? introduction : this.introduction;
         this.idvms = (idvms != null)? idvms : this.idvms;
         this.id1365 = (id1365 != null)? id1365 : this.id1365;
+    }
+
+    public void lock() {
+        this.isAccountNonLocked = false;
+    }
+
+    public void unlock() {
+        this.isAccountNonLocked = true;
     }
 }

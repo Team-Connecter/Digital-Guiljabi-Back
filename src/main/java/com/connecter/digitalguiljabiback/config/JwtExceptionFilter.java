@@ -1,5 +1,6 @@
 package com.connecter.digitalguiljabiback.config;
 
+import com.connecter.digitalguiljabiback.exception.UserLockedException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.JwtException;
@@ -24,6 +25,8 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
       chain.doFilter(req, res); // go to 'JwtAuthenticationFilter'
     } catch (JwtException ex) {
       setErrorResponse(HttpStatus.UNAUTHORIZED, res, ex);
+    } catch (UserLockedException ex) {
+      setErrorResponse(HttpStatus.FORBIDDEN, res, ex);
     }
   }
 
@@ -31,7 +34,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
     res.setStatus(status.value());
     res.setContentType("application/json; charset=UTF-8");
 
-    JwtExceptionResponse jwtExceptionResponse = new JwtExceptionResponse(ex.getMessage(), HttpStatus.UNAUTHORIZED);
+    JwtExceptionResponse jwtExceptionResponse = new JwtExceptionResponse(ex.getMessage(), status);
     res.getWriter().write(jwtExceptionResponse.convertToJson());
   }
 

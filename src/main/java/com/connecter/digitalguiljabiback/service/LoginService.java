@@ -5,6 +5,7 @@ import com.connecter.digitalguiljabiback.domain.RefreshToken;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
 import com.connecter.digitalguiljabiback.dto.login.UserRequest;
+import com.connecter.digitalguiljabiback.exception.UserLockedException;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.RefreshTokenRepository;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
@@ -55,6 +56,9 @@ public class LoginService {
       Users newUser = Users.makeUsers(oauthType.name() + userDTO.getUid(), passwordEncoder.encode(userDTO.getUid()), oauthType);
       user = userRepository.save(newUser);
     }
+
+    if (!user.isAccountNonExpired())
+      throw new UserLockedException();
 
     authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(
@@ -119,6 +123,10 @@ public class LoginService {
   public LoginResponse tempLogin(UserRequest userDto, HttpServletRequest request) {
     Users user = userRepository.findByUid(userDto.getUid())
       .orElseGet(() -> null);
+
+    if (!user.isAccountNonLocked()) {
+      throw new UserLockedException();
+    }
 
     authenticationManager.authenticate(
       new UsernamePasswordAuthenticationToken(

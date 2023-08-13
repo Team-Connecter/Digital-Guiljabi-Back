@@ -16,7 +16,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(UsernameDuplicatedException.class)
   protected ResponseEntity handlerUsernameDuplicatedException(UsernameDuplicatedException e) {
     log.info("UsernameDuplicatedException = {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.CONFLICT).build();
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorDto(e.getMessage()));
+  }
+
+  @ExceptionHandler(UserLockedException.class)
+  protected ResponseEntity handlerUserLockedException(UserLockedException e) {
+    log.info("UserLockedException = {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(e.getMessage()));
   }
   @ExceptionHandler(TokenInValidException.class)
   protected ResponseEntity handlerTokenInValidException(TokenInValidException e) {

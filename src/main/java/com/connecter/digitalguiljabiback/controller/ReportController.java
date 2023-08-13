@@ -77,6 +77,8 @@ public class ReportController {
   //ADMIN ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
   @Operation(summary = "신고 횟수가 많은 순으로 정보글 조회", description = """
     [관리자] 신고 횟수가 많은 순으로 정보글을 조회합니다. 신고횟수 5회 이상만 조회도 가능<br>
+    ① RECENT: (기본값)최신순<br>
+    ② REP_HIGH: 신고 많은 순<br>
     200: 성공
     """)
   @Parameter(name = "viewHigh5", description = "신고횟수 5회 이상만 조회할 지 결정")

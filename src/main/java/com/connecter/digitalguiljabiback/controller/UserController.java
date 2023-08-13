@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +33,7 @@ public class UserController {
   private final UserService userService;
 
   @Operation(summary = "내 정보 조회", description = """
-    [로그인 필요] 최상위 카테고리를 조회합니다<br>
+    [로그인 필요]<br>
     200: 성공<br>
     403: 로그인 필요
     """)
@@ -89,7 +88,7 @@ public class UserController {
   }
 
   @Operation(summary = "사용자 정보 한 번에 변경(자기소개, 닉네임 등)", description = """
-    [로그인 필요] 사용자 정보를 변경합니다<br>
+    [로그인 필요]<br>
     200: 성공<br>
     403: 로그인 필요
     """)
@@ -126,6 +125,33 @@ public class UserController {
     return ResponseEntity.ok(all);
   }
 
+  @Operation(summary = "회원 정지먹이기", description = """
+    [관리자] <br>
+    200: 성공<br>
+    404: 해당 pk의 사용자가 존재하지 않음<br>
+    """)
+  @GetMapping("/admin/users/{userPk}/lock")
+  public ResponseEntity lockUser(
+    @PathVariable Long userPk
+  ) {
+    userService.lockUser(userPk);
+
+    return ResponseEntity.ok().build();
+  }
+
+  @Operation(summary = "회원 정지 풀어주기", description = """
+    [관리자] <br>
+    200: 성공<br>
+    404: 해당 pk의 사용자가 존재하지 않음<br>
+    """)
+  @GetMapping("/admin/users/{userPk}/unlock")
+  public ResponseEntity unlockUser(
+    @PathVariable Long userPk
+  ) {
+    userService.unlockUser(userPk);
+
+    return ResponseEntity.ok().build();
+  }
 
 
 
