@@ -577,22 +577,22 @@ public class BoardService {
       throw new ForbiddenException("권한이 없는 사용자입니다");
 
     boardRepository.delete(board);
+    board.deleteLikeCnt();
   }
 
   // 게시글 좋아요
   public void addLikeToBoard(Users user, Long boardPk) {
     Board board = findBoard(boardPk);
 
-    Likes likes = Likes.makeLikes(user, board);
-
     // 이전에 좋아요를 눌렀는지 확인
     boolean isClicked = boardLikeRepository.existsByUserAndBoard(user, board);
     if(!isClicked) {
+      Likes likes = Likes.makeLikes(user, board);
       boardLikeRepository.save(likes);
       board.addLikeCnt();
     }
-
-
+    
+    //좋아요가 이미 존재하면 무시
   }
 
   // 게시글 좋아요 취소
@@ -600,14 +600,15 @@ public class BoardService {
     Board board = findBoard(boardPk);
 
     Likes likes = boardLikeRepository.findByUserAndBoard(user, board)
-      .orElseThrow(() -> new NotFoundException("좋아요가 존재하지 않습니다."));
+      .orElseGet(() -> null);
 
-    boolean isClicked = boardLikeRepository.existsByUserAndBoard(user, board);
-    if(isClicked) {
-      boardLikeRepository.delete(likes);
-      board.deleteLikeCnt();
-    }
+    //좋아요가 존재하지 않는다면 무시
+    if (likes == null)
+      return;
 
+    //이전에 좋아요를 눌렀다면 삭제
+    boardLikeRepository.delete(likes);
+    board.deleteLikeCnt();
   }
 
   @Transactional(readOnly = true)
