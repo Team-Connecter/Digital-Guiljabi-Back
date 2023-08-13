@@ -37,15 +37,15 @@ public class BookmarkService {
         Users findUser = userRepository.findById(user.getPk())
                 .orElseThrow(() -> new NotFoundException("해당하는 사용자가 없습니다."));
 
-        Bookmark bookmark = Bookmark.makeBookmark(findUser, board);
-
         // 이전에 북마크 했는지 확인
         boolean isClicked = bookmarkRepository.existsByUserAndBoard(user, board);
         if(!isClicked) {
+            Bookmark bookmark = Bookmark.makeBookmark(findUser, board);
             bookmarkRepository.save(bookmark);
-
             board.addBookmarkCnt();
         }
+
+        //이미 북마크 했다면 무시
     }
 
     public void cancelBookmark(Users user, Long boardId) {
@@ -53,10 +53,14 @@ public class BookmarkService {
                 .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
 
         Bookmark bookmark = bookmarkRepository.findByUserAndBoard(user, board)
-                .orElseThrow(() -> new NotFoundException("북마크가 존재하지 않습니다."));
+                .orElseGet(() -> null);
 
+        //북마크가 없으면 무시
+        if (bookmark == null)
+            return;
+        
+        //북마크가 존재하면 삭제
         bookmarkRepository.delete(bookmark);
-
         board.cancelBookmarkCnt();
     }
 
