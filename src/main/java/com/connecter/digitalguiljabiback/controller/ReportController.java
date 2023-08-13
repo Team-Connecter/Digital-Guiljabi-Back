@@ -32,7 +32,7 @@ public class ReportController {
   private final BoardService boardService;
 
   @Operation(summary = "정보글 신고하기", description = """
-    [로그인 필요] .<br>
+    [로그인 필요] ① IRREL: 내용과 크게다름 ② COPYR: 저작권 침해 ③ NOXI: 유해,광고성 ④ ETC: 기타<br>
     200: 성공<br>
     400: 잘못된 요청 - type과 content는 필수<br>
     404: 해당 pk의 정보글이 존재하지 않음<br>

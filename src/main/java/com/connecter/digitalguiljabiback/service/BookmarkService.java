@@ -31,7 +31,6 @@ public class BookmarkService {
     public final UserRepository userRepository;
 
     public void addBookmark(Users user, Long boardId) {
-
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new NotFoundException("해당하는 정보글을 찾을 수 없습니다."));
 
@@ -44,10 +43,9 @@ public class BookmarkService {
         boolean isClicked = bookmarkRepository.existsByUserAndBoard(user, board);
         if(!isClicked) {
             bookmarkRepository.save(bookmark);
+
+            board.addBookmarkCnt();
         }
-
-        board.addBookmarkCnt();
-
     }
 
     public void cancelBookmark(Users user, Long boardId) {
@@ -58,6 +56,8 @@ public class BookmarkService {
                 .orElseThrow(() -> new NotFoundException("북마크가 존재하지 않습니다."));
 
         bookmarkRepository.delete(bookmark);
+
+        board.cancelBookmarkCnt();
     }
 
     public BookmarkListResponse getBookmarkList(Users user, Pageable pageable) {
