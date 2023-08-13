@@ -1,5 +1,6 @@
 package com.connecter.digitalguiljabiback.config;
 
+import com.connecter.digitalguiljabiback.exception.UserLockedException;
 import com.connecter.digitalguiljabiback.service.JwtService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -57,6 +58,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             if (jwtService.isTokenValid(jwt, userDetails)) {
+                if (!userDetails.isAccountNonLocked()) {
+                    throw new UserLockedException();
+                }
+
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                   userDetails,
                   null, //우리는 credentials가 없는 사용자 사용

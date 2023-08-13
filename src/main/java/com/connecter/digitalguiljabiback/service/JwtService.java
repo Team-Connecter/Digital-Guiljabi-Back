@@ -77,6 +77,7 @@ public class JwtService {
 
         boolean b = (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
 
+        //블랙리스트 토큰인지 확인
         Integer isExist = tokenBlackListRepository.isExistToken(token)
           .orElseGet(() -> null);
 

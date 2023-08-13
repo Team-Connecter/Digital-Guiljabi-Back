@@ -90,4 +90,18 @@ public class UserService {
 
     return findByNickname != null;
   }
+
+  public void lockUser(Long userPk) {
+    Users findUser = userRepository.findById(userPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
+
+    findUser.lock();
+  }
+
+  public void unlockUser(Long userPk) {
+    Users findUser = userRepository.findById(userPk)
+      .orElseThrow(() -> new NoSuchElementException("해당하는 사용자가 없습니다"));
+
+    findUser.unlock();
+  }
 }
