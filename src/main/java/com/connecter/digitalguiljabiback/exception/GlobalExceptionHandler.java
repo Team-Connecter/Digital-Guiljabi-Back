@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ForbiddenException.class)
   protected ResponseEntity handlerForbiddenException(ForbiddenException e) {
     log.info("ForbiddenException = {}", e.getMessage());
-    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorDto(e.getMessage()));
   }
 
   @ExceptionHandler(CategoryNameDuplicatedException.class)

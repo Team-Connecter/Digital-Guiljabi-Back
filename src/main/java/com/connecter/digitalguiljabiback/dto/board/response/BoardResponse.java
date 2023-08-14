@@ -2,6 +2,7 @@ package com.connecter.digitalguiljabiback.dto.board.response;
 
 import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.category.CategoryResponse;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -29,5 +30,6 @@ public class BoardResponse {
   private List<CategoryResponse> categories;
   private Long likeCnt;
   private Long bookmarkCnt;
+  @JsonProperty("isMine")
   private boolean isMine;
 }
