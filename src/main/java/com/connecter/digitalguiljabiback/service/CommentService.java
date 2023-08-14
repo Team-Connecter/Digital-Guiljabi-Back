@@ -50,7 +50,7 @@ public class CommentService {
                 .orElseThrow(() -> new NotFoundException("해당하는 댓글을 찾을 수 없습니다."));
 
         // Admin은 통과, 회원이면 댓글 확인
-    if(!user.getRole().equals(ADMIN) && !comment.getUser().getPk().equals(user.getPk())) {
+        if(!user.getRole().equals(ADMIN) && comment.getUser().getPk() != user.getPk()) {
             throw new ForbiddenException("작성자만 댓글을 삭제할 수 있습니다.");
         }
 

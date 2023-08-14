@@ -573,7 +573,7 @@ public class BoardService {
   public void deleteBoard(Users user, Long boardPk) throws NoSuchElementException, ForbiddenException{
     Board board = findBoard(boardPk);
 
-    if (user.getRole() != UserRole.ADMIN && board.getUser() != user)
+    if (user.getRole() != UserRole.ADMIN && board.getUser().getPk() != user.getPk())
       throw new ForbiddenException("권한이 없는 사용자입니다");
 
     boardRepository.delete(board);
