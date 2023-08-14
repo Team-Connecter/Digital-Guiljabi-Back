@@ -18,4 +18,5 @@ public class CommentResponse {
     private String profileUrl;
     private String content;
     private LocalDateTime createAt;
+    private boolean isMine;
 }

@@ -29,4 +29,5 @@ public class BoardResponse {
   private List<CategoryResponse> categories;
   private Long likeCnt;
   private Long bookmarkCnt;
+  private boolean isMine;
 }

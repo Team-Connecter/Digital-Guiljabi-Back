@@ -58,7 +58,7 @@ public class CommentService {
     }
 
     // 댓글 조회
-    public CommentListResponse getCommentList(Pageable pageable, Long boardPk) {
+    public CommentListResponse getCommentList(Pageable pageable, Long boardPk, Users user) {
 
         // 게시글 존재 여부 확인
         boardRepository.findById(boardPk)
@@ -74,6 +74,7 @@ public class CommentService {
                     .profileUrl(comment.getUser().getProfileUrl())
                     .content(comment.getContent())
                     .createAt(comment.getCreateAt())
+                    .isMine(comment.getUser().getPk() == user.getPk())
                     .build()
         ).toList();
 
