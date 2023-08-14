@@ -163,7 +163,7 @@ public class BoardService {
       .tags(tagList)
       .likeCnt(board.getLikeCnt())
       .bookmarkCnt(board.getBookmarkCnt())
-      .isMine(user.getPk() == writer.getPk())
+      .isMine((user != null)? user.getPk() == writer.getPk(): false)
       .build();
 
     return boardResponse;
