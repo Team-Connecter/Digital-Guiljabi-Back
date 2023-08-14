@@ -59,11 +59,14 @@ public class CommentController {
             // 최신순
             @RequestParam(value = "size",required = false, defaultValue = "10") int size,
             @RequestParam(value = "page",required = false, defaultValue = "0") int page,
-            @PathVariable Long boardPk)
+            @PathVariable Long boardPk,
+            @AuthenticationPrincipal Users user
+    )
+
     {
         Pageable pageable = PageRequest.of(page-1, size);
 
-        return ResponseEntity.ok().body(commentService.getCommentList(pageable, boardPk));
+        return ResponseEntity.ok().body(commentService.getCommentList(pageable, boardPk, user));
 
     }
 }
