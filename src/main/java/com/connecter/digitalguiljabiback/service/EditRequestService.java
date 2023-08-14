@@ -1,18 +1,18 @@
 package com.connecter.digitalguiljabiback.service;
 
+import com.connecter.digitalguiljabiback.domain.FirebaseToken;
 import com.connecter.digitalguiljabiback.domain.board.Board;
 import com.connecter.digitalguiljabiback.domain.EditRequest;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.editRequest.response.*;
 import com.connecter.digitalguiljabiback.dto.editRequest.EditRequestRequest;
 import com.connecter.digitalguiljabiback.exception.NotFoundException;
+import com.connecter.digitalguiljabiback.firebase.PushNotificationRequest;
+import com.connecter.digitalguiljabiback.firebase.PushNotificationService;
 import com.connecter.digitalguiljabiback.repository.BoardRepository;
 import com.connecter.digitalguiljabiback.repository.EditRequestRepository;
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.Bucket;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.cloud.StorageClient;
-import jakarta.validation.Valid;
+import com.connecter.digitalguiljabiback.repository.FirebaseTokenRepository;
+import com.connecter.digitalguiljabiback.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,11 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -37,6 +32,9 @@ public class EditRequestService {
 
     private final EditRequestRepository editRequestRepository;
     private final BoardRepository boardRepository;
+    private final UserRepository userRepository;
+    private final FirebaseTokenRepository firebaseTokenRepository;
+    private PushNotificationService pushNotificationService;
 
 
     public void addRequest(Users user, Long boardPk, EditRequestRequest editRequestRequest)
@@ -116,7 +114,23 @@ public class EditRequestService {
         Board board = boardRepository.findById(boardPk)
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
 
+        Users user = userRepository.findById(board.getUser().getPk())
+                .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 user가 존재하지 않습니다"));
+
         board.editRequest(reason);
+
+
+        // user 의 모든 token 찾기
+        List<FirebaseToken> firebaseTokens = firebaseTokenRepository.findAllByUser(user);
+
+        // 알림 보내기
+        for (FirebaseToken firebaseToken : firebaseTokens) {
+            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + reason, firebaseToken.getToken());
+            pushNotificationService.sendPushNotificationToToken(request);
+        }
+
+
+
     }
 
     public void notifyEditRequestAndHide(Long boardPk, String reason) {
@@ -125,6 +139,19 @@ public class EditRequestService {
 
         // 게시글 숨기기
         board.hide(reason);
+
+        Users user = userRepository.findById(board.getUser().getPk())
+                .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 user가 존재하지 않습니다"));
+
+
+        // user 의 모든 token 찾기
+        List<FirebaseToken> firebaseTokens = firebaseTokenRepository.findAllByUser(user);
+
+        // 알림 보내기
+        for (FirebaseToken firebaseToken : firebaseTokens) {
+            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + reason, firebaseToken.getToken());
+            pushNotificationService.sendPushNotificationToToken(request);
+        }
     }
 
 
