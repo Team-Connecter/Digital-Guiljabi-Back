@@ -74,7 +74,7 @@ public class CommentService {
                     .profileUrl(comment.getUser().getProfileUrl())
                     .content(comment.getContent())
                     .createAt(comment.getCreateAt())
-                    .isMine(comment.getUser().getPk() == user.getPk())
+                    .isMine((user != null)? comment.getUser().getPk() == user.getPk(): false)
                     .build()
         ).toList();
 
