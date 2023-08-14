@@ -46,7 +46,9 @@ public class BookmarkController {
 
     @Secured("USER")
     @Operation(summary = "내 북마크 조회", description = """
-    [로그인 필요]<br>200: 성공
+    [로그인 필요]<br>
+    항상 최신순으로 보임<br>
+    200: 성공
     """)
     @GetMapping("/bookmarks")
     public ResponseEntity<BookmarkListResponse> getBookmarkList(
