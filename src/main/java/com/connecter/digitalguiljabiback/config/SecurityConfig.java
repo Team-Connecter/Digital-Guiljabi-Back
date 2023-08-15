@@ -51,6 +51,7 @@ public class SecurityConfig {
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/root").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/*/children").permitAll()
             .requestMatchers(HttpMethod.GET, "/api/v1/categories/*/ancestor").permitAll()
+            .requestMatchers(HttpMethod.GET, "/api/auth/kakao/login-url").permitAll()
             .requestMatchers( "/api/v1/admin/**").hasAuthority("ADMIN")
             .anyRequest().authenticated()
           .and()
