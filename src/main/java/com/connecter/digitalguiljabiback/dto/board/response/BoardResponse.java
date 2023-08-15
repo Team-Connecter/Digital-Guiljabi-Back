@@ -32,4 +32,8 @@ public class BoardResponse {
   private Long bookmarkCnt;
   @JsonProperty("isMine")
   private boolean isMine;
+  @JsonProperty("isBookmarked")
+  private boolean isBookmarked;
+  @JsonProperty("isLiked")
+  private boolean isLiked;
 }
