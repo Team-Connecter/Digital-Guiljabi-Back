@@ -31,8 +31,8 @@ public class KakaoAuthUrlBuilder implements AuthUrlBuilder {
         String redirectUri = encodeQueryParam(kakaoProperties.getRedirectUri());
 
         return String.format(
-                "%s?client_id=%s&redirect_uri=%s&response_type=%s",
-                authorizationUri, clientId, redirectUri, "code");
+                "%s?client_id=%s",
+                authorizationUri, clientId);
     }
 
     /**
