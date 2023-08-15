@@ -52,7 +52,9 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-admin:9.2.0'
     implementation group: 'com.google.firebase', name: 'firebase-admin', version: '7.1.0'
 
-
+    //test
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
 }
 

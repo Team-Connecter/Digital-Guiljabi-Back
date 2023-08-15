@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -45,8 +46,8 @@ class BoardServiceTest {
   private final String introduction = "introduction";
   private final String thumbnail = "asd";
   private CardDto[] cards;
-  private String[] tags;
-  private String[] sources;
+  private List<String> tags;
+  private List<String> sources;
   private String reason;
 
 
@@ -56,13 +57,13 @@ class BoardServiceTest {
     for (int i =0; i<3; i++)
       cards[i] = new CardDto("subtitle"+i, "img"+i, "content"+i);
 
-    tags = new String[3];
+    tags = new ArrayList<>();
     for (int i =0; i<3; i++)
-      tags[i] = "tag" + i;
+      tags.add("tag" + i);
 
-    sources = new String[3];
+    sources = new ArrayList<>();
     for (int i =0; i<3; i++)
-      sources[i] = "source" + i;
+      sources.add("source" + i);
 
     reason = "마음에 안듦";
   }
@@ -94,13 +95,13 @@ class BoardServiceTest {
     assertEquals(user.getPk(), boardInfo.getWriterPk());
     assertEquals(user.getNickname(), boardInfo.getWriterName());
     assertEquals(3, boardInfo.getCardCnt());
-    for (int i =0; i< sources.length; i++)
-      assertEquals(sources[i], boardInfo.getSources().get(i));
+    for (int i =0; i< sources.size(); i++)
+      assertEquals(sources.get(i), boardInfo.getSources().get(i));
 
     assertEquals(0L, boardInfo.getLikeCnt());
     assertEquals(0L, boardInfo.getBookmarkCnt());
-    for (int i =0; i< tags.length; i++)
-      assertEquals(tags[i], boardInfo.getTags().get(i));
+    for (int i =0; i< tags.size(); i++)
+      assertEquals(tags.get(i), boardInfo.getTags().get(i));
 
     for (int i =0; i<cards.length; i++) {
       List<CardDto> getCard = boardInfo.getCards();
@@ -149,7 +150,7 @@ class BoardServiceTest {
     AddBoardRequest request = new AddBoardRequest(title,introduction,thumbnail,cards,tags, sources);
     boardService.makeBoard(user, request);
 
-    BoardListRequest boardListRequest = new BoardListRequest(null, title, 10, 1, null);
+    BoardListRequest boardListRequest = BoardListRequest.makeRequest(null, title, 10, 1, null);
     BoardListResponse boardList = boardService.getBoardList(boardListRequest, BoardStatus.WAITING);
 
     boolean hasData = false;
@@ -180,7 +181,7 @@ class BoardServiceTest {
     Category savedCategory = categoryService.add(new AddCategoryRequest("카테고리1", null));
 
     //board 승인목록 조회 - 데이터가 없어야함
-    BoardListRequest request2 = new BoardListRequest(null, null, 10, 1, null);
+    BoardListRequest request2 = BoardListRequest.makeRequest(null, null, 10, 1, null);
     BoardListResponse approvedBoardList = boardService.getApprovedBoardList(request2);
 
     boolean hasData = false;
@@ -197,7 +198,7 @@ class BoardServiceTest {
     boardService.approve(newBoard.getPk(), List.of(new Long[]{savedCategory.getPk()}));
 
     //board 승인목록 조회 - 데이터가 있어야함
-    BoardListRequest request3 = new BoardListRequest(null, title, 10, 1, null);
+    BoardListRequest request3 = BoardListRequest.makeRequest(null, title, 10, 1, null);
     approvedBoardList = boardService.getApprovedBoardList(request3);
 
     hasData = false;
@@ -237,7 +238,7 @@ class BoardServiceTest {
     boardService.reject(newBoard.getPk(), reason);
 
     //board 승인목록 조회 - 데이터가 없어야함
-    BoardListRequest request3 = new BoardListRequest(null, null, 10, 1, null);
+    BoardListRequest request3 = BoardListRequest.makeRequest(null, null, 10, 1, null);
     BoardListResponse approvedBoardList = boardService.getApprovedBoardList(request3);
 
     boolean hasData = false;
@@ -251,7 +252,7 @@ class BoardServiceTest {
     assertFalse(hasData);
 
     //거부된 애들 조회
-    BoardListRequest listRequest = new BoardListRequest(null, null, null, null, null);
+    BoardListRequest listRequest = BoardListRequest.makeRequest(null, null, null, null, null);
     BoardListResponse boardList = boardService.getBoardList(listRequest, BoardStatus.REFUSAL);
 
     hasData = false;

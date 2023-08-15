@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,8 +43,8 @@ class ReportServiceTest {
   private final String introduction = "introduction";
   private final String thumbnail = "asd";
   private CardDto[] cards;
-  private String[] tags;
-  private String[] sources;
+  private List<String> tags;
+  private List<String> sources;
   private String reason;
 
   private Users user1;
@@ -55,13 +56,13 @@ class ReportServiceTest {
     for (int i =0; i<3; i++)
       cards[i] = new CardDto("subtitle"+i, "img"+i, "content"+i);
 
-    tags = new String[3];
+    tags = new ArrayList<>();
     for (int i =0; i<3; i++)
-      tags[i] = "tag" + i;
+      tags.add("tag" + i);
 
-    sources = new String[3];
+    sources = new ArrayList<>();
     for (int i =0; i<3; i++)
-      sources[i] = "source" + i;
+      sources.add("source" + i);
 
     reason = "마음에 안듦";
   }
