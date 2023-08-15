@@ -38,7 +38,7 @@ public class LoginController {
     회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
     201: 성공
     """)
-  @GetMapping("/login/kakao")
+  @GetMapping("/auth/kakao/login-url")
   public ResponseEntity<Map> getKakaoLoginUrl() {
     Map<String, String> map = new HashMap<>();
     map.put("loginUrl", kakaoClient.getAuthUrl());
@@ -50,8 +50,12 @@ public class LoginController {
    * @param authorizationCode 인가 코드
    * @return AuthResponseDTO 로그인 또는 회원 가입 결과를 담은 응답 DTO
    */
-  @Hidden
-  @GetMapping("/login/callback")
+  @Operation(summary = "카카오 로그인", description = """
+    [모두 접근가능] 카카오 로그인 후 받은 인가코드를 넘겨주면 로그인이 가능<br>
+    회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
+    200: 성공
+    """)
+  @GetMapping("/login/kakao")
   public ResponseEntity<LoginResponse> processKakaoLoginCallback(@RequestParam("code") String authorizationCode, HttpServletRequest request) {
     AuthRequest params = new AuthRequest(authorizationCode);
     KakaoUserResponse response = kakaoClient.handleCallback(params);

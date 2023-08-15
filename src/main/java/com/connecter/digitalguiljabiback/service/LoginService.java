@@ -57,7 +57,7 @@ public class LoginService {
       user = userRepository.save(newUser);
     }
 
-    if (!user.isAccountNonExpired())
+    if (!user.isAccountNonLocked())
       throw new UserLockedException();
 
     authenticationManager.authenticate(
