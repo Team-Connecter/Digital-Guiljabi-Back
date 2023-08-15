@@ -58,7 +58,7 @@ public class CommentController {
     public ResponseEntity<CommentListResponse> getCommentList(
             // 최신순
             @RequestParam(value = "size",required = false, defaultValue = "10") int size,
-            @RequestParam(value = "page",required = false, defaultValue = "0") int page,
+            @RequestParam(value = "page",required = false, defaultValue = "1") int page,
             @PathVariable Long boardPk,
             @AuthenticationPrincipal Users user
     )
