@@ -42,6 +42,7 @@ public class BoardService {
   private final BoardVersionContentRepository versionContentRepository;
   private final BoardVersionRepository versionRepository;
   private final VersionDiffRepository versionDiffRepository;
+  private final BookmarkRepository bookmarkRepository;
 
   //source를 구분하는 구분자
   private final String sourceDelim = "\tl\tL\t@ls";
@@ -148,6 +149,14 @@ public class BoardService {
     List<CardDto> cardDtoList = CardDto.convert(board.getContents());
     List<CategoryResponse> categories = CategoryResponse.convert(board.getBoardCategories());
 
+    boolean isBookmarked = false;
+    boolean isLiked = false;
+
+    if (user != null) {
+      isBookmarked = bookmarkRepository.existsByUserAndBoard(user, board);
+      isLiked = boardLikeRepository.existsByUserAndBoard(user, board);
+    }
+
     BoardResponse boardResponse = BoardResponse.builder()
       .title(board.getTitle())
       .introduction(board.getIntroduction())
@@ -164,6 +173,8 @@ public class BoardService {
       .likeCnt(board.getLikeCnt())
       .bookmarkCnt(board.getBookmarkCnt())
       .isMine((user != null)? user.getPk() == writer.getPk(): false)
+      .isBookmarked(isBookmarked)
+      .isLiked(isLiked)
       .build();
 
     return boardResponse;
