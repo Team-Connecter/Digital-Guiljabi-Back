@@ -28,12 +28,12 @@ public class NaverAuthUrlBuilder implements AuthUrlBuilder {
         String authorizationUri = naverProperties.getAuthorizationUri();
         String state = new BigInteger(130, new SecureRandom()).toString();
         String clientId = encodeQueryParam(naverProperties.getClientId());
-        String redirectUri = encodeQueryParam(naverProperties.getRedirectUri());
+        String redirectUri = encodeQueryParam(naverProperties.getRedirectUri()); //&redirect_uri=%s&response_type=%s
         String response_type = "code";
 
         return String.format(
-                "%s?client_id=%s&redirect_uri=%s&response_type=%s",
-                authorizationUri, clientId, redirectUri, "code");
+                "%s?client_id=%s",
+                authorizationUri, clientId);
     }
 
     /**
