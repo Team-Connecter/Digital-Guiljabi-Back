@@ -44,6 +44,12 @@ public class LoginController {
     map.put("loginUrl", kakaoClient.getAuthUrl());
     return ResponseEntity.status(HttpStatus.CREATED).body(map);
   }
+  @GetMapping("/login/kakao/test")
+  public ResponseEntity asdf(
+    @RequestParam("code") String authorizationCode
+  ) {
+    return ResponseEntity.ok(authorizationCode);
+  }
 
   /**
    * 카카오 로그인 콜백을 처리하고 인증에 성공한 경우 로그인 또는 회원 가입
@@ -56,9 +62,13 @@ public class LoginController {
     200: 성공
     """)
   @GetMapping("/login/kakao")
-  public ResponseEntity<LoginResponse> processKakaoLoginCallback(@RequestParam("code") String authorizationCode, HttpServletRequest request) {
-    AuthRequest params = new AuthRequest(authorizationCode);
-    KakaoUserResponse response = kakaoClient.handleCallback(params);
+  public ResponseEntity<LoginResponse> processKakaoLoginCallback(
+    @RequestParam("code") String authorizationCode,
+    @RequestParam("redirect_url") String redirectUrl,
+    HttpServletRequest request
+  ) {
+    AuthRequest params = new AuthRequest(authorizationCode.trim());
+    KakaoUserResponse response = kakaoClient.handleCallback(params, redirectUrl);
 
     log.info("사용자 UID: {}", response.getUid());
 
