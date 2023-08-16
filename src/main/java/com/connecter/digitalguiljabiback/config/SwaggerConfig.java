@@ -2,6 +2,7 @@ package com.connecter.digitalguiljabiback.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
+import io.swagger.v3.oas.annotations.servers.Server;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -22,7 +23,10 @@ import java.util.Collections;
       <h2>500: 서버에러</h2>
       """,
     version = "v1"
-  )
+  ),
+  servers = {
+    @Server(url = "/", description = "API 서버")
+  }
 )
 public class SwaggerConfig {
 
