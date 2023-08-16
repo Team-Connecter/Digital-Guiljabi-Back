@@ -44,6 +44,7 @@ public class LoginController {
     map.put("loginUrl", kakaoClient.getAuthUrl());
     return ResponseEntity.status(HttpStatus.CREATED).body(map);
   }
+  @Hidden
   @GetMapping("/login/kakao/test")
   public ResponseEntity asdf(
     @RequestParam("code") String authorizationCode
@@ -84,7 +85,7 @@ public class LoginController {
     https://nid.naver.com/oauth2.0/authorize?client_id={}&redirect_uri={}&response_type=code<br>
     201: 성공
     """)
-  @GetMapping("/login/naver/login-url")
+  @GetMapping("/auth/naver/login-url")
   public ResponseEntity<Map> getNaverLoginUrl() {
     Map<String, String> map = new HashMap<>();
     map.put("loginUrl", naverClient.getAuthUrl());
@@ -98,7 +99,8 @@ public class LoginController {
    * @return AuthResponseDTO 로그인 또는 회원 가입 결과를 담은 응답 DTO
    */
 
-  @GetMapping("/login/callback/naver")
+  @Hidden
+  @GetMapping("/login/naver/test")
   public ResponseEntity processNaverLoginCallback(
     @RequestParam("code") String authorizationCode,
     @RequestParam("state") String state
