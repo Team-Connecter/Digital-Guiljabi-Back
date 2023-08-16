@@ -81,9 +81,10 @@ public class LoginController {
   @Operation(summary = "네이버 로그인 페이지 url 받기", description = """
     [모두 접근가능] 네이버로 로그인할 수 있는 url을 받아옵니다.<br>
     회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
+    https://nid.naver.com/oauth2.0/authorize?client_id={}&redirect_uri={}&response_type=code<br>
     201: 성공
     """)
-  @GetMapping("/login/naver")
+  @GetMapping("/login/naver/login-url")
   public ResponseEntity<Map> getNaverLoginUrl() {
     Map<String, String> map = new HashMap<>();
     map.put("loginUrl", naverClient.getAuthUrl());
@@ -96,8 +97,23 @@ public class LoginController {
    * @param state 사이트 간 요청 위조 공격을 방지하기 위해 애플리케이션에서 생성한 상태 토큰값으로 URL 인코딩을 적용한 값을 사용
    * @return AuthResponseDTO 로그인 또는 회원 가입 결과를 담은 응답 DTO
    */
-  @Hidden
+
   @GetMapping("/login/callback/naver")
+  public ResponseEntity processNaverLoginCallback(
+    @RequestParam("code") String authorizationCode,
+    @RequestParam("state") String state
+  ){
+    return ResponseEntity.ok(authorizationCode + "     " + state);
+  }
+
+  @Operation(summary = "네이버 로그인", description = """
+    [모두 접근가능] 네이버 로그인 후 받은 인가코드를 넘겨주면 로그인이 가능<br>
+    state는 사이트 간 요청 위조 공격을 방지하기 위해 생성한 값입니다. 필수로 넣어주세용<br>
+    ex) BigInteger(130, new SecureRandom()).toString() <br>
+    회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
+    200: 성공
+    """)
+  @GetMapping("/login/naver")
   public ResponseEntity<LoginResponse> processNaverLoginCallback(
     @RequestParam("code") String authorizationCode,
     @RequestParam("state") String state,
