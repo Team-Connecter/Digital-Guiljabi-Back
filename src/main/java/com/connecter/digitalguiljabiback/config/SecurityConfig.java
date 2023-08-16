@@ -70,6 +70,10 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://localhost");
         configuration.addAllowedOrigin("http://localhost/");
         configuration.addAllowedOrigin("http://localhost:80");
+        configuration.addAllowedOrigin("https://digital.seol.pro");
+        configuration.addAllowedOrigin("https://digital.seol.pro/");
+        configuration.addAllowedOrigin("https://digital.seol.pro:80");
+        configuration.addAllowedOrigin("https://digital.seol.pro:8080");
         configuration.addAllowedOrigin("http://localhost:80/");
         configuration.addAllowedOrigin("https://lucky-llama-7b0801.netlify.app");
         configuration.addAllowedOrigin("https://lucky-llama-7b0801.netlify.app/");
