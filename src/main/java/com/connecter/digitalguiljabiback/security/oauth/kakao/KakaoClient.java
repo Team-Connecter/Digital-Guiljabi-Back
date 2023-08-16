@@ -37,8 +37,8 @@ public class KakaoClient {
      * @param req KakaoAuthRequest 객체로부터 인증 정보를 받아옵니다.
      * @return 로그인 완료 메시지
      */
-    public KakaoUserResponse handleCallback(AuthRequest req) {
-        String accessToken = authClient.requestAccessToken(req);
+    public KakaoUserResponse handleCallback(AuthRequest req, String redirectUrl) {
+        String accessToken = authClient.requestAccessToken(req, redirectUrl);
 
         KakaoUserResponse userInfo = authClient.requestUserInfo(accessToken);
         log.info("카카오 액세스 토근 발급 성공: {}", accessToken);

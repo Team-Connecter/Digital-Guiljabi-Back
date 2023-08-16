@@ -41,14 +41,14 @@ public class KakaoAuthClient {
      * @return 요청한 액세스 토큰 문자열
      * @throws KakaoClientException 카카오 API 호출 중 예외가 발생했을 경우
      */
-    public String requestAccessToken(AuthRequest request) {
+    public String requestAccessToken(AuthRequest request, String redirectUrl) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, String> body = request.makeBody();
         body.add("grant_type", kakaoProperties.getGrantType());
         body.add("client_id", kakaoProperties.getClientId());
-        body.add("redirect_uri", kakaoProperties.getRedirectUri());
+        body.add("redirect_uri", redirectUrl);
         body.add("client_secret", kakaoProperties.getClientSecret());
 
         HttpEntity<?> httpEntity = new HttpEntity<>(body, httpHeaders);
