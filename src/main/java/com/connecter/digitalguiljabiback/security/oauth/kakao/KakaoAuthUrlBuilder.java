@@ -28,7 +28,6 @@ public class KakaoAuthUrlBuilder implements AuthUrlBuilder {
     public String buildAuthUrl() {
         String authorizationUri = kakaoProperties.getAuthorizationUri();
         String clientId = encodeQueryParam(kakaoProperties.getClientId());
-        String redirectUri = encodeQueryParam(kakaoProperties.getRedirectUri());
 
         return String.format(
                 "%s?client_id=%s",
