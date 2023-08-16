@@ -106,18 +106,18 @@ public class EditRequestController {
 
     @Operation(summary = "글쓴이에게 수정요청사항 알리기 - 게시글 숨기지 않기")
     @PostMapping("/admin/board/{boardPk}/edit-request/nothidden")
-    public ResponseEntity notHideBoard(@PathVariable Long boardPk, @RequestBody EditRequestRequest reason)
+    public ResponseEntity notHideBoard(@PathVariable Long boardPk, @RequestBody EditRequestRequest request)
     {
-        editRequestService.notifyEditRequest(boardPk, reason);
+        editRequestService.notifyEditRequest(boardPk, request);
 
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "글쓴이에게 수정요청사항 알리기 - 게시글 숨기기")
     @PostMapping("/admin/board/{boardPk}/edit-request/hidden")
-    public ResponseEntity hideBoard(@PathVariable Long boardPk, @RequestBody String reason)
+    public ResponseEntity hideBoard(@PathVariable Long boardPk, @RequestBody EditRequestRequest request)
     {
-        editRequestService.notifyEditRequestAndHide(boardPk, reason);
+        editRequestService.notifyEditRequestAndHide(boardPk, request);
 
         return ResponseEntity.ok().build();
     }
