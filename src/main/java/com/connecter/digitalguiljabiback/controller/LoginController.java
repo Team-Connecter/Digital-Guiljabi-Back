@@ -58,13 +58,14 @@ public class LoginController {
    */
   @Operation(summary = "카카오 로그인", description = """
     [모두 접근가능] 카카오 로그인 후 받은 인가코드를 넘겨주면 로그인이 가능<br>
+    redirect_url은 카카오로그인 url 요청 시 사용한 값을 넣어주세요<br>
     회원가입이 끝나면 꼭 유저닉네임을 설정하도록 해주세요!!<br>
     200: 성공
     """)
   @GetMapping("/login/kakao")
   public ResponseEntity<LoginResponse> processKakaoLoginCallback(
     @RequestParam("code") String authorizationCode,
-    @RequestParam("redirect_url") String redirectUrl,
+    @RequestParam("redirectUrl") String redirectUrl,
     HttpServletRequest request
   ) {
     AuthRequest params = new AuthRequest(authorizationCode.trim());
