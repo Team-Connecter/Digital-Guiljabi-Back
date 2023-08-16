@@ -20,6 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -274,6 +276,9 @@ class BoardServiceTest {
         break;
       }
     }
+
+    String state = new BigInteger(130, new SecureRandom()).toString();
+    log.info("@@: " + state);
 
     assertTrue(hasData);
   }
