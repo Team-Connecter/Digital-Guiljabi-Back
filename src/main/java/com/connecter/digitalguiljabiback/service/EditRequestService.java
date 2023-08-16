@@ -125,7 +125,7 @@ public class EditRequestService {
 
         // 알림 보내기
         for (FirebaseToken firebaseToken : firebaseTokens) {
-            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + request, firebaseToken.getToken());
+            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + editRequestRequest.getContent(), firebaseToken.getToken());
             pushNotificationService.sendPushNotificationToToken(request);
         }
 
@@ -149,7 +149,7 @@ public class EditRequestService {
 
         // 알림 보내기
         for (FirebaseToken firebaseToken : firebaseTokens) {
-            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + editRequestRequest, firebaseToken.getToken());
+            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + editRequestRequest.getContent(), firebaseToken.getToken());
             pushNotificationService.sendPushNotificationToToken(request);
         }
     }
