@@ -26,10 +26,9 @@ public class NaverAuthUrlBuilder implements AuthUrlBuilder {
     @Override
     public String buildAuthUrl() {
         String authorizationUri = naverProperties.getAuthorizationUri();
-        String state = new BigInteger(130, new SecureRandom()).toString();
+//        String state = new BigInteger(130, new SecureRandom()).toString();
         String clientId = encodeQueryParam(naverProperties.getClientId());
-        String redirectUri = encodeQueryParam(naverProperties.getRedirectUri()); //&redirect_uri=%s&response_type=%s
-        String response_type = "code";
+//        String response_type = "code";
 
         return String.format(
                 "%s?client_id=%s",
