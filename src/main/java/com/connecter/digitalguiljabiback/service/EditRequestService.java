@@ -34,7 +34,7 @@ public class EditRequestService {
     private final BoardRepository boardRepository;
     private final UserRepository userRepository;
     private final FirebaseTokenRepository firebaseTokenRepository;
-    private PushNotificationService pushNotificationService;
+    private final PushNotificationService pushNotificationService;
 
 
     public void addRequest(Users user, Long boardPk, EditRequestRequest editRequestRequest)
@@ -110,14 +110,14 @@ public class EditRequestService {
         editRequestRepository.delete(editRequest);
     }
 
-    public void notifyEditRequest(Long boardPk, String reason) {
+    public void notifyEditRequest(Long boardPk, EditRequestRequest reason) {
         Board board = boardRepository.findById(boardPk)
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
 
         Users user = userRepository.findById(board.getUser().getPk())
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 user가 존재하지 않습니다"));
 
-        board.editRequest(reason);
+        board.editRequest(reason.getContent());
 
 
         // user 의 모든 token 찾기
@@ -133,12 +133,12 @@ public class EditRequestService {
 
     }
 
-    public void notifyEditRequestAndHide(Long boardPk, String reason) {
+    public void notifyEditRequestAndHide(Long boardPk, EditRequestRequest reason) {
         Board board = boardRepository.findById(boardPk)
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 board가 존재하지 않습니다"));
 
         // 게시글 숨기기
-        board.hide(reason);
+        board.hide(reason.getContent());
 
         Users user = userRepository.findById(board.getUser().getPk())
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 user가 존재하지 않습니다"));
