@@ -1,7 +1,10 @@
 package com.connecter.digitalguiljabiback.exception;
 
+import com.connecter.digitalguiljabiback.config.properties.DiscordProperties;
 import com.connecter.digitalguiljabiback.exception.category.CategoryNotFoundException;
+import com.connecter.digitalguiljabiback.service.DiscordService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +15,9 @@ import java.util.NoSuchElementException;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+  @Autowired
+  DiscordService discordService;
 
   @ExceptionHandler(UsernameDuplicatedException.class)
   protected ResponseEntity handlerUsernameDuplicatedException(UsernameDuplicatedException e) {
@@ -63,6 +69,15 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(InternalServerException.class)
   protected ResponseEntity handlerInternalServerException(InternalServerException e) {
     log.info("InternalServerException = {}", e.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+  }
+
+  @ExceptionHandler(Exception.class)
+  protected ResponseEntity handlerOtherException(Exception e) {
+    log.info("Exception = {}", e.getMessage());
+
+//    discordService.callErrorEvent(e.getMessage());
+
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
   }
 }
