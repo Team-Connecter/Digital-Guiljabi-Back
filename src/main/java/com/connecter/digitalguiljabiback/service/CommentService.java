@@ -70,7 +70,7 @@ public class CommentService {
             CommentResponse.builder()
                     .commentPk(comment.getPk())
                     .boardPk(boardPk)
-                    .username(comment.getUser().getUsername())
+                    .username(comment.getUser().getNickname())
                     .profileUrl(comment.getUser().getProfileUrl())
                     .content(comment.getContent())
                     .createAt(comment.getCreateAt())
