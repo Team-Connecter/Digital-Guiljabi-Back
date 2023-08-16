@@ -72,12 +72,4 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
   }
 
-  @ExceptionHandler(Exception.class)
-  protected ResponseEntity handlerOtherException(Exception e) {
-    log.info("Exception = {}", e.getMessage());
-
-//    discordService.callErrorEvent(e.getMessage());
-
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-  }
 }

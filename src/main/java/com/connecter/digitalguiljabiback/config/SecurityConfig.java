@@ -71,9 +71,9 @@ public class SecurityConfig {
         configuration.addAllowedOrigin("http://localhost/");
         configuration.addAllowedOrigin("http://localhost:80");
         configuration.addAllowedOrigin("http://localhost:80/");
-        configuration.addAllowedOrigin("https://timely-concha-38b820.netlify.app");
-        configuration.addAllowedOrigin("https://timely-concha-38b820.netlify.app/");
-        configuration.addAllowedOrigin("https://timely-concha-38b820.netlify.app:443");
+        configuration.addAllowedOrigin("https://lucky-llama-7b0801.netlify.app");
+        configuration.addAllowedOrigin("https://lucky-llama-7b0801.netlify.app/");
+        configuration.addAllowedOrigin("https://lucky-llama-7b0801.netlify.app:443");
         configuration.addAllowedHeader("*");
         configuration.addAllowedMethod("*");
         configuration.setAllowCredentials(true);
