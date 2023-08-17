@@ -119,13 +119,12 @@ public class EditRequestService {
 
         board.editRequest(editRequestRequest.getContent());
 
-
         // user 의 모든 token 찾기
         List<FirebaseToken> firebaseTokens = firebaseTokenRepository.findAllByUser(user);
 
         // 알림 보내기
         for (FirebaseToken firebaseToken : firebaseTokens) {
-            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + editRequestRequest.getContent(), firebaseToken.getToken());
+            PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + board.getReason(), firebaseToken.getToken());
 
             pushNotificationService.sendPushNotificationToToken(request);
         }
@@ -143,7 +142,6 @@ public class EditRequestService {
 
         Users user = userRepository.findById(board.getUser().getPk())
                 .orElseThrow(() -> new NoSuchElementException("해당하는 pk의 user가 존재하지 않습니다"));
-
 
         // user 의 모든 token 찾기
         List<FirebaseToken> firebaseTokens = firebaseTokenRepository.findAllByUser(user);
