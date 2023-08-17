@@ -160,6 +160,7 @@ public class LoginController {
     [로그인 필요] 로그아웃을 합니다.<br> 
     카카오 로그아웃의 경우 logout url이 반환되고, jwt토큰이 만료됩니다<br>
     네이버, 일반 로그아웃의 경우 jwt토큰만 만료됩니다<br>
+    로그아웃 리다이랙트 url을 꼭 넣어주세요!! &logout_redirect_uri={url} <br>
     200: 성공<br>
     """)
   @PostMapping("/logout")
