@@ -9,4 +9,8 @@ import java.util.List;
 public interface FirebaseTokenRepository extends JpaRepository<FirebaseToken, Long> {
 
     List<FirebaseToken> findAllByUser(Users user);
+
+    boolean existsByToken(String token);
+
+    FirebaseToken findByToken(String token);
 }
