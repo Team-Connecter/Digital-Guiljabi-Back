@@ -31,6 +31,7 @@ public class BriefBoardInfo {
   private Long bookmarkCnt;
   private BoardStatus status;
   private String reason;
+  private Boolean isCertified;
 
   public void setStatus(BoardStatus status, String reason) {
     this.status = status;
@@ -51,6 +52,7 @@ public class BriefBoardInfo {
         .thumbnail(b.getThumbnailUrl())
         .updateAt(b.getUpdateAt())
         .likeCnt(b.getLikeCnt())
+        .isCertified(b.isCertified())
         .bookmarkCnt(b.getBookmarkCnt())
         .status(b.getStatus())
         .reason(b.getReason())
@@ -85,6 +87,7 @@ public class BriefBoardInfo {
         )
         .likeCnt(b.getLikeCnt())
         .bookmarkCnt(b.getBookmarkCnt())
+        .isCertified(b.isCertified())
         .build();
 
       breifList.add(brbi);

@@ -36,4 +36,8 @@ public class BoardResponse {
   private boolean isBookmarked;
   @JsonProperty("isLiked")
   private boolean isLiked;
+
+  @JsonProperty("isCertified")
+  private boolean isCertified;
+
 }

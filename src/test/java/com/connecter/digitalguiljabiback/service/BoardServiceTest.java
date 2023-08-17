@@ -278,7 +278,6 @@ class BoardServiceTest {
     }
 
     String state = new BigInteger(130, new SecureRandom()).toString();
-    log.info("@@: " + state);
 
     assertTrue(hasData);
   }

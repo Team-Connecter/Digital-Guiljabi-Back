@@ -34,8 +34,6 @@ public class AWSS3Service { //
         final String endPoint = "https://kr.object.ncloudstorage.com";
         final String regionName = "kr-standard";
 
-        log.info("@@: " + accessKey);
-
         // S3 client initialization
         s3 = AmazonS3ClientBuilder.standard()
                 .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, regionName))

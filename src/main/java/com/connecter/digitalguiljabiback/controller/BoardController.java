@@ -181,12 +181,13 @@ public class BoardController {
 
   @Operation(summary = "정보글을 승인하고 카테고리 달기", description = """
     [관리자] 정보글을 승인하고, 필요하다면 카테고리를 추가합니다<br>
+    전문가의 인증이 있는 글은 isCertified를 true로 줍니다(안넣거나 null로 넣으면 false)<br>
     200: 성공<br>
     403: 권한 없음
     """)
   @PostMapping("/admin/boards/{boardPk}/approve")
   public ResponseEntity approveBoard(@PathVariable Long boardPk, @RequestBody ApproveBoardRequest request) throws NoSuchElementException {
-    boardService.approve(boardPk, request.getCategoryPkList());
+    boardService.approve(boardPk, request);
 
     return ResponseEntity.ok().build();
   }

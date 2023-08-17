@@ -20,8 +20,13 @@ public class BoardListRequest {
   @Min(value = 1, message = "page는 0보다 커야합니다")
   private Integer page = 1;
   private SortType sort;
+  private Boolean isCertified;
+
+  public static BoardListRequest makeRequest(Long categoryPk, String q, Integer pageSize, Integer page, SortType sort, Boolean isCertified) {
+    return new BoardListRequest(categoryPk, q, pageSize, page, sort, isCertified);
+  }
 
   public static BoardListRequest makeRequest(Long categoryPk, String q, Integer pageSize, Integer page, SortType sort) {
-    return new BoardListRequest(categoryPk, q, pageSize, page, sort);
+    return new BoardListRequest(categoryPk, q, pageSize, page, sort, null);
   }
 }
