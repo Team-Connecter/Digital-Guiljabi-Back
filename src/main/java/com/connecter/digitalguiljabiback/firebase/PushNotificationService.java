@@ -39,8 +39,28 @@ public class PushNotificationService {
     // 토큰 저장
     public void saveToken(Users user, FirebaseTokenRequest request) {
 
-        FirebaseToken firebaseToken = FirebaseToken.makeFirebaseToken(user, request.getToken());
-        firebaseTokenRepository.save(firebaseToken);
+        String token = request.getToken();
+
+        if (!firebaseTokenRepository.existsByToken(token)) // 토큰이 저장되어 있지 않는 기기면(새 기기)
+        {
+            FirebaseToken firebaseToken = FirebaseToken.makeFirebaseToken(user, token);
+            firebaseTokenRepository.save(firebaseToken);
+        } 
+        else // 토큰이 이미 저장되어있으면
+        {
+            // 이미 토큰이 저장되어 있는 경우 해당 토큰의 레코드 삭제 후 새로 저장
+            FirebaseToken existingToken = firebaseTokenRepository.findByToken(token);
+
+            if (existingToken != null) {
+                // 기존 토큰 레코드 삭제
+                firebaseTokenRepository.delete(existingToken);
+
+                // 새 기기의 토큰 정보 저장
+                FirebaseToken newFirebaseToken = FirebaseToken.makeFirebaseToken(user, token);
+                firebaseTokenRepository.save(newFirebaseToken);
+            }
+
+        }
 
     }
 
