@@ -11,4 +11,5 @@ import java.util.List;
 @Getter
 public class ApproveBoardRequest {
   private List<Long> categoryPkList;
+  Boolean isCertified;
 }
