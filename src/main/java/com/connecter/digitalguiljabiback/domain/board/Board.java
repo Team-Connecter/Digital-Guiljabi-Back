@@ -168,7 +168,5 @@ public class Board {
 
   public void editRequest(String reason) {
     this.reason = reason;
-    this.status = BoardStatus.APPROVED;
   }
-
 }
