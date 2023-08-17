@@ -31,8 +31,7 @@ public class KakaoAuthClient {
 
     public String getLogoutUrl() {
         return kakaoProperties.getLogoutUri()
-          + "?client_id=" + kakaoProperties.getClientId()
-          + "&logout_redirect_uri=" + kakaoProperties.getLogoutRedirectUri();
+          + "?client_id=" + kakaoProperties.getClientId();
     }
 
     /**
