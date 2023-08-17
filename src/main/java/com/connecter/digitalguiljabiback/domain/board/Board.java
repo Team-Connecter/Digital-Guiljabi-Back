@@ -47,6 +47,9 @@ public class Board {
   @Column(name = "thumbnail_url", length = 99999)
   private String thumbnailUrl = null;
 
+  @Column(name = "is_certified")
+  private boolean isCertified = false;
+
   @Lob
   @Column(length = 999999999)
   private String introduction;
@@ -168,5 +171,13 @@ public class Board {
 
   public void editRequest(String reason) {
     this.reason = reason;
+  }
+
+  public void certified() {
+    this.isCertified = true;
+  }
+
+  public void unCertified() {
+    this.isCertified = false;
   }
 }

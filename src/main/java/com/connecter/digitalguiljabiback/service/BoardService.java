@@ -4,6 +4,7 @@ import com.connecter.digitalguiljabiback.domain.*;
 import com.connecter.digitalguiljabiback.domain.board.*;
 import com.connecter.digitalguiljabiback.dto.board.*;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.ApproveBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
@@ -175,6 +176,7 @@ public class BoardService {
       .isMine((user != null)? user.getPk() == writer.getPk(): false)
       .isBookmarked(isBookmarked)
       .isLiked(isLiked)
+      .isCertified(board.isCertified())
       .build();
 
     return boardResponse;
@@ -274,8 +276,9 @@ public class BoardService {
     return PageRequest.of(page-1, pageSize, sort);
   }
 
-  public void approve(Long boardPk, List<Long> categoryPkList) throws NoSuchElementException {
+  public void approve(Long boardPk, ApproveBoardRequest request) throws NoSuchElementException {
     Board board = findBoard(boardPk);
+    List<Long> categoryPkList = request.getCategoryPkList();
 
     List<Category> categoryList = new ArrayList<>();
     if (categoryPkList != null)
@@ -298,6 +301,12 @@ public class BoardService {
       }
 
       board.setBoardCategories(boardCategoryList);
+
+      if (request.getIsCertified() != null && request.getIsCertified() == true)
+        board.certified();
+      else
+        board.unCertified();
+
     }
 
     board.approve();

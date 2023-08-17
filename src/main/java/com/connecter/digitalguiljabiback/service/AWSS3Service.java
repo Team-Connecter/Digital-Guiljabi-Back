@@ -8,24 +8,28 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.*;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 
+@Slf4j
 @Service
 public class AWSS3Service { //
 
     private final AmazonS3 s3;
     private final String bucketName = "digital-guiljabi";
 
-    @Value("${aws.s3.accessKey}")
     private String accessKey ;
 
-    @Value("${aws.s3.secretKey}")
     private String secretKey;
 
-    public AWSS3Service() {
+    public AWSS3Service(@Value("${aws.s3.accessKey}") String accessKey, @Value("${aws.s3.secretKey}") String secretKey) {
+        this.accessKey = accessKey;
+        this.secretKey = secretKey;
+
         try{
         final String endPoint = "https://kr.object.ncloudstorage.com";
         final String regionName = "kr-standard";
