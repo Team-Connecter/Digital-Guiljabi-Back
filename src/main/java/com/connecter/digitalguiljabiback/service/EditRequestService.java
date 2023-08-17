@@ -130,6 +130,10 @@ public class EditRequestService {
             pushNotificationService.sendPushNotificationToToken(request);
         }
 
+        
+        // 수정요청 삭제
+        List<EditRequest> editRequestsToDelete = editRequestRepository.findByBoard(board);
+        editRequestRepository.deleteAll(editRequestsToDelete);
 
 
     }
@@ -153,6 +157,11 @@ public class EditRequestService {
             PushNotificationRequest request = new PushNotificationRequest("\"" + board.getTitle() + "\" 글 수정요청 알림", "수정요청 사항: " + editRequestRequest.getContent(), firebaseToken.getToken());
             pushNotificationService.sendPushNotificationToToken(request);
         }
+
+        // 수정요청 삭제
+        List<EditRequest> editRequestsToDelete = editRequestRepository.findByBoard(board);
+        editRequestRepository.deleteAll(editRequestsToDelete);
+
     }
 
 
