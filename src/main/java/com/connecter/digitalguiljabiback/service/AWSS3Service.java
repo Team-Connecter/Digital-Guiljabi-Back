@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 
 @Service
-public class AWSS3Service {
+public class AWSS3Service { //
 
     private final AmazonS3 s3;
     private final String bucketName = "digital-guiljabi";

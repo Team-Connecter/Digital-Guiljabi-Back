@@ -19,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/api/v1")
 public class AWSS3Controller {
 
-    private final AWSS3Service awsS3Service;
+    private final AWSS3Service awsS3Service; //
 
     @Autowired
     public AWSS3Controller(AWSS3Service awsS3Service) {
