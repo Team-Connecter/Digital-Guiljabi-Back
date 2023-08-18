@@ -165,7 +165,7 @@ public class BoardService {
       .writerPk(writer.getPk())
       .writerName(writer.getNickname())
       .writerProfileUrl(writer.getProfileUrl())
-      .updateAt(board.getUpdateAt())
+      .updateAt(board.convertDate(board.getUpdateAt()))
       .cardCnt(cardDtoList.size())
       .cards(cardDtoList)
       .categories(categories)

@@ -8,7 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Builder
@@ -22,7 +24,8 @@ public class BoardResponse {
   private Long writerPk;
   private String writerName;
   private String writerProfileUrl;
-  private LocalDateTime updateAt;
+  private String updateAt;
+  //private LocalDateTime updateAt;
   private int cardCnt;
   private List<CardDto> cards;
   private List<String> sources;
@@ -39,5 +42,12 @@ public class BoardResponse {
 
   @JsonProperty("isCertified")
   private boolean isCertified;
+
+  public String convertDate(LocalDateTime updateAt) {
+    String convertedDate = updateAt.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"));
+    return convertedDate;
+  }
+
+
 
 }

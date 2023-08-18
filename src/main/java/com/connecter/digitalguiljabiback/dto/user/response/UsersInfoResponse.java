@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 public class UsersInfoResponse {
   private String introduction;
   private String nickname;
-  private LocalDateTime joinAt;
+  private String joinAt;
+  //  private LocalDateTime joinAt;
   private String id1365;
   private String idVms;
   private String imgUrl;
