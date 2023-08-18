@@ -60,7 +60,7 @@ public class UserService {
     return UsersInfoResponse.builder()
       .nickname(user.getNickname())
       .introduction(user.getIntroduction())
-      .joinAt(user.getCreateAt())
+      .joinAt(user.convertDate(user.getCreateAt()))
       .idVms(user.getIdvms())
       .id1365(user.getId1365())
       .imgUrl(user.getProfileUrl())
