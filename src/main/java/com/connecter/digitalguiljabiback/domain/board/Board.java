@@ -183,7 +183,7 @@ public class Board {
   }
 
   public String convertDate(LocalDateTime updateAt) {
-    String convertedDate = updateAt.format(DateTimeFormatter.ofPattern("yyyy. MM. dd. HH:mm:ss"));
+    String convertedDate = updateAt.format(DateTimeFormatter.ofPattern("yyyy. MM. dd. HH:mm"));
     return convertedDate;
   }
 }
