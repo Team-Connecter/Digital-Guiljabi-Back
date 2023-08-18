@@ -1,79 +1,64 @@
 package com.connecter.digitalguiljabiback.service;
 
-import com.amazonaws.SdkClientException;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.*;
-
+import com.amazonaws.services.s3.Headers;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
+import java.util.UUID;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
-public class AWSS3Service { //
+public class AWSS3Service {
 
-    private final AmazonS3 s3;
-    private final String bucketName = "digital-guiljabi";
+    private final AmazonS3 amazonS3;
+    @Value("${cloud.aws.credentials.bucket-name}")
+    public String bucketName;
 
-    private String accessKey ;
+    //Pre-Signed URL 받아옴
+    public String getPreSignedUrl(String fileName) {
+        String onlyOneFileName = onlyOneFileName(fileName);
 
-    private String secretKey;
+        log.info("@@@qwer");
 
-    public AWSS3Service(@Value("${aws.s3.accessKey}") String accessKey, @Value("${aws.s3.secretKey}") String secretKey) {
-        this.accessKey = accessKey;
-        this.secretKey = secretKey;
-
-        try{
-        final String endPoint = "https://kr.object.ncloudstorage.com";
-        final String regionName = "kr-standard";
-
-        // S3 client initialization
-        s3 = AmazonS3ClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(endPoint, regionName))
-                .withCredentials(new AWSStaticCredentialsProvider(new BasicAWSCredentials(accessKey, secretKey)))
-                .build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to initialize AWSS3Service", e);
+        String prefix = "";
+        if (!prefix.equals("")) {
+            fileName = prefix + "/" + fileName;
         }
+        GeneratePresignedUrlRequest generatePresignedUrlRequest = getGeneratePreSignedUrlRequest(fileName);
+        URL url = amazonS3.generatePresignedUrl(generatePresignedUrlRequest);
+        return url.toString();
     }
 
-    public void uploadFileToFolder(String objectName, InputStream filePath) {
+    private GeneratePresignedUrlRequest getGeneratePreSignedUrlRequest(String fileName) {
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+          new GeneratePresignedUrlRequest(bucketName, fileName)
+            .withMethod(HttpMethod.PUT)
+            .withExpiration(getPreSignedUrlExpiration());
+        generatePresignedUrlRequest.addRequestParameter(
+          Headers.S3_CANNED_ACL,
+          CannedAccessControlList.PublicRead.toString());
+        return generatePresignedUrlRequest;
+    }
 
-        String folderName = "sample/";
-        // Upload local file to the specified folder
-        String key = folderName + objectName;
+    private Date getPreSignedUrlExpiration() {
+        Date expiration = new Date();
+        long expTimeMillis = expiration.getTime();
+        expTimeMillis += 1000 * 60 * 2;
+        expiration.setTime(expTimeMillis);
+        log.info(expiration.toString());
+        return expiration;
+    }
 
-        try {
-//            s3.putObject(bucketName, key, new File(filePath));
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentType("image/jpeg"); // 이미지 타입에 맞게 설정
-
-            s3.putObject(bucketName, key, filePath, metadata);
-            System.out.format("Object %s has been uploaded to folder %s.\n", objectName, folderName);
-
-            // Set bucket ACL
-            AccessControlList bucketAcl = s3.getBucketAcl(bucketName);
-            bucketAcl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
-            s3.setBucketAcl(bucketName, bucketAcl);
-
-            // Set object ACL
-            AccessControlList objectAcl = s3.getObjectAcl(bucketName, key);
-            objectAcl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
-            s3.setObjectAcl(bucketName, key, objectAcl);
-
-
-        } catch (AmazonS3Exception e) {
-            e.printStackTrace();
-        } catch (SdkClientException e) {
-            e.printStackTrace();
-        }
+    private String onlyOneFileName(String filename){
+        return UUID.randomUUID().toString()+filename;
     }
 }
