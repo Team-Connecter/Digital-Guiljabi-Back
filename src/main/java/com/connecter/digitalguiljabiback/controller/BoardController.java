@@ -139,7 +139,6 @@ public class BoardController {
     return ResponseEntity.ok().build();
   }
 
-  @Secured("USER")
   @Operation(summary = "정보글 좋아요 추가", description = """
     [로그인 필요]<br>
     200: 성공<br>
@@ -156,7 +155,6 @@ public class BoardController {
     200: 성공<br>
     404: boardId 를 pk로 가지는 정보글을 찾을 수 없음 or 좋아요를 누른 적이 없음
     """)
-  @Secured("USER")
   @DeleteMapping("/boards/{boardId}/likes")
   public ResponseEntity cancelLikeToBoard(@AuthenticationPrincipal Users user, @PathVariable("boardId") Long boardId) {
     boardService.cancelLikeToBoard(user, boardId);

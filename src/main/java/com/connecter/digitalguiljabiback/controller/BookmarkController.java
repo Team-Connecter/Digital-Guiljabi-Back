@@ -23,7 +23,6 @@ public class BookmarkController {
 
     private final BookmarkService bookmarkService;
 
-    @Secured("USER")
     @Operation(summary = "북마크하기", description = """
     [로그인 필요]<br>200: 성공
     """)
@@ -33,7 +32,6 @@ public class BookmarkController {
         return ResponseEntity.ok().build();
     }
 
-    @Secured("USER")
     @Operation(summary = "북마크 취소", description = """
     [로그인 필요] 본인의 북마크를 취소합니다.<br>200: 성공
     """)
@@ -44,7 +42,6 @@ public class BookmarkController {
     }
 
 
-    @Secured("USER")
     @Operation(summary = "내 북마크 조회", description = """
     [로그인 필요]<br>
     항상 최신순으로 보임<br>

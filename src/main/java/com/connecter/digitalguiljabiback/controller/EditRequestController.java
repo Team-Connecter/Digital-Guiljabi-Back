@@ -30,7 +30,6 @@ public class EditRequestController {
     200: 성공<br>
     404: 해당 pk의 정보글이 존재하지 않음
     """)
-    @Secured("USER")
     @PostMapping("/boards/{boardPk}/edit-requests")
     public ResponseEntity editRequest(
             @AuthenticationPrincipal Users user,
@@ -48,7 +47,6 @@ public class EditRequestController {
     200: 성공<br>
     403: 로그인 필요
     """)
-    @Secured("USER")
     @GetMapping("/edit-requests/my")
     public ResponseEntity<MyEditRequestListResponse> getMyEditRequest(
             // 최신순
