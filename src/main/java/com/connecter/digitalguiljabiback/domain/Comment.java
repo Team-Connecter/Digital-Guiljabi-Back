@@ -49,7 +49,7 @@ public class Comment {
     }
 
     public String convertDate(LocalDateTime createAt) {
-        String convertedDate = createAt.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"));
+        String convertedDate = createAt.format(DateTimeFormatter.ofPattern("yyyy. MM. dd. HH:mm:ss"));
         return convertedDate;
     }
 }
