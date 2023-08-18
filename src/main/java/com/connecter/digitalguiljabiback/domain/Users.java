@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -122,5 +123,10 @@ public class Users implements UserDetails {
 
     public void unlock() {
         this.isAccountNonLocked = true;
+    }
+
+    public String convertDate(LocalDateTime createAt) {
+        String convertedDate = createAt.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"));
+        return convertedDate;
     }
 }

@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -179,5 +180,10 @@ public class Board {
 
   public void unCertified() {
     this.isCertified = false;
+  }
+
+  public String convertDate(LocalDateTime updateAt) {
+    String convertedDate = updateAt.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH:mm:ss"));
+    return convertedDate;
   }
 }
