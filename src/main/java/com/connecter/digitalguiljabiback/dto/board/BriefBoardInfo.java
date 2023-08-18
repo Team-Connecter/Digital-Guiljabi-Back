@@ -24,7 +24,8 @@ public class BriefBoardInfo {
   private String title;
   private String username;
   private String thumbnail;
-  private LocalDateTime updateAt;
+  private String updateAt;
+  //  private LocalDateTime updateAt;
   private String introduction;
   private String[] tag;
   private Long likeCnt;
@@ -50,7 +51,7 @@ public class BriefBoardInfo {
         .boardPk(b.getPk())
         .title(b.getTitle())
         .thumbnail(b.getThumbnailUrl())
-        .updateAt(b.getUpdateAt())
+        .updateAt(b.convertDate(b.getUpdateAt()))
         .likeCnt(b.getLikeCnt())
         .isCertified(b.isCertified())
         .bookmarkCnt(b.getBookmarkCnt())
@@ -79,7 +80,7 @@ public class BriefBoardInfo {
         .title(b.getTitle())
         .username(userList.get(i).getNickname())
         .thumbnail(b.getThumbnailUrl())
-        .updateAt(b.getUpdateAt())
+        .updateAt(b.convertDate(b.getUpdateAt()))
         .introduction(b.getIntroduction())
         .tag(tagList.get(i).stream()
           .map(Tag::getName)

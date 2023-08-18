@@ -18,7 +18,8 @@ public class CommentResponse {
     private String username;
     private String profileUrl;
     private String content;
-    private LocalDateTime createAt;
+    private String createAt;
+//    private LocalDateTime createAt;
     @JsonProperty("isMine")
     private boolean isMine;
 }
