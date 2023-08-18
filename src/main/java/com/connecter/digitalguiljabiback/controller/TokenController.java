@@ -1,6 +1,7 @@
 package com.connecter.digitalguiljabiback.controller;
 
 import com.connecter.digitalguiljabiback.domain.RefreshToken;
+import com.connecter.digitalguiljabiback.domain.UserRole;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
 import com.connecter.digitalguiljabiback.exception.ForbiddenException;
@@ -55,6 +56,28 @@ public class TokenController {
 
     Map<String, Boolean> response = new HashMap<>();
     response.put("isTokenValid", isTokenValid);
+    return ResponseEntity.ok(response);
+  }
+
+  @Operation(summary = "관리자검사", description = """
+    """)
+  @GetMapping("/token/isadmin")
+  public ResponseEntity isAdmin(@RequestHeader(value="Authorization", required = false) String authHeader) {
+    boolean isAdmin = false;
+
+    if (authHeader != null) {
+      String token = authHeader.substring(7);
+      String uid = jwtService.extractUsername(token);
+
+      Users user = userRepository.findByUid(uid)
+        .orElseGet(() -> null);
+
+      if (user != null && user.getRole() == UserRole.ADMIN)
+        isAdmin = true;
+    }
+
+    Map<String, Boolean> response = new HashMap<>();
+    response.put("isAdmin", isAdmin);
     return ResponseEntity.ok(response);
   }
 
