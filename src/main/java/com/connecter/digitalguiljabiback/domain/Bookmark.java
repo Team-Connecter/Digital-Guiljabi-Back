@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -40,5 +41,10 @@ public class Bookmark {
         bookmark.board = board;
 
         return bookmark;
+    }
+
+    public String convertDate(LocalDateTime createAt) {
+        String convertedDate = createAt.format(DateTimeFormatter.ofPattern("yyyy. MM. dd. HH:mm"));
+        return convertedDate;
     }
 }

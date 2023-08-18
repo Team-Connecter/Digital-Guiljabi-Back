@@ -75,7 +75,7 @@ public class BookmarkService {
                         .boardPk(bookmark.getBoard().getPk())
                         .title(bookmark.getBoard().getTitle())
                         .thumbnail(bookmark.getBoard().getThumbnailUrl())
-                        .createAt(bookmark.getCreateAt())
+                        .createAt(bookmark.convertDate(bookmark.getCreateAt()))
                         .likeCnt(bookmark.getBoard().getLikeCnt())
                         .bookmarkCnt(bookmark.getBoard().getBookmarkCnt())
                         .build()

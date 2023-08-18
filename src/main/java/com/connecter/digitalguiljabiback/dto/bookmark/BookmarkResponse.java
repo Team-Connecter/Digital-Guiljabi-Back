@@ -16,7 +16,7 @@ public class BookmarkResponse {
     private Long boardPk;
     private String title;
     private String thumbnail;
-    private LocalDateTime createAt;
+    private String createAt;
     private Long likeCnt;
     private Long bookmarkCnt;
 
