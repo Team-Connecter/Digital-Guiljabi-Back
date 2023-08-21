@@ -1,5 +1,6 @@
 package com.connecter.digitalguiljabiback.config;
 
+import com.connecter.digitalguiljabiback.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,12 +8,18 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -31,15 +38,34 @@ public class SecurityConfig {
       "/logoutPage"
     };
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtService jwtService;
     private final JwtExceptionFilter jwtExceptionFilter;
     private final AuthenticationProvider authenticationProvider;
+    private final UserDetailsService userDetailsService;
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer()  {
+        return (web) -> web.ignoring()
+          .requestMatchers(whiteList)
+          .requestMatchers(HttpMethod.GET, "/api/v1/boards/*")
+          .requestMatchers(HttpMethod.GET, "/api/v1/boards")
+          .requestMatchers(HttpMethod.GET, "/api/v1/boards/popular")
+          .requestMatchers(HttpMethod.GET, "/api/v1/boards/*/comments")
+          .requestMatchers(HttpMethod.GET, "/api/v1/categories/root")
+          .requestMatchers(HttpMethod.GET, "/api/v1/categories/*/children")
+          .requestMatchers(HttpMethod.GET, "/api/v1/categories/*/ancestor")
+          .requestMatchers(HttpMethod.GET, "/api/auth/kakao/login-url")
+          .requestMatchers(HttpMethod.GET, "/api/auth/naver/login-url");
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
           .csrf().disable()
           .httpBasic().disable()
+          .sessionManagement()
+          .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+          .and()
           .cors().configurationSource(corsConfigurationSource())
           .and()
           .authorizeHttpRequests()
@@ -57,7 +83,7 @@ public class SecurityConfig {
             .anyRequest().authenticated()
           .and()
           .authenticationProvider(authenticationProvider)
-          .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+          .addFilterBefore(new JwtAuthenticationFilter(jwtService, userDetailsService), UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class);
 
         return http.build();

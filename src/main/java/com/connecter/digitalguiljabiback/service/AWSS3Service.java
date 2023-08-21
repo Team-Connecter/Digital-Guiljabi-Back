@@ -27,8 +27,6 @@ public class AWSS3Service {
     public String getPreSignedUrl(String fileName) {
         String onlyOneFileName = onlyOneFileName(fileName);
 
-        log.info("@@@qwer");
-
         String prefix = "";
         if (!prefix.equals("")) {
             fileName = prefix + "/" + fileName;
