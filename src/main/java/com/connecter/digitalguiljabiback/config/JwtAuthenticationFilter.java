@@ -21,7 +21,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j
-@Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -32,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
+
 
         final String authHeader;
         authHeader = request.getHeader("Authorization");
@@ -47,8 +47,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7); //Bearer 제외
         userId = jwtService.extractUsername(jwt);
 
-        if (userId == null)
+        if (userId == null) {
             throw new JwtException("유효하지 않은 토큰");
+        }
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails;
             try {
