@@ -50,7 +50,15 @@
 
 <br><br><br>
 # 아키텍처
-
+- 깃허브액션
+- s3
+- naver cloud
+- mysql
+- 
+<br><br><br>
 # ERD
-
+![erd](https://github.com/Team-Connecter/Digital-Guiljabi-Back/assets/86856676/e4b659b0-9896-44af-8b39-c84ee0e98bdf)
+<br><br><br>
 # API 명세서
+https://documenter.getpostman.com/view/21305392/2s9XxyRtkg#b8206cdd-586c-46a9-a332-3beba787c250
+<br><br><br>
