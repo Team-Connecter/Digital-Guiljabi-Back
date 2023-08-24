@@ -10,6 +10,7 @@ import com.connecter.digitalguiljabiback.exception.TokenInValidException;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.RefreshTokenRepository;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
+import com.connecter.digitalguiljabiback.util.Helper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,7 +72,7 @@ public class RefreshTokenService {
       throw new TokenInValidException("리프레쉬 토큰이 만료됨");
     }
 
-    if (!refreshToken.getIp().equals(LoginService.getClientIp(request))) {
+    if (!refreshToken.getIp().equals(Helper.getClientIp(request))) {
       //@TODO 다른 ip에서 로그인되었다는 알림을 보냄
     }
 
@@ -79,7 +80,7 @@ public class RefreshTokenService {
     refreshTokenRepository.delete(refreshToken);
     String refreshTokenString = jwtService.generateRefreshToken(user);
 
-    refreshTokenRepository.save(RefreshToken.makeRefreshToken(refreshTokenString, LoginService.getClientIp(request), user, jwtService.extractExpiration(refreshTokenString)));
+    refreshTokenRepository.save(RefreshToken.makeRefreshToken(refreshTokenString, Helper.getClientIp(request), user, jwtService.extractExpiration(refreshTokenString)));
 
     return LoginResponse.makeResponse(accessToken, refreshTokenString);
 
