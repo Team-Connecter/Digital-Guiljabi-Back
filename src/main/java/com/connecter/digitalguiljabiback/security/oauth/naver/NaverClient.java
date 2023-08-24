@@ -1,21 +1,16 @@
 package com.connecter.digitalguiljabiback.security.oauth.naver;
 
 import com.connecter.digitalguiljabiback.dto.login.AuthRequest;
-import com.connecter.digitalguiljabiback.dto.login.NaverUserResponse;
+import com.connecter.digitalguiljabiback.dto.login.response.NaverUserResponse;
+import com.connecter.digitalguiljabiback.security.oauth.Oauth2Client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-
-/**
- * 네이버와의 통신을 담당하는 클라이언트 클래스
- * NaverAuthClient를 사용하여 액세스 토큰을 요청하고 사용자 정보를 가져옵니다.
- * NaverAuthUrlBuilder를 사용하여 네이버 인증 URL을 생성
- */
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class NaverClient {
+public class NaverClient implements Oauth2Client {
 
     private final NaverAuthClient authClient;
     private final NaverAuthUrlBuilder authUrlBuilder;
@@ -29,12 +24,12 @@ public class NaverClient {
         return authUrl;
     }
 
-    /**
-     * 네이버 콜백으로부터 받은 인증 코드를 사용하여 로그인 처리를 합니다.
-     * @param req AuthRequest 객체로부터 인증 정보를 받아옵니다.
-     * @return 로그인 완료 메시지
-     */
-    public NaverUserResponse handleCallback(AuthRequest req) {
+    @Override
+    public NaverUserResponse getUserInfo(AuthRequest req, String redirectUrl) {
+        return getUserInfo(req);
+    }
+
+    public NaverUserResponse getUserInfo(AuthRequest req) {
         String accessToken = authClient.requestAccessToken(req);
 
         NaverUserResponse userInfo = authClient.requestUserInfo(accessToken);

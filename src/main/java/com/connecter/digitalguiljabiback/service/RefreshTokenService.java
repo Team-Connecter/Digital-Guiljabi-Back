@@ -1,26 +1,18 @@
 package com.connecter.digitalguiljabiback.service;
 
-import com.connecter.digitalguiljabiback.domain.OauthType;
 import com.connecter.digitalguiljabiback.domain.RefreshToken;
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
-import com.connecter.digitalguiljabiback.dto.login.UserRequest;
-import com.connecter.digitalguiljabiback.exception.ForbiddenException;
+import com.connecter.digitalguiljabiback.dto.login.response.LoginResponse;
 import com.connecter.digitalguiljabiback.exception.TokenInValidException;
-import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.RefreshTokenRepository;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
+import com.connecter.digitalguiljabiback.util.Helper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -71,7 +63,7 @@ public class RefreshTokenService {
       throw new TokenInValidException("리프레쉬 토큰이 만료됨");
     }
 
-    if (!refreshToken.getIp().equals(LoginService.getClientIp(request))) {
+    if (!refreshToken.getIp().equals(Helper.getClientIp(request))) {
       //@TODO 다른 ip에서 로그인되었다는 알림을 보냄
     }
 
@@ -79,7 +71,7 @@ public class RefreshTokenService {
     refreshTokenRepository.delete(refreshToken);
     String refreshTokenString = jwtService.generateRefreshToken(user);
 
-    refreshTokenRepository.save(RefreshToken.makeRefreshToken(refreshTokenString, LoginService.getClientIp(request), user, jwtService.extractExpiration(refreshTokenString)));
+    refreshTokenRepository.save(RefreshToken.makeRefreshToken(refreshTokenString, Helper.getClientIp(request), user, jwtService.extractExpiration(refreshTokenString)));
 
     return LoginResponse.makeResponse(accessToken, refreshTokenString);
 

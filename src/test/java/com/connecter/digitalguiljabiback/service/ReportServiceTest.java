@@ -6,6 +6,7 @@ import com.connecter.digitalguiljabiback.domain.board.BoardStatus;
 import com.connecter.digitalguiljabiback.dto.board.AdminBriefBoardInfo;
 import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.ApproveBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.response.AdminBoardListResponse;
 import com.connecter.digitalguiljabiback.dto.category.AddCategoryRequest;
 import com.connecter.digitalguiljabiback.dto.report.ReportRequest;
@@ -80,7 +81,7 @@ class ReportServiceTest {
     //카테고리 만들기
     Category savedCategory = categoryService.add(new AddCategoryRequest("카테고리1", null));
     //승인하기
-    boardService.approve(newBoard.getPk(), List.of(new Long[]{savedCategory.getPk()}));
+    boardService.approve(newBoard.getPk(), new ApproveBoardRequest(List.of(new Long[]{savedCategory.getPk()}), null));
   }
 
   //신고등록 테스트 (board에 신고횟수 증가 여부)

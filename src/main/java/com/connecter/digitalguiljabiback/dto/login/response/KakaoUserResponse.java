@@ -1,5 +1,6 @@
-package com.connecter.digitalguiljabiback.dto.login;
+package com.connecter.digitalguiljabiback.dto.login.response;
 
+import com.connecter.digitalguiljabiback.dto.login.UserRequest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Slf4j
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoUserResponse {
+public class KakaoUserResponse  implements Oauth2UserResponse {
     @JsonProperty("id")
     private Long uid;
 

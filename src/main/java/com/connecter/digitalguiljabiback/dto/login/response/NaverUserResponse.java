@@ -1,5 +1,6 @@
-package com.connecter.digitalguiljabiback.dto.login;
+package com.connecter.digitalguiljabiback.dto.login.response;
 
+import com.connecter.digitalguiljabiback.dto.login.UserRequest;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 @Slf4j
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class NaverUserResponse {
+public class NaverUserResponse implements Oauth2UserResponse {
     @JsonProperty("response")
     private ResponseData response;
 
@@ -27,7 +28,7 @@ public class NaverUserResponse {
         private String id;
     }
 
-    public String getId() {
+    public String getUid() {
         return response.getId();
     }
 

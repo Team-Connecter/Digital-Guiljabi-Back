@@ -259,12 +259,10 @@ public class BoardService {
   private Pageable makePageable(SortType sortType, Integer page, Integer pageSize) throws RuntimeException {
 
     Sort sort;
-    if (sortType == null || sortType == SortType.POP) {
+    if (sortType == null || sortType == SortType.POP)
       sort = Sort.by(Sort.Direction.DESC, "likeCnt");
-    }
-    else {
+    else
       sort = Sort.by(Sort.Direction.DESC, "updateAt");
-    }
 
 
     if (page == null)

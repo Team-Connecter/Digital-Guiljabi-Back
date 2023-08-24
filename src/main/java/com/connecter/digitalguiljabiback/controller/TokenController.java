@@ -1,17 +1,12 @@
 package com.connecter.digitalguiljabiback.controller;
 
-import com.connecter.digitalguiljabiback.domain.RefreshToken;
 import com.connecter.digitalguiljabiback.domain.UserRole;
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
-import com.connecter.digitalguiljabiback.exception.ForbiddenException;
+import com.connecter.digitalguiljabiback.dto.login.response.LoginResponse;
 import com.connecter.digitalguiljabiback.repository.RefreshTokenRepository;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import com.connecter.digitalguiljabiback.service.JwtService;
-import com.connecter.digitalguiljabiback.service.LoginService;
 import com.connecter.digitalguiljabiback.service.RefreshTokenService;
-import com.connecter.digitalguiljabiback.service.UserService;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Tag(name = "JWT 토큰", description = "토큰 관련 API")
 @RequiredArgsConstructor
