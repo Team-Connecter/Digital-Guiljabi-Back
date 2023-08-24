@@ -1,27 +1,18 @@
 package com.connecter.digitalguiljabiback.service;
 
-import com.connecter.digitalguiljabiback.domain.OauthType;
 import com.connecter.digitalguiljabiback.domain.RefreshToken;
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
-import com.connecter.digitalguiljabiback.dto.login.UserRequest;
-import com.connecter.digitalguiljabiback.exception.ForbiddenException;
+import com.connecter.digitalguiljabiback.dto.login.response.LoginResponse;
 import com.connecter.digitalguiljabiback.exception.TokenInValidException;
-import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.repository.RefreshTokenRepository;
 import com.connecter.digitalguiljabiback.repository.UserRepository;
 import com.connecter.digitalguiljabiback.util.Helper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

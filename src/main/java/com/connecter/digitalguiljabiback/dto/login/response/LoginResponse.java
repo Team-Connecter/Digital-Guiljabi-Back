@@ -1,10 +1,8 @@
-package com.connecter.digitalguiljabiback.dto.login;
+package com.connecter.digitalguiljabiback.dto.login.response;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.extern.java.Log;
 
 
 @Getter

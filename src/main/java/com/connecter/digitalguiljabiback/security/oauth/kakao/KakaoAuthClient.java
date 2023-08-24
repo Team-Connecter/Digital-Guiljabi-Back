@@ -3,8 +3,8 @@ package com.connecter.digitalguiljabiback.security.oauth.kakao;
 import com.connecter.digitalguiljabiback.config.properties.KakaoProperties;
 import com.connecter.digitalguiljabiback.exception.KakaoClientException;
 import com.connecter.digitalguiljabiback.dto.login.AuthRequest;
-import com.connecter.digitalguiljabiback.dto.login.AuthResponse;
-import com.connecter.digitalguiljabiback.dto.login.KakaoUserResponse;
+import com.connecter.digitalguiljabiback.dto.login.response.AuthResponse;
+import com.connecter.digitalguiljabiback.dto.login.response.KakaoUserResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -34,12 +34,6 @@ public class KakaoAuthClient {
           + "?client_id=" + kakaoProperties.getClientId();
     }
 
-    /**
-     * 카카오 API로 액세스 토큰을 요청
-     * @param request KakaoAuthRequest 객체로부터 인증 정보를 받아옵니다.
-     * @return 요청한 액세스 토큰 문자열
-     * @throws KakaoClientException 카카오 API 호출 중 예외가 발생했을 경우
-     */
     public String requestAccessToken(AuthRequest request, String redirectUrl) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -64,12 +58,6 @@ public class KakaoAuthClient {
         }
     }
 
-    /**
-     * 카카오 API로부터 사용자 정보를 요청합니다.
-     * @param accessToken 요청할 사용자의 액세스 토큰 문자열
-     * @return 사용자 정보를 담고 있는 KakaoUserInfoResponse 객체
-     * @throws KakaoClientException 카카오 API 호출 중 예외가 발생했을 경우
-     */
     public KakaoUserResponse requestUserInfo(String accessToken) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);

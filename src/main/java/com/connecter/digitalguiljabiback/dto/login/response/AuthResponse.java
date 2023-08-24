@@ -1,4 +1,4 @@
-package com.connecter.digitalguiljabiback.dto.login;
+package com.connecter.digitalguiljabiback.dto.login.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;

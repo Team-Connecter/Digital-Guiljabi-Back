@@ -3,6 +3,9 @@ package com.connecter.digitalguiljabiback.controller;
 import com.connecter.digitalguiljabiback.domain.OauthType;
 import com.connecter.digitalguiljabiback.domain.Users;
 import com.connecter.digitalguiljabiback.dto.login.*;
+import com.connecter.digitalguiljabiback.dto.login.response.KakaoUserResponse;
+import com.connecter.digitalguiljabiback.dto.login.response.LoginResponse;
+import com.connecter.digitalguiljabiback.dto.login.response.NaverUserResponse;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
 import com.connecter.digitalguiljabiback.security.oauth.kakao.KakaoClient;
 import com.connecter.digitalguiljabiback.security.oauth.naver.NaverClient;
@@ -70,7 +73,7 @@ public class LoginController {
     HttpServletRequest request
   ) {
     AuthRequest params = new AuthRequest(authorizationCode.trim());
-    KakaoUserResponse response = kakaoClient.handleCallback(params, redirectUrl);
+    KakaoUserResponse response = kakaoClient.getUserInfo(params, redirectUrl);
 
     log.info("사용자 UID: {}", response.getUid());
 
@@ -122,9 +125,9 @@ public class LoginController {
     HttpServletRequest request
   ) {
     AuthRequest params = new AuthRequest(authorizationCode, state);
-    NaverUserResponse response = naverClient.handleCallback(params);
+    NaverUserResponse response = naverClient.getUserInfo(params);
 
-    log.info("사용자 UID: {}", response.getId());
+    log.info("사용자 UID: {}", response.getUid());
 
     LoginResponse loginResponseDTO = loginService.loginOrCreate(response.toUserRequest(), OauthType.NAVER, request);
 

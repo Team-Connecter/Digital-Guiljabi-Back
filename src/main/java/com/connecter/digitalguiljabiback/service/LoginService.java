@@ -3,7 +3,7 @@ package com.connecter.digitalguiljabiback.service;
 import com.connecter.digitalguiljabiback.domain.OauthType;
 import com.connecter.digitalguiljabiback.domain.RefreshToken;
 import com.connecter.digitalguiljabiback.domain.Users;
-import com.connecter.digitalguiljabiback.dto.login.LoginResponse;
+import com.connecter.digitalguiljabiback.dto.login.response.LoginResponse;
 import com.connecter.digitalguiljabiback.dto.login.UserRequest;
 import com.connecter.digitalguiljabiback.exception.UserLockedException;
 import com.connecter.digitalguiljabiback.exception.UsernameDuplicatedException;
@@ -18,10 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -42,12 +38,7 @@ public class LoginService {
   private final AuthenticationManager authenticationManager;
   private final PasswordEncoder passwordEncoder;
 
-  /**
-   * 로그인 또는 회원 가입 처리를 수행
-   * @param userDTO 로그인 또는 회원 가입에 필요한 사용자 정보 객체
-   * @param oauthType oauth 로그인 시 타입지정: KAKAO, NAVER 등
-   * @return 인증 응답 DTO
-   */
+
   public LoginResponse loginOrCreate(UserRequest userDTO, OauthType oauthType, HttpServletRequest request) {
     Users user = userRepository.findByUid(oauthType.name() + userDTO.getUid())
       .orElseGet(() -> null);
