@@ -6,6 +6,7 @@ import com.connecter.digitalguiljabiback.domain.board.BoardStatus;
 import com.connecter.digitalguiljabiback.dto.board.BriefBoardInfo;
 import com.connecter.digitalguiljabiback.dto.board.CardDto;
 import com.connecter.digitalguiljabiback.dto.board.request.AddBoardRequest;
+import com.connecter.digitalguiljabiback.dto.board.request.ApproveBoardRequest;
 import com.connecter.digitalguiljabiback.dto.board.request.BoardListRequest;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardListResponse;
 import com.connecter.digitalguiljabiback.dto.board.response.BoardResponse;
@@ -197,7 +198,7 @@ class BoardServiceTest {
     assertFalse(hasData);
 
     //승인하기
-    boardService.approve(newBoard.getPk(), List.of(new Long[]{savedCategory.getPk()}));
+    boardService.approve(newBoard.getPk(), new ApproveBoardRequest(List.of(new Long[]{savedCategory.getPk()}), null) );
 
     //board 승인목록 조회 - 데이터가 있어야함
     BoardListRequest request3 = BoardListRequest.makeRequest(null, title, 10, 1, null);
